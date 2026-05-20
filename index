@@ -1,0 +1,1278 @@
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestorDeudas — Supabase</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ══════════════════ VARIABLES ══════════════════ */
+:root {
+  --bg:#F9F8F4; --surface:#FFFFFF; --accent:#2D6A4F; --accent2:#52B788;
+  --accent3:#B7E4C7; --text:#1A1A1A; --muted:#6B7280; --border:#E5E7EB;
+  --danger:#DC2626; --warn:#D97706; --info:#2563EB;
+  --radius:12px; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── CONFIG BANNER ── */
+#config-banner{background:#FEF3C7;border-bottom:1px solid #FCD34D;padding:12px 24px;font-size:13px;color:#92400E;display:flex;align-items:center;gap:12px}
+#config-banner strong{font-weight:600}
+#config-banner input{padding:6px 12px;border:1.5px solid #FCD34D;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:white;color:#1A1A1A;width:320px}
+#config-banner input:focus{outline:none;border-color:var(--accent)}
+.btn-config{padding:7px 16px;background:var(--accent);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer}
+.btn-config:hover{background:#1B4332}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B4332 0%,#2D6A4F 50%,#40916C 100%)}
+.login-card{background:white;border-radius:20px;padding:48px 40px;width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{width:64px;height:64px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+.login-title{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:32px}
+.role-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.role-btn{padding:14px;border:2px solid var(--border);border-radius:var(--radius);background:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s}
+.role-btn.active{border-color:var(--accent);background:#F0FBF5;color:var(--accent)}
+.role-icon{font-size:20px;display:block;margin-bottom:4px}
+#admin-pin-area{margin-bottom:20px}
+#admin-pin-area input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;text-align:center;letter-spacing:6px;color:var(--text)}
+#admin-pin-area input:focus{outline:none;border-color:var(--accent)}
+.btn-enter{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-enter:hover{opacity:.9}
+.pin-error{color:var(--danger);font-size:12px;margin-top:8px;display:none}
+
+/* ── TOPBAR ── */
+#app{display:none;min-height:100vh}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-brand{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.topbar-name{font-family:'DM Serif Display',serif;font-size:18px}
+.topbar-nav{display:flex;gap:4px}
+.nav-btn{padding:7px 16px;border:none;border-radius:8px;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.nav-btn:hover{background:var(--bg);color:var(--text)}
+.nav-btn.active{background:var(--accent3);color:var(--accent)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.badge-role{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.badge-admin{background:#FEF3C7;color:#92400E}
+.badge-viewer{background:#DBEAFE;color:#1E40AF}
+.btn-logout{padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;background:white;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;color:var(--muted)}
+.btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ── LOADER OVERLAY ── */
+#loader{position:fixed;inset:0;background:rgba(255,255,255,.75);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+#loader.on{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-msg{font-size:13px;color:var(--muted)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast-item{padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:slide-in .25s ease;max-width:320px}
+.toast-ok{background:#D1FAE5;color:#065F46}
+.toast-err{background:#FEE2E2;color:#991B1B}
+@keyframes slide-in{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── MAIN ── */
+.main{padding:32px;max-width:1200px;margin:0 auto}
+.page{display:none}
+.page.active{display:block}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-family:'DM Serif Display',serif;font-size:28px}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:white;border-radius:var(--radius);padding:20px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.stat-value{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text)}
+.stat-value.green{color:var(--accent)}
+.stat-value.red{color:var(--danger)}
+.stat-value.amber{color:var(--warn)}
+
+/* ── TABLE CARD ── */
+.table-card{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden}
+.table-toolbar{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.search-input{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);width:200px}
+.search-input:focus{outline:none;border-color:var(--accent);background:white}
+select.filter-sel{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);cursor:pointer}
+select.filter-sel:focus{outline:none;border-color:var(--accent)}
+input[type="date"].filter-date{padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg)}
+input[type="date"].filter-date:focus{outline:none;border-color:var(--accent)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:12px 16px;text-align:left;background:#F9FAFB;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+td{padding:13px 16px;border-bottom:1px solid #F3F4F6;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFFF8}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:#D1FAE5;color:#065F46}
+.badge-red{background:#FEE2E2;color:#991B1B}
+.badge-amber{background:#FEF3C7;color:#92400E}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+.badge-gray{background:#F3F4F6;color:#4B5563}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover{background:#1B4332}
+.btn-secondary{background:white;color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:#FEF2F2;color:var(--danger);border:1.5px solid #FECACA}
+.btn-danger:hover{background:#FEE2E2}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-pdf{background:linear-gradient(135deg,#BE185D,#9D174D);color:white}
+.btn-pdf:hover{opacity:.9}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:16px;padding:32px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.modal-title{font-family:'DM Serif Display',serif;font-size:22px}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.modal-close:hover{border-color:var(--danger);color:var(--danger)}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+label.lbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+input.inp,select.sel,textarea.txa{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white;transition:border-color .15s}
+input.inp:focus,select.sel:focus,textarea.txa:focus{outline:none;border-color:var(--accent)}
+textarea.txa{resize:vertical;min-height:80px}
+
+/* ── ITEMS ── */
+.items-section{grid-column:1/-1;margin-top:8px}
+.items-section-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.items-list{border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.item-row{display:grid;grid-template-columns:1fr 80px 100px 36px;border-bottom:1px solid var(--border)}
+.item-row:last-child{border-bottom:none}
+.item-row input{border:none;border-right:1px solid var(--border);border-radius:0;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:13px}
+.item-row input:last-of-type{border-right:none}
+.item-row input:focus{outline:none;background:#F0FBF5}
+.item-del{border:none;background:white;cursor:pointer;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center}
+.item-del:hover{background:#FEF2F2;color:var(--danger)}
+.items-header{display:grid;grid-template-columns:1fr 80px 100px 36px;background:#F9FAFB;border-bottom:1px solid var(--border)}
+.items-header span{padding:7px 12px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-right:1px solid var(--border)}
+.items-header span:last-child{border-right:none}
+.totals-row{background:#F0FBF5;padding:12px 16px;border-radius:8px;display:flex;flex-direction:column;gap:4px;align-items:flex-end;font-size:13px;margin-top:8px}
+.totals-row .t-line{display:flex;gap:16px;color:var(--muted)}
+.totals-row .t-line strong{color:var(--text);min-width:100px;text-align:right}
+.totals-row .t-total{font-weight:700;color:var(--accent);font-size:15px}
+
+/* ── LOGO PREVIEW ── */
+.logo-preview{width:100%;height:80px;border:1.5px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:6px}
+.logo-preview img{max-height:72px;max-width:100%;object-fit:contain}
+.logo-preview span{font-size:12px;color:var(--muted)}
+
+/* ── CRONOGRAMA ── */
+.month-block{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden}
+.month-header{padding:14px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;display:flex;justify-content:space-between;align-items:center}
+.month-name{font-family:'DM Serif Display',serif;font-size:18px}
+
+/* ── STORE GRID ── */
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:24px}
+.store-card{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:12px}
+.store-logo-wrap{height:60px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:8px;overflow:hidden}
+.store-logo-wrap img{max-height:54px;max-width:100%;object-fit:contain}
+.store-name{font-weight:600;font-size:15px}
+.store-debt{font-family:'DM Serif Display',serif;font-size:22px;color:var(--danger)}
+
+@media(max-width:600px){
+  .main{padding:16px}
+  .form-grid{grid-template-columns:1fr}
+  .topbar{padding:0 16px}
+  .topbar-nav .nav-btn span{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- CONFIG BANNER -->
+<div id="config-banner">
+  <strong>⚙️ Configuración Supabase:</strong>
+  <input id="sb-url" type="text" placeholder="https://rzzwubgzzcxqkkvcifow.supabase.co" />
+  <input id="sb-key" type="text" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6end1Ymd6emN4cWtrdmNpZm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTY2MjEsImV4cCI6MjA5NDg3MjYyMX0.sUv6VsuMvyIjUBYDpPxd8WyTdd9L6LuKGsoc0vXlLT8" />
+  <button class="btn-config" onclick="initSupabase()">Conectar</button>
+  <span id="sb-status" style="font-size:12px;margin-left:8px"></span>
+</div>
+
+<!-- LOADER -->
+<div id="loader"><div class="spinner"></div><div class="loader-msg" id="loader-msg">Cargando...</div></div>
+
+<!-- TOASTS -->
+<div id="toast"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">💳</div>
+    <h1 class="login-title">GestorDeudas</h1>
+    <p class="login-sub">Control de créditos compartidos</p>
+    <div class="role-selector">
+      <button class="role-btn active" id="btn-viewer" onclick="selectRole('viewer')">
+        <span class="role-icon">👁️</span>Solo lectura
+      </button>
+      <button class="role-btn" id="btn-admin" onclick="selectRole('admin')">
+        <span class="role-icon">⚙️</span>Administrador
+      </button>
+    </div>
+    <div id="admin-pin-area" style="display:none">
+      <input type="password" id="pin-input" placeholder="● ● ● ●" maxlength="4" oninput="clearPinError()">
+      <p class="pin-error" id="pin-error">Clave incorrecta.</p>
+    </div>
+    <button class="btn-enter" onclick="doLogin()">Ingresar →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">💳</div>
+      <span class="topbar-name">GestorDeudas</span>
+    </div>
+    <nav class="topbar-nav">
+      <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">📊 <span>Resumen</span></button>
+      <button class="nav-btn" onclick="showPage('facturas')" id="nav-facturas">📄 <span>Facturas</span></button>
+      <button class="nav-btn" onclick="showPage('pagos')" id="nav-pagos">💳 <span>Pagos</span></button>
+      <button class="nav-btn" onclick="showPage('cronograma')" id="nav-cronograma">📅 <span>Cronograma</span></button>
+      <button class="nav-btn admin-only" onclick="showPage('casas')" id="nav-casas">🏪 <span>Casas</span></button>
+    </nav>
+    <div class="topbar-right">
+      <span class="badge-role" id="role-badge">Visor</span>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h2 class="page-title">Resumen General</h2><p class="page-sub">Vista consolidada de todas las deudas</p></div>
+        <select class="filter-sel" id="dash-filter-person" onchange="renderDashboard()">
+          <option value="">Todas las personas</option>
+          <option value="Maria del Carmen">María del Carmen</option>
+          <option value="Otra persona">Otra persona</option>
+        </select>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="table-card">
+        <div class="table-toolbar"><strong style="font-size:13px;color:var(--muted)">Deudas por factura</strong></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Casa</th><th>Factura</th><th>Responsable</th><th>Total</th><th>Cuotas</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead>
+            <tbody id="dash-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FACTURAS -->
+    <section class="page" id="page-facturas">
+      <div class="page-header">
+        <div><h2 class="page-title">Facturas y Créditos</h2><p class="page-sub">Registro de deudas con ítems y cuotas</p></div>
+        <button class="btn btn-primary admin-only" onclick="openNuevaFactura()">+ Nueva factura</button>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <input type="text" class="search-input" placeholder="Buscar..." id="fac-search" oninput="renderFacturas()">
+          <select class="filter-sel" id="filt-fac-person" onchange="renderFacturas()">
+            <option value="">Todas las personas</option>
+            <option value="Maria del Carmen">María del Carmen</option>
+            <option value="Otra persona">Otra persona</option>
+          </select>
+          <input type="date" class="filter-date" id="filt-fac-desde" onchange="renderFacturas()">
+          <input type="date" class="filter-date" id="filt-fac-hasta" onchange="renderFacturas()">
+          <select class="filter-sel" id="filt-fac-estado" onchange="renderFacturas()">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="parcial">Parcial</option>
+            <option value="pagado">Pagado</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>N° Factura</th><th>Casa</th><th>Fecha</th><th>Responsable</th><th>Total</th><th>Cuotas</th><th>Saldo</th><th>Estado</th><th class="admin-only">Acciones</th></tr></thead>
+            <tbody id="fac-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGOS -->
+    <section class="page" id="page-pagos">
+      <div class="page-header">
+        <div><h2 class="page-title">Registro de Pagos</h2><p class="page-sub">Historial de abonos y quién los realizó</p></div>
+        <button class="btn btn-primary admin-only" onclick="openModal('modal-pago')">+ Registrar pago</button>
+      </div>
+      <div class="table-card">
+        <div class="table-toolbar">
+          <input type="date" class="filter-date" id="filt-pago-desde" onchange="renderPagos()">
+          <input type="date" class="filter-date" id="filt-pago-hasta" onchange="renderPagos()">
+          <select class="filter-sel" id="filt-pago-quien" onchange="renderPagos()">
+            <option value="">¿Quién pagó?</option>
+            <option value="Maria del Carmen">María del Carmen</option>
+            <option value="Otra persona">Otra persona</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Comprobante</th><th>Factura</th><th>Casa</th><th>Deuda de</th><th>Pagó</th><th>Monto</th><th>Nota</th><th class="admin-only">Acción</th></tr></thead>
+            <tbody id="pago-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top:24px">
+        <h3 style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:12px">Abonos cruzados</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Pagos realizados por una persona en deudas que no le corresponden.</p>
+        <div class="table-card">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Factura</th><th>Deuda de</th><th>Pagó</th><th>Monto</th><th>Fecha</th><th>Observación</th></tr></thead>
+              <tbody id="cruzados-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRONOGRAMA -->
+    <section class="page" id="page-cronograma">
+      <div class="page-header">
+        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Cuotas organizadas por mes</p></div>
+        <button class="btn btn-pdf" onclick="exportPDF()">⬇ Exportar PDF</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+        <select class="filter-sel" id="cron-person" onchange="renderCronograma()">
+          <option value="">Todas las personas</option>
+          <option value="Maria del Carmen">María del Carmen</option>
+          <option value="Otra persona">Otra persona</option>
+        </select>
+        <input type="date" class="filter-date" id="cron-desde" onchange="renderCronograma()">
+        <input type="date" class="filter-date" id="cron-hasta" onchange="renderCronograma()">
+        <select class="filter-sel" id="cron-estado" onchange="renderCronograma()">
+          <option value="">Todos</option>
+          <option value="pendiente">Pendientes</option>
+          <option value="pagado">Pagadas</option>
+        </select>
+      </div>
+      <div id="cronograma-content"></div>
+    </section>
+
+    <!-- CASAS -->
+    <section class="page" id="page-casas">
+      <div class="page-header">
+        <div><h2 class="page-title">Casas Comerciales</h2><p class="page-sub">Tiendas con créditos activos</p></div>
+        <button class="btn btn-primary admin-only" onclick="openNuevaCasa()">+ Nueva casa</button>
+      </div>
+      <div class="store-grid" id="store-grid"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ══════ MODALES ══════ -->
+
+<!-- Modal: Factura -->
+<div class="modal-overlay" id="modal-factura">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-fac-title">Nueva Factura</h3>
+      <button class="modal-close" onclick="closeModal('modal-factura')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="lbl">N° de Factura *</label><input class="inp" id="fac-numero" placeholder="FAC-001"></div>
+      <div class="form-group"><label class="lbl">Casa comercial *</label><select class="sel" id="fac-casa"></select></div>
+      <div class="form-group"><label class="lbl">Fecha de emisión *</label><input class="inp" type="date" id="fac-fecha"></div>
+      <div class="form-group"><label class="lbl">Responsable *</label>
+        <select class="sel" id="fac-responsable">
+          <option value="Maria del Carmen">María del Carmen</option>
+          <option value="Otra persona">Otra persona</option>
+          <option value="Compartida">Compartida (50/50)</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="lbl">Número de cuotas</label><input class="inp" type="number" id="fac-cuotas" value="1" min="1"></div>
+      <div class="form-group"><label class="lbl">Fecha primera cuota</label><input class="inp" type="date" id="fac-primera-cuota"></div>
+      <div class="form-group"><label class="lbl">IVA (%)</label>
+        <select class="sel" id="fac-iva">
+          <option value="0">0% — Sin IVA</option>
+          <option value="5">5%</option>
+          <option value="12" selected>12% — Ecuador estándar</option>
+          <option value="15">15%</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="lbl">Notas</label><input class="inp" id="fac-notas" placeholder="Opcional..."></div>
+      <div class="items-section form-group full">
+        <div class="items-section-title">Ítems comprados</div>
+        <div class="items-list">
+          <div class="items-header"><span>Descripción</span><span>Cant.</span><span>Precio unit.</span><span></span></div>
+          <div id="items-container"></div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="addItemRow()" style="margin-top:6px">+ Agregar ítem</button>
+        <div class="totals-row">
+          <div class="t-line"><span>Subtotal:</span><strong id="t-subtotal">$0.00</strong></div>
+          <div class="t-line"><span>IVA (<span id="t-iva-pct">12</span>%):</span><strong id="t-iva">$0.00</strong></div>
+          <div class="t-line t-total"><span>TOTAL:</span><strong id="t-total">$0.00</strong></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-factura')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveFactura()">Guardar factura</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Pago -->
+<div class="modal-overlay" id="modal-pago">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h3 class="modal-title">Registrar Pago</h3>
+      <button class="modal-close" onclick="closeModal('modal-pago')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="lbl">Factura *</label><select class="sel" id="pago-factura" onchange="updatePagoInfo()"></select></div>
+      <div class="form-group"><label class="lbl">Fecha de pago *</label><input class="inp" type="date" id="pago-fecha"></div>
+      <div class="form-group"><label class="lbl">N° Comprobante</label><input class="inp" id="pago-comprobante" placeholder="COMP-001"></div>
+      <div class="form-group"><label class="lbl">¿Quién pagó? *</label>
+        <select class="sel" id="pago-quien">
+          <option value="Maria del Carmen">María del Carmen</option>
+          <option value="Otra persona">Otra persona</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="lbl">Monto pagado *</label><input class="inp" type="number" id="pago-monto" step="0.01" placeholder="0.00"></div>
+      <div class="form-group"><label class="lbl">Observación</label><input class="inp" id="pago-nota" placeholder="Ej: Pagué deuda de la otra persona"></div>
+      <div class="form-group full" id="pago-info-box" style="background:#F0FBF5;border-radius:8px;padding:12px;font-size:13px;color:var(--accent);display:none"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pago')">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePago()">Guardar pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Casa -->
+<div class="modal-overlay" id="modal-casa">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-casa-title">Nueva Casa Comercial</h3>
+      <button class="modal-close" onclick="closeModal('modal-casa')">✕</button>
+    </div>
+    <div class="form-grid full">
+      <div class="form-group"><label class="lbl">Nombre *</label><input class="inp" id="casa-nombre" placeholder="Ej: La Ganga"></div>
+      <div class="form-group">
+        <label class="lbl">URL del logotipo</label>
+        <input class="inp" id="casa-logo-url" placeholder="https://..." oninput="previewLogo()">
+        <div class="logo-preview" id="logo-preview"><span>Vista previa del logo</span></div>
+      </div>
+      <div class="form-group"><label class="lbl">Descripción</label><textarea class="txa" id="casa-desc" placeholder="Opcional"></textarea></div>
+    </div>
+    <input type="hidden" id="casa-edit-id">
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-casa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCasa()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Detalle factura -->
+<div class="modal-overlay" id="modal-detalle">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h3 class="modal-title" id="detalle-titulo">Detalle de Factura</h3>
+      <button class="modal-close" onclick="closeModal('modal-detalle')">✕</button>
+    </div>
+    <div id="detalle-content"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// SUPABASE CLIENT
+// ═══════════════════════════════════════
+let sb = null;
+
+// Cargar config guardada
+const savedUrl = localStorage.getItem('sb_url') || '';
+const savedKey = localStorage.getItem('sb_key') || '';
+if (savedUrl) document.getElementById('sb-url').value = savedUrl;
+if (savedKey) document.getElementById('sb-key').value = savedKey;
+
+function initSupabase() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  const status = document.getElementById('sb-status');
+  if (!url || !key) { status.textContent = '⚠️ Ingresa URL y Key'; return; }
+  try {
+    sb = supabase.createClient(url, key);
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    status.textContent = '✅ Conectado';
+    status.style.color = '#065F46';
+    showToast('Conectado a Supabase', 'ok');
+  } catch(e) {
+    status.textContent = '❌ Error: ' + e.message;
+    status.style.color = '#991B1B';
+  }
+}
+
+// Auto-init si hay datos guardados
+if (savedUrl && savedKey) {
+  setTimeout(() => { initSupabase(); }, 100);
+}
+
+function requireSb() {
+  if (!sb) { showToast('Primero conecta con Supabase usando el banner arriba', 'err'); return false; }
+  return true;
+}
+
+// ═══════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════
+function loading(msg = 'Cargando...') {
+  document.getElementById('loader-msg').textContent = msg;
+  document.getElementById('loader').classList.add('on');
+}
+function loaded() { document.getElementById('loader').classList.remove('on'); }
+
+function showToast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = 'toast-item ' + (type === 'ok' ? 'toast-ok' : 'toast-err');
+  el.textContent = msg;
+  t.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function fmt(n) { return '$' + parseFloat(n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+let currentRole = 'viewer';
+const ADMIN_PIN = '1995';
+
+function selectRole(role) {
+  currentRole = role;
+  document.getElementById('btn-viewer').classList.toggle('active', role === 'viewer');
+  document.getElementById('btn-admin').classList.toggle('active', role === 'admin');
+  document.getElementById('admin-pin-area').style.display = role === 'admin' ? 'block' : 'none';
+}
+
+function clearPinError() { document.getElementById('pin-error').style.display = 'none'; }
+
+async function doLogin() {
+  if (!requireSb()) return;
+  if (currentRole === 'admin') {
+    if (document.getElementById('pin-input').value !== ADMIN_PIN) {
+      document.getElementById('pin-error').style.display = 'block';
+      return;
+    }
+  }
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  const badge = document.getElementById('role-badge');
+  if (currentRole === 'admin') {
+    badge.textContent = 'Administrador'; badge.className = 'badge-role badge-admin';
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+  } else {
+    badge.textContent = 'Solo lectura'; badge.className = 'badge-role badge-viewer';
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+  }
+  await loadFacturasSelect();
+  await renderDashboard();
+}
+
+function doLogout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pin-input').value = '';
+  selectRole('viewer');
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+async function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'dashboard') await renderDashboard();
+  if (page === 'facturas') await renderFacturas();
+  if (page === 'pagos') await renderPagos();
+  if (page === 'cronograma') await renderCronograma();
+  if (page === 'casas') await renderStores();
+}
+
+// ═══════════════════════════════════════
+// DATA HELPERS (Supabase queries)
+// ═══════════════════════════════════════
+
+async function getFacturasConPagos(filters = {}) {
+  let q = sb.from('facturas')
+    .select('*, casas_comerciales(nombre, logo_url), factura_items(*), pagos(*)')
+    .order('fecha_emision', { ascending: false });
+  if (filters.responsable) q = q.eq('responsable', filters.responsable);
+  if (filters.desde) q = q.gte('fecha_emision', filters.desde);
+  if (filters.hasta) q = q.lte('fecha_emision', filters.hasta);
+  const { data, error } = await q;
+  if (error) { showToast('Error cargando facturas: ' + error.message, 'err'); return []; }
+  return data || [];
+}
+
+async function loadFacturasSelect() {
+  if (!sb) return;
+  const { data } = await sb.from('facturas').select('id, numero, responsable, casas_comerciales(nombre)').order('numero');
+  const opts = (data || []).map(f => `<option value="${f.id}">${f.numero} — ${f.casas_comerciales?.nombre || ''}</option>`).join('');
+  document.getElementById('pago-factura').innerHTML = '<option value="">Seleccionar...</option>' + opts;
+}
+
+function calcPagado(fac) {
+  return (fac.pagos || []).reduce((s, p) => s + parseFloat(p.monto || 0), 0);
+}
+
+function calcSaldo(fac) {
+  return Math.max(0, parseFloat(fac.total || 0) - calcPagado(fac));
+}
+
+function getEstado(fac) {
+  const saldo = calcSaldo(fac);
+  const pagado = calcPagado(fac);
+  if (saldo <= 0) return 'pagado';
+  if (pagado > 0) return 'parcial';
+  return 'pendiente';
+}
+
+function badgeEstado(est) {
+  if (est === 'pagado') return '<span class="badge badge-green">Pagado</span>';
+  if (est === 'parcial') return '<span class="badge badge-amber">Parcial</span>';
+  return '<span class="badge badge-red">Pendiente</span>';
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+async function renderDashboard() {
+  if (!sb) return;
+  loading('Cargando resumen...');
+  const personFilt = document.getElementById('dash-filter-person').value;
+  const facturas = await getFacturasConPagos(personFilt ? { responsable: personFilt } : {});
+
+  const totalDeuda = facturas.reduce((s, f) => s + parseFloat(f.total || 0), 0);
+  const totalPagado = facturas.reduce((s, f) => s + calcPagado(f), 0);
+  const totalSaldo = facturas.reduce((s, f) => s + calcSaldo(f), 0);
+
+  // Abonos cruzados
+  const { data: cruzados } = await sb.from('pagos').select('quien_pago, deuda_de, monto').neq('quien_pago', sb.raw ? '' : null);
+  const cruzadosMC = (cruzados || []).filter(p => p.quien_pago === 'Maria del Carmen' && p.deuda_de === 'Otra persona').reduce((s, p) => s + parseFloat(p.monto || 0), 0);
+  const cruzadosOtra = (cruzados || []).filter(p => p.quien_pago === 'Otra persona' && p.deuda_de === 'Maria del Carmen').reduce((s, p) => s + parseFloat(p.monto || 0), 0);
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Deuda total</div><div class="stat-value">${fmt(totalDeuda)}</div></div>
+    <div class="stat-card"><div class="stat-label">Total pagado</div><div class="stat-value green">${fmt(totalPagado)}</div></div>
+    <div class="stat-card"><div class="stat-label">Saldo pendiente</div><div class="stat-value red">${fmt(totalSaldo)}</div></div>
+    <div class="stat-card"><div class="stat-label">M.C. pagó deuda ajena</div><div class="stat-value amber">${fmt(cruzadosMC)}</div></div>
+    <div class="stat-card"><div class="stat-label">Otra persona pagó deuda M.C.</div><div class="stat-value amber">${fmt(cruzadosOtra)}</div></div>`;
+
+  const tbody = document.getElementById('dash-table-body');
+  tbody.innerHTML = facturas.length
+    ? facturas.map(f => `<tr>
+        <td>${f.casas_comerciales?.nombre || '—'}</td>
+        <td>${f.numero}</td><td>${f.responsable}</td>
+        <td>${fmt(f.total)}</td><td>${f.num_cuotas}</td>
+        <td>${fmt(calcPagado(f))}</td><td>${fmt(calcSaldo(f))}</td>
+        <td>${badgeEstado(getEstado(f))}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">Sin facturas registradas</td></tr>';
+  loaded();
+}
+
+// ═══════════════════════════════════════
+// CASAS COMERCIALES
+// ═══════════════════════════════════════
+function openNuevaCasa() {
+  ['casa-nombre','casa-logo-url','casa-desc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('casa-edit-id').value = '';
+  document.getElementById('modal-casa-title').textContent = 'Nueva Casa Comercial';
+  document.getElementById('logo-preview').innerHTML = '<span>Vista previa del logo</span>';
+  openModal('modal-casa');
+}
+
+function previewLogo() {
+  const url = document.getElementById('casa-logo-url').value.trim();
+  document.getElementById('logo-preview').innerHTML = url
+    ? `<img src="${url}" onerror="this.parentElement.innerHTML='<span>No se pudo cargar</span>'">`
+    : '<span>Vista previa del logo</span>';
+}
+
+async function saveCasa() {
+  if (!requireSb()) return;
+  const nombre = document.getElementById('casa-nombre').value.trim();
+  if (!nombre) { showToast('Ingresa el nombre de la casa comercial', 'err'); return; }
+  const editId = document.getElementById('casa-edit-id').value;
+  const obj = { nombre, logo_url: document.getElementById('casa-logo-url').value.trim(), descripcion: document.getElementById('casa-desc').value.trim() };
+  loading('Guardando...');
+  let error;
+  if (editId) {
+    ({ error } = await sb.from('casas_comerciales').update(obj).eq('id', editId));
+  } else {
+    ({ error } = await sb.from('casas_comerciales').insert(obj));
+  }
+  loaded();
+  if (error) { showToast('Error: ' + error.message, 'err'); return; }
+  showToast(editId ? 'Casa actualizada' : 'Casa creada', 'ok');
+  closeModal('modal-casa');
+  await renderStores();
+  await loadCasasSelect();
+}
+
+async function deleteCasa(id) {
+  if (!confirm('¿Eliminar esta casa comercial?')) return;
+  loading('Eliminando...');
+  const { error } = await sb.from('casas_comerciales').delete().eq('id', id);
+  loaded();
+  if (error) { showToast('Error: ' + error.message, 'err'); return; }
+  showToast('Casa eliminada', 'ok');
+  await renderStores();
+  await loadCasasSelect();
+}
+
+async function editCasa(id) {
+  const { data } = await sb.from('casas_comerciales').select('*').eq('id', id).single();
+  if (!data) return;
+  document.getElementById('modal-casa-title').textContent = 'Editar Casa Comercial';
+  document.getElementById('casa-nombre').value = data.nombre;
+  document.getElementById('casa-logo-url').value = data.logo_url || '';
+  document.getElementById('casa-desc').value = data.descripcion || '';
+  document.getElementById('casa-edit-id').value = data.id;
+  previewLogo();
+  openModal('modal-casa');
+}
+
+async function loadCasasSelect() {
+  if (!sb) return;
+  const { data } = await sb.from('casas_comerciales').select('id, nombre').order('nombre');
+  const opts = (data || []).map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+  document.getElementById('fac-casa').innerHTML = '<option value="">Seleccionar...</option>' + opts;
+}
+
+async function renderStores() {
+  if (!sb) return;
+  loading('Cargando casas...');
+  const { data: casas } = await sb.from('casas_comerciales').select('*').order('nombre');
+  const { data: facturas } = await sb.from('facturas').select('id, casa_id, total, pagos(monto)');
+  loaded();
+
+  const grid = document.getElementById('store-grid');
+  if (!casas || !casas.length) {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:13px">No hay casas registradas.</p>';
+    return;
+  }
+
+  grid.innerHTML = casas.map(c => {
+    const deuda = (facturas || []).filter(f => f.casa_id === c.id).reduce((s, f) => {
+      const pagado = (f.pagos || []).reduce((ps, p) => ps + parseFloat(p.monto || 0), 0);
+      return s + Math.max(0, parseFloat(f.total || 0) - pagado);
+    }, 0);
+    const logoHtml = c.logo_url
+      ? `<img src="${c.logo_url}" onerror="this.style.display='none'">`
+      : '<span style="font-size:24px">🏪</span>';
+    const adminBtns = currentRole === 'admin'
+      ? `<div style="display:flex;gap:8px;margin-top:4px">
+           <button class="btn btn-secondary btn-sm" onclick="editCasa('${c.id}')">✏️ Editar</button>
+           <button class="btn btn-danger btn-sm" onclick="deleteCasa('${c.id}')">🗑</button>
+         </div>` : '';
+    return `<div class="store-card">
+      <div class="store-logo-wrap">${logoHtml}</div>
+      <div>
+        <div class="store-name">${c.nombre}</div>
+        ${c.descripcion ? `<div style="font-size:12px;color:var(--muted)">${c.descripcion}</div>` : ''}
+      </div>
+      <div class="store-debt">${fmt(deuda)}</div>
+      ${adminBtns}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// FACTURAS
+// ═══════════════════════════════════════
+let editingFacturaId = null;
+
+function addItemRow(desc = '', qty = 1, price = '') {
+  const container = document.getElementById('items-container');
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Descripción" value="${desc}" oninput="recalcTotals()">
+    <input type="number" placeholder="1" value="${qty}" min="1" oninput="recalcTotals()">
+    <input type="number" placeholder="0.00" value="${price}" step="0.01" min="0" oninput="recalcTotals()">
+    <button class="item-del" onclick="this.parentElement.remove();recalcTotals()">✕</button>`;
+  container.appendChild(row);
+  recalcTotals();
+}
+
+function recalcTotals() {
+  let subtotal = 0;
+  document.querySelectorAll('#items-container .item-row').forEach(r => {
+    const inputs = r.querySelectorAll('input');
+    subtotal += (parseFloat(inputs[1].value) || 0) * (parseFloat(inputs[2].value) || 0);
+  });
+  const ivaPct = parseFloat(document.getElementById('fac-iva').value) || 0;
+  const iva = subtotal * ivaPct / 100;
+  document.getElementById('t-subtotal').textContent = fmt(subtotal);
+  document.getElementById('t-iva-pct').textContent = ivaPct;
+  document.getElementById('t-iva').textContent = fmt(iva);
+  document.getElementById('t-total').textContent = fmt(subtotal + iva);
+}
+
+document.getElementById('fac-iva').addEventListener('change', recalcTotals);
+
+async function openNuevaFactura() {
+  editingFacturaId = null;
+  document.getElementById('modal-fac-title').textContent = 'Nueva Factura';
+  ['fac-numero','fac-notas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fac-fecha').value = new Date().toISOString().slice(0,10);
+  document.getElementById('fac-cuotas').value = 1;
+  document.getElementById('fac-primera-cuota').value = '';
+  document.getElementById('items-container').innerHTML = '';
+  await loadCasasSelect();
+  addItemRow();
+  recalcTotals();
+  openModal('modal-factura');
+}
+
+async function saveFactura() {
+  if (!requireSb()) return;
+  const numero = document.getElementById('fac-numero').value.trim();
+  const casaId = document.getElementById('fac-casa').value;
+  const fecha = document.getElementById('fac-fecha').value;
+  if (!numero || !casaId || !fecha) { showToast('Completa los campos obligatorios', 'err'); return; }
+
+  const rows = document.querySelectorAll('#items-container .item-row');
+  const items = [];
+  let subtotal = 0;
+  rows.forEach((r, idx) => {
+    const inputs = r.querySelectorAll('input');
+    const desc = inputs[0].value.trim();
+    const qty = parseFloat(inputs[1].value) || 0;
+    const price = parseFloat(inputs[2].value) || 0;
+    if (desc || price) { items.push({ descripcion: desc, cantidad: qty, precio_unit: price, orden: idx }); subtotal += qty * price; }
+  });
+
+  const ivaPct = parseFloat(document.getElementById('fac-iva').value) || 0;
+  const iva = parseFloat((subtotal * ivaPct / 100).toFixed(2));
+  const total = parseFloat((subtotal + iva).toFixed(2));
+  const numCuotas = parseInt(document.getElementById('fac-cuotas').value) || 1;
+  const primeraCuota = document.getElementById('fac-primera-cuota').value || null;
+
+  // Generar cuotas
+  const cuotasArr = [];
+  if (primeraCuota) {
+    const montoCuota = parseFloat((total / numCuotas).toFixed(2));
+    const base = new Date(primeraCuota + 'T00:00:00');
+    for (let i = 0; i < numCuotas; i++) {
+      const d = new Date(base); d.setMonth(d.getMonth() + i);
+      cuotasArr.push({ numero: i + 1, fecha_vence: d.toISOString().slice(0,10), monto: montoCuota, pagada: false });
+    }
+  }
+
+  const facObj = {
+    numero, casa_id: casaId,
+    fecha_emision: fecha,
+    responsable: document.getElementById('fac-responsable').value,
+    subtotal: parseFloat(subtotal.toFixed(2)), iva_porcentaje: ivaPct, iva_valor: iva, total,
+    num_cuotas: numCuotas, fecha_primera_cuota: primeraCuota,
+    notas: document.getElementById('fac-notas').value.trim()
+  };
+
+  loading('Guardando factura...');
+  let facId = editingFacturaId;
+
+  if (editingFacturaId) {
+    const { error } = await sb.from('facturas').update(facObj).eq('id', editingFacturaId);
+    if (error) { loaded(); showToast('Error: ' + error.message, 'err'); return; }
+    // Borrar items y cuotas anteriores para recrcarlos
+    await sb.from('factura_items').delete().eq('factura_id', editingFacturaId);
+    await sb.from('cuotas').delete().eq('factura_id', editingFacturaId);
+  } else {
+    const { data, error } = await sb.from('facturas').insert(facObj).select().single();
+    if (error) { loaded(); showToast('Error: ' + error.message, 'err'); return; }
+    facId = data.id;
+  }
+
+  // Insertar items
+  if (items.length) {
+    const { error } = await sb.from('factura_items').insert(items.map(it => ({ ...it, factura_id: facId })));
+    if (error) showToast('Items: ' + error.message, 'err');
+  }
+
+  // Insertar cuotas
+  if (cuotasArr.length) {
+    const { error } = await sb.from('cuotas').insert(cuotasArr.map(c => ({ ...c, factura_id: facId })));
+    if (error) showToast('Cuotas: ' + error.message, 'err');
+  }
+
+  loaded();
+  showToast(editingFacturaId ? 'Factura actualizada' : 'Factura guardada', 'ok');
+  closeModal('modal-factura');
+  await loadFacturasSelect();
+  await renderFacturas();
+  await renderDashboard();
+}
+
+async function deleteFactura(id) {
+  if (!confirm('¿Eliminar esta factura y sus pagos?')) return;
+  loading('Eliminando...');
+  await sb.from('pagos').delete().eq('factura_id', id);
+  await sb.from('cuotas').delete().eq('factura_id', id);
+  await sb.from('factura_items').delete().eq('factura_id', id);
+  const { error } = await sb.from('facturas').delete().eq('id', id);
+  loaded();
+  if (error) { showToast('Error: ' + error.message, 'err'); return; }
+  showToast('Factura eliminada', 'ok');
+  await loadFacturasSelect();
+  await renderFacturas();
+  await renderDashboard();
+}
+
+async function editFactura(id) {
+  loading('Cargando...');
+  const { data: f } = await sb.from('facturas').select('*, factura_items(*)').eq('id', id).single();
+  await loadCasasSelect();
+  loaded();
+  if (!f) return;
+  editingFacturaId = id;
+  document.getElementById('modal-fac-title').textContent = 'Editar Factura';
+  document.getElementById('fac-numero').value = f.numero;
+  document.getElementById('fac-casa').value = f.casa_id;
+  document.getElementById('fac-fecha').value = f.fecha_emision;
+  document.getElementById('fac-responsable').value = f.responsable;
+  document.getElementById('fac-cuotas').value = f.num_cuotas;
+  document.getElementById('fac-primera-cuota').value = f.fecha_primera_cuota || '';
+  document.getElementById('fac-iva').value = f.iva_porcentaje;
+  document.getElementById('fac-notas').value = f.notas || '';
+  document.getElementById('items-container').innerHTML = '';
+  (f.factura_items || []).sort((a,b) => a.orden - b.orden).forEach(it => addItemRow(it.descripcion, it.cantidad, it.precio_unit));
+  recalcTotals();
+  openModal('modal-factura');
+}
+
+async function verDetalle(id) {
+  loading('Cargando...');
+  const { data: f } = await sb.from('facturas').select('*, casas_comerciales(nombre), factura_items(*), pagos(*), cuotas(*)').eq('id', id).single();
+  loaded();
+  if (!f) return;
+  const pagado = calcPagado(f); const saldo = calcSaldo(f);
+  document.getElementById('detalle-titulo').textContent = `Factura ${f.numero}`;
+  document.getElementById('detalle-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;font-size:13px">
+      <div><span style="color:var(--muted)">Casa:</span> <strong>${f.casas_comerciales?.nombre || '—'}</strong></div>
+      <div><span style="color:var(--muted)">Fecha:</span> <strong>${f.fecha_emision}</strong></div>
+      <div><span style="color:var(--muted)">Responsable:</span> <strong>${f.responsable}</strong></div>
+      <div><span style="color:var(--muted)">Cuotas:</span> <strong>${f.num_cuotas}</strong></div>
+      ${f.notas ? `<div style="grid-column:1/-1"><span style="color:var(--muted)">Notas:</span> ${f.notas}</div>` : ''}
+    </div>
+    <table style="margin-bottom:16px">
+      <thead><tr><th>Ítem</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr></thead>
+      <tbody>${(f.factura_items||[]).sort((a,b)=>a.orden-b.orden).map(it=>`<tr><td>${it.descripcion}</td><td>${it.cantidad}</td><td>${fmt(it.precio_unit)}</td><td>${fmt(it.cantidad*it.precio_unit)}</td></tr>`).join('')}</tbody>
+    </table>
+    <div style="background:#F0FBF5;padding:12px;border-radius:8px;font-size:13px;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div>Subtotal: <strong>${fmt(f.subtotal)}</strong></div>
+      <div>IVA (${f.iva_porcentaje}%): <strong>${fmt(f.iva_valor)}</strong></div>
+      <div style="font-size:16px;color:var(--accent)">Total: <strong>${fmt(f.total)}</strong></div>
+      <div style="color:var(--danger)">Saldo pendiente: <strong>${fmt(saldo)}</strong></div>
+      <div style="color:var(--accent)">Ya pagado: <strong>${fmt(pagado)}</strong></div>
+    </div>
+    ${f.cuotas && f.cuotas.length ? `
+    <h4 style="margin:16px 0 8px;font-size:14px;color:var(--muted)">Cuotas programadas</h4>
+    <table><thead><tr><th>#</th><th>Vence</th><th>Monto</th><th>Estado</th></tr></thead>
+    <tbody>${f.cuotas.sort((a,b)=>a.numero-b.numero).map(c=>`<tr><td>${c.numero}</td><td>${c.fecha_vence}</td><td>${fmt(c.monto)}</td><td>${c.pagada?'<span class="badge badge-green">Pagada</span>':'<span class="badge badge-red">Pendiente</span>'}</td></tr>`).join('')}</tbody></table>` : ''}`;
+  openModal('modal-detalle');
+}
+
+async function renderFacturas() {
+  if (!sb) return;
+  loading('Cargando facturas...');
+  const personFilt = document.getElementById('filt-fac-person').value;
+  const desde = document.getElementById('filt-fac-desde').value;
+  const hasta = document.getElementById('filt-fac-hasta').value;
+  const estadoFilt = document.getElementById('filt-fac-estado').value;
+  const search = document.getElementById('fac-search').value.toLowerCase();
+
+  const facturas = await getFacturasConPagos({ responsable: personFilt, desde, hasta });
+  loaded();
+
+  let list = facturas.filter(f => {
+    if (estadoFilt && getEstado(f) !== estadoFilt) return false;
+    if (search) {
+      const casa = f.casas_comerciales?.nombre?.toLowerCase() || '';
+      if (!f.numero.toLowerCase().includes(search) && !casa.includes(search)) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById('fac-table-body');
+  tbody.innerHTML = list.length
+    ? list.map(f => {
+        const adminBtns = currentRole === 'admin'
+          ? `<td><div style="display:flex;gap:4px">
+              <button class="btn btn-secondary btn-sm" onclick="verDetalle('${f.id}')">👁</button>
+              <button class="btn btn-secondary btn-sm" onclick="editFactura('${f.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFactura('${f.id}')">🗑</button>
+            </div></td>` : '';
+        return `<tr>
+          <td><strong>${f.numero}</strong></td>
+          <td>${f.casas_comerciales?.nombre || '—'}</td>
+          <td>${f.fecha_emision}</td><td>${f.responsable}</td>
+          <td>${fmt(f.total)}</td><td>${f.num_cuotas}</td>
+          <td>${fmt(calcSaldo(f))}</td>
+          <td>${badgeEstado(getEstado(f))}</td>
+          ${adminBtns}
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">Sin resultados</td></tr>';
+}
+
+// ═══════════════════════════════════════
+// PAGOS
+// ═══════════════════════════════════════
+async function updatePagoInfo() {
+  const facId = document.getElementById('pago-factura').value;
+  if (!facId || !sb) return;
+  const { data: f } = await sb.from('facturas').select('*, pagos(monto)').eq('id', facId).single();
+  const box = document.getElementById('pago-info-box');
+  if (f) {
+    const pagado = calcPagado(f);
+    const saldo = Math.max(0, parseFloat(f.total || 0) - pagado);
+    const cuota = f.num_cuotas > 0 ? f.total / f.num_cuotas : f.total;
+    box.style.display = 'block';
+    box.innerHTML = `<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota aprox.:</strong> ${fmt(cuota)} &nbsp;|&nbsp; <strong>Responsable:</strong> ${f.responsable}`;
+    document.getElementById('pago-monto').value = cuota.toFixed(2);
+  } else { box.style.display = 'none'; }
+}
+
+async function savePago() {
+  if (!requireSb()) return;
+  const facId = document.getElementById('pago-factura').value;
+  const fecha = document.getElementById('pago-fecha').value;
+  const monto = parseFloat(document.getElementById('pago-monto').value) || 0;
+  const quien = document.getElementById('pago-quien').value;
+  if (!facId || !fecha || !monto) { showToast('Completa los campos obligatorios', 'err'); return; }
+
+  const { data: fac } = await sb.from('facturas').select('responsable').eq('id', facId).single();
+
+  loading('Guardando pago...');
+  const { error } = await sb.from('pagos').insert({
+    factura_id: facId, fecha_pago: fecha,
+    num_comprobante: document.getElementById('pago-comprobante').value.trim(),
+    quien_pago: quien, deuda_de: fac?.responsable || '',
+    monto, observacion: document.getElementById('pago-nota').value.trim()
+  });
+  loaded();
+  if (error) { showToast('Error: ' + error.message, 'err'); return; }
+  showToast('Pago registrado', 'ok');
+  closeModal('modal-pago');
+  await renderPagos();
+  await renderDashboard();
+  await renderFacturas();
+}
+
+async function deletePago(id) {
+  if (!confirm('¿Eliminar este pago?')) return;
+  loading('Eliminando...');
+  const { error } = await sb.from('pagos').delete().eq('id', id);
+  loaded();
+  if (error) { showToast('Error: ' + error.message, 'err'); return; }
+  showToast('Pago eliminado', 'ok');
+  await renderPagos();
+  await renderDashboard();
+}
+
+async function renderPagos() {
+  if (!sb) return;
+  loading('Cargando pagos...');
+  const desde = document.getElementById('filt-pago-desde').value;
+  const hasta = document.getElementById('filt-pago-hasta').value;
+  const quien = document.getElementById('filt-pago-quien').value;
+
+  let q = sb.from('pagos').select('*, facturas(numero, casas_comerciales(nombre))').order('fecha_pago', { ascending: false });
+  if (desde) q = q.gte('fecha_pago', desde);
+  if (hasta) q = q.lte('fecha_pago', hasta);
+  if (quien) q = q.eq('quien_pago', quien);
+
+  const { data: pagos, error } = await q;
+  loaded();
+  if (error) { showToast('Error: ' + error.message, 'err'); return; }
+
+  const tbody = document.getElementById('pago-table-body');
+  tbody.innerHTML = (pagos || []).length
+    ? pagos.map(p => {
+        const adminBtns = currentRole === 'admin'
+          ? `<td><button class="btn btn-danger btn-sm" onclick="deletePago('${p.id}')">🗑</button></td>` : '';
+        return `<tr>
+          <td>${p.fecha_pago}</td><td>${p.num_comprobante || '—'}</td>
+          <td>${p.facturas?.numero || '—'}</td>
+          <td>${p.facturas?.casas_comerciales?.nombre || '—'}</td>
+          <td>${p.deuda_de || '—'}</td>
+          <td><span class="badge badge-blue">${p.quien_pago}</span></td>
+          <td><strong>${fmt(p.monto)}</strong></td>
+          <td style="font-size:12px;color:var(--muted)">${p.observacion || ''}</td>
+          ${adminBtns}
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
+
+  // Cruzados
+  const cruzados = (pagos || []).filter(p => p.deuda_de && p.deuda_de !== p.quien_pago);
+  document.getElementById('cruzados-body').innerHTML = cruzados.length
+    ? cruzados.map(p => `<tr style="background:#FFFBEB">
+        <td>${p.facturas?.numero || '—'}</td>
+        <td>${p.deuda_de}</td><td><strong>${p.quien_pago}</strong></td>
+        <td>${fmt(p.monto)}</td><td>${p.fecha_pago}</td>
+        <td style="font-size:12px;color:var(--muted)">${p.observacion || '—'}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">Sin abonos cruzados</td></tr>';
+}
+
+// ═══════════════════════════════════════
+// CRONOGRAMA
+// ═══════════════════════════════════════
+async function renderCronograma() {
+  if (!sb) return;
+  loading('Cargando cronograma...');
+  const personFilt = document.getElementById('cron-person').value;
+  const desde = document.getElementById('cron-desde').value;
+  const hasta = document.getElementById('cron-hasta').value;
+  const estadoFilt = document.getElementById('cron-estado').value;
+
+  let q = sb.from('cuotas').select('*, facturas(numero, responsable, total, num_cuotas, pagos(monto), casas_comerciales(nombre))').order('fecha_vence');
+  if (desde) q = q.gte('fecha_vence', desde);
+  if (hasta) q = q.lte('fecha_vence', hasta);
+  if (estadoFilt === 'pendiente') q = q.eq('pagada', false);
+  if (estadoFilt === 'pagado') q = q.eq('pagada', true);
+
+  const { data: cuotas, error } = await q;
+  loaded();
+
+  let list = (cuotas || []).filter(c => !personFilt || c.facturas?.responsable === personFilt);
+
+  const meses = {};
+  const mesesNombres = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  list.forEach(c => {
+    const key = c.fecha_vence.slice(0, 7);
+    if (!meses[key]) meses[key] = [];
+    meses[key].push(c);
+  });
+
+  const container = document.getElementById('cronograma-content');
+  if (!Object.keys(meses).length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:14px;text-align:center;padding:40px">No hay cuotas programadas.</p>';
+    return;
+  }
+
+  container.innerHTML = Object.keys(meses).sort().map(key => {
+    const [yr, mo] = key.split('-');
+    const items = meses[key];
+    const total = items.reduce((s, c) => s + parseFloat(c.monto || 0), 0);
+    const pendiente = items.filter(c => !c.pagada).reduce((s, c) => s + parseFloat(c.monto || 0), 0);
+    return `
+      <div class="month-block">
+        <div class="month-header">
+          <span class="month-name">${mesesNombres[parseInt(mo)-1]} ${yr}</span>
+          <span style="font-size:13px;font-weight:600;opacity:.9">Total: ${fmt(total)} &nbsp;|&nbsp; Pendiente: ${fmt(pendiente)}</span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Vence</th><th>Factura</th><th>Casa</th><th>Responsable</th><th>Cuota</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>${items.map(c => `<tr style="${c.pagada?'opacity:.5':''}">
+              <td>${c.fecha_vence}</td>
+              <td>${c.facturas?.numero || '—'}</td>
+              <td>${c.facturas?.casas_comerciales?.nombre || '—'}</td>
+              <td>${c.facturas?.responsable || '—'}</td>
+              <td>${c.numero}/${c.facturas?.num_cuotas || '?'}</td>
+              <td><strong>${fmt(c.monto)}</strong></td>
+              <td>${c.pagada ? '<span class="badge badge-green">Pagada</span>' : '<span class="badge badge-red">Pendiente</span>'}</td>
+            </tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// PDF EXPORT
+// ═══════════════════════════════════════
+async function exportPDF() {
+  if (!sb) { showToast('Conecta primero con Supabase', 'err'); return; }
+  loading('Generando PDF...');
+  const personFilt = document.getElementById('cron-person').value;
+
+  let q = sb.from('cuotas').select('*, facturas(numero, responsable, num_cuotas, casas_comerciales(nombre))').order('fecha_vence');
+  const { data: cuotas } = await q;
+  loaded();
+
+  const list = (cuotas || []).filter(c => !personFilt || c.facturas?.responsable === personFilt);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  doc.setFillColor(45,106,79); doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(18);
+  doc.text('Cronograma de Pagos', 14, 16);
+  doc.setFontSize(10); doc.text('GestorDeudas', 14, 23);
+  doc.setTextColor(100,100,100); doc.setFontSize(9);
+  doc.text(`Generado: ${new Date().toLocaleDateString('es-EC')} | ${personFilt || 'Todas las personas'}`, 14, 34);
+
+  const meses = {};
+  const mesesNombres = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  list.forEach(c => { const k=c.fecha_vence.slice(0,7); if(!meses[k]) meses[k]=[]; meses[k].push(c); });
+
+  let y = 42;
+  Object.keys(meses).sort().forEach(key => {
+    if (y > 260) { doc.addPage(); y = 14; }
+    const [yr, mo] = key.split('-');
+    const items = meses[key];
+    const pendiente = items.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+    doc.setFillColor(82,183,136); doc.rect(14,y,182,7,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(10);
+    doc.text(`${mesesNombres[parseInt(mo)-1]} ${yr}`, 16, y+5);
+    doc.text(`Pendiente: $${pendiente.toFixed(2)}`, 158, y+5);
+    y += 10;
+    doc.setFontSize(8); doc.setTextColor(120,120,120);
+    ['FECHA','FACTURA','CASA','RESPONSABLE','CUOTA','MONTO','ESTADO'].forEach((h,i) => {
+      doc.text(h, [14,38,68,112,148,163,180][i], y);
+    });
+    y += 4; doc.setDrawColor(200,200,200); doc.line(14,y,196,y); y += 4;
+    items.forEach(c => {
+      if (y > 270) { doc.addPage(); y = 14; }
+      doc.setTextColor(c.pagada?160:40); doc.setFontSize(8);
+      doc.text(c.fecha_vence||'',14,y);
+      doc.text((c.facturas?.numero||'').slice(0,10),38,y);
+      doc.text((c.facturas?.casas_comerciales?.nombre||'').slice(0,18),68,y);
+      doc.text((c.facturas?.responsable||'').slice(0,16),112,y);
+      doc.text(`${c.numero}/${c.facturas?.num_cuotas||'?'}`,148,y);
+      doc.text(`$${parseFloat(c.monto||0).toFixed(2)}`,163,y);
+      doc.setTextColor(c.pagada?22:185, c.pagada?101:28, c.pagada?52:28);
+      doc.text(c.pagada?'Pagada':'Pendiente',180,y);
+      y += 6;
+    });
+    y += 4;
+  });
+  doc.save('cronograma-pagos.pdf');
+  showToast('PDF descargado', 'ok');
+}
+</script>
+</body>
+</html>
