@@ -146,90 +146,27 @@ textarea.txa{resize:vertical;min-height:70px}
 .logo-preview{width:100%;height:70px;border:1.5px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:6px}
 .logo-preview img{max-height:62px;max-width:100%;object-fit:contain}
 .logo-preview span{font-size:12px;color:var(--muted)}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+.store-card{background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);padding:18px;display:flex;flex-direction:column;gap:10px}
+.store-logo-wrap{height:54px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:8px;overflow:hidden}
+.store-logo-wrap img{max-height:48px;max-width:100%;object-fit:contain}
+.store-name{font-weight:600;font-size:14px}
+.store-debt{font-family:'DM Serif Display',serif;font-size:20px;color:var(--danger)}
 
-/* ══════════════════════════════
-   MEJORA 1: STORE CARDS (La Ganga style)
-══════════════════════════════ */
-.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-bottom:24px}
-.store-card{background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column;transition:all .2s}
-.store-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.1);transform:translateY(-2px)}
-.store-card-header{background:linear-gradient(135deg,#F0FBF5,#E8F5E9);padding:20px;display:flex;align-items:center;justify-content:center;min-height:80px;position:relative}
-.store-logo-wrap{height:52px;display:flex;align-items:center;justify-content:center}
-.store-logo-wrap img{max-height:48px;max-width:140px;object-fit:contain}
-.store-card-body{padding:16px}
-.store-name{font-weight:700;font-size:15px;margin-bottom:4px}
-.store-desc{font-size:11px;color:var(--muted);margin-bottom:12px}
-.store-progress-wrap{margin-bottom:10px}
-.store-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
-.store-progress-bar{height:6px;background:#E5E7EB;border-radius:99px;overflow:hidden}
-.store-progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s ease}
-.store-debt-row{display:flex;justify-content:space-between;align-items:center}
-.store-debt{font-family:'DM Serif Display',serif;font-size:22px;color:var(--danger)}
-.store-facturas-count{font-size:11px;color:var(--muted);background:var(--bg);padding:3px 8px;border-radius:6px}
-.store-card-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:6px}
-.store-split{display:flex;gap:8px;margin-top:10px}
-.store-split-item{flex:1;border-radius:8px;padding:8px 10px;text-align:center}
-.store-split-mc{background:#F5F3FF;border:1px solid #DDD6FE}
-.store-split-richard{background:#E0F2FE;border:1px solid #BAE6FD}
-.store-split-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
-.store-split-mc .store-split-label{color:var(--mc)}
-.store-split-richard .store-split-label{color:var(--richard)}
-.store-split-val{font-family:'DM Serif Display',serif;font-size:15px}
-.store-split-mc .store-split-val{color:var(--mc)}
-.store-split-richard .store-split-val{color:var(--richard)}
-
-/* ══════════════════════════════
-   MEJORA 2: FOTO COMPROBANTE
-══════════════════════════════ */
-.foto-upload-area{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative}
-.foto-upload-area:hover{border-color:var(--accent);background:#F0FBF5}
-.foto-upload-area.has-foto{border-color:var(--accent);background:#F0FBF5;border-style:solid}
-.foto-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.foto-preview-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:8px;object-fit:contain;display:none}
-.foto-upload-icon{font-size:28px;margin-bottom:6px}
-.foto-upload-text{font-size:13px;color:var(--muted);font-weight:500}
-.foto-upload-sub{font-size:11px;color:var(--muted);margin-top:3px}
-.foto-thumb{width:48px;height:48px;border-radius:6px;object-fit:cover;cursor:pointer;border:1px solid var(--border)}
-.foto-thumb:hover{opacity:.85}
-
-/* ══════════════════════════════
-   MEJORA 3: CALENDARIO MENSUAL
-══════════════════════════════ */
-.cal-header-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.cal-nav-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.cal-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
-.cal-month-title{font-family:'DM Serif Display',serif;font-size:22px;min-width:180px}
-.cal-summary-strip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.cal-sum-card{background:#fff;border-radius:10px;padding:12px 16px;border:1px solid var(--border);min-width:130px}
-.cal-sum-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px}
-.cal-sum-val{font-family:'DM Serif Display',serif;font-size:20px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px}
-.cal-day-header{text-align:center;padding:8px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-.cal-day{min-height:72px;background:#fff;border-radius:8px;border:1px solid var(--border);padding:6px;position:relative;transition:all .15s}
-.cal-day.empty{background:transparent;border:none}
-.cal-day.today{border:2px solid var(--accent);background:#F0FBF5}
-.cal-day.has-cuotas{background:#FFFBEB}
-.cal-day-num{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px}
-.cal-day.today .cal-day-num{color:var(--accent);font-weight:700}
-.cal-cuota-dot{border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.cal-cuota-dot.mc-pend{background:#EDE9FE;color:#5B21B6}
-.cal-cuota-dot.mc-paid{background:#F3F4F6;color:var(--muted);text-decoration:line-through}
-.cal-cuota-dot.ri-pend{background:#DBEAFE;color:#1E40AF}
-.cal-cuota-dot.ri-paid{background:#F3F4F6;color:var(--muted);text-decoration:line-through}
-.cal-cuota-dot.comp-pend{background:#D1FAE5;color:#065F46}
-.cal-cuota-dot.vencida{background:#FEE2E2;color:#991B1B}
-.cal-more{font-size:10px;color:var(--muted);font-style:italic}
-.cal-month-total{text-align:right;font-size:12px;color:var(--muted);font-weight:500;padding:2px 0}
-.cal-panel-lista{margin-top:20px}
-
-/* GANTT */
+/* ════════════════════════════════
+   CRONOGRAMA GANTT
+════════════════════════════════ */
 .gantt-wrap{overflow-x:auto;background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:20px}
 .gantt-container{min-width:900px;padding:0}
+
+/* Header de meses */
 .gantt-months-row{display:flex;border-bottom:2px solid var(--border);background:#F9FAFB;position:sticky;top:0;z-index:10}
 .gantt-label-col{min-width:240px;width:240px;padding:10px 16px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-right:1px solid var(--border);flex-shrink:0}
 .gantt-months{display:flex;flex:1;overflow:hidden}
 .gantt-month-cell{flex:1;min-width:80px;text-align:center;padding:8px 4px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;border-right:1px solid #F3F4F6}
 .gantt-month-cell.current{background:linear-gradient(135deg,#F0FBF5,#E8F5E9);color:var(--accent);font-weight:700}
+
+/* Filas de factura */
 .gantt-row{display:flex;border-bottom:1px solid #F3F4F6;min-height:52px;transition:background .15s}
 .gantt-row:hover{background:#FAFFF8}
 .gantt-row:last-child{border-bottom:none}
@@ -241,6 +178,8 @@ textarea.txa{resize:vertical;min-height:70px}
 .gantt-grid-line{flex:1;min-width:80px;border-right:1px solid #F3F4F6}
 .gantt-grid-line.current{background:rgba(45,106,79,.04)}
 .gantt-cuotas{position:absolute;inset:0;display:flex;align-items:center;padding:0 4px}
+
+/* Barra individual de cuota */
 .gantt-cuota{position:absolute;height:28px;border-radius:6px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;overflow:hidden;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.15)}
 .gantt-cuota:hover{transform:scaleY(1.15);box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:5}
 .gantt-cuota.mc-pendiente{background:linear-gradient(135deg,#7C3AED,#9333EA)}
@@ -250,20 +189,28 @@ textarea.txa{resize:vertical;min-height:70px}
 .gantt-cuota.compartida-pendiente{background:linear-gradient(135deg,#2D6A4F,#52B788)}
 .gantt-cuota.compartida-pagada{background:linear-gradient(135deg,#52B788,#95D5B2);opacity:.6}
 .gantt-cuota.vencida{box-shadow:0 0 0 2px var(--danger) inset}
+
+/* Tooltip Gantt */
 .gantt-tooltip{position:fixed;background:#1A1A1A;color:#fff;border-radius:8px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);min-width:180px;display:none}
 .gantt-tooltip.visible{display:block}
 .gantt-tooltip-title{font-weight:700;font-size:13px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:5px}
 .gantt-tooltip-line{display:flex;justify-content:space-between;gap:12px;margin-bottom:3px;font-size:11px;color:rgba(255,255,255,.8)}
 .gantt-tooltip-line strong{color:#fff}
+
+/* Leyenda Gantt */
 .gantt-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:#fff;border-radius:var(--r);border:1px solid var(--border)}
 .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
 .legend-dot{width:14px;height:14px;border-radius:4px}
+
+/* Vista lista (tabla clásica) del cronograma */
 .cron-tabs{display:flex;gap:8px;margin-bottom:16px}
 .cron-tab{padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
 .cron-tab.active{border-color:var(--accent);background:var(--accent3);color:var(--accent)}
 .month-block{background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
 .month-header{padding:12px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;justify-content:space-between;align-items:center}
 .month-name{font-family:'DM Serif Display',serif;font-size:17px}
+
+/* Botón pagar cuota inline */
 .btn-pagar-cuota{padding:4px 10px;font-size:11px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:opacity .15s}
 .btn-pagar-cuota:hover{opacity:.85}
 .btn-desmarcar{padding:4px 10px;font-size:11px;border-radius:6px;background:#F3F4F6;color:var(--muted);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
@@ -274,8 +221,6 @@ textarea.txa{resize:vertical;min-height:70px}
   .item-row,.items-header{grid-template-columns:2fr 48px 80px 56px 110px 28px}
   .totals-split{grid-template-columns:1fr}
   .gantt-label-col,.gantt-row-label{min-width:140px;width:140px}
-  .cal-grid{gap:2px}
-  .cal-day{min-height:56px;padding:4px}
 }
 </style>
 </head>
@@ -284,19 +229,6 @@ textarea.txa{resize:vertical;min-height:70px}
 <div id="loader"><div class="spinner"></div><div class="loader-msg" id="loader-msg">Cargando...</div></div>
 <div id="toast"></div>
 <div class="gantt-tooltip" id="gantt-tooltip"></div>
-
-<!-- MODAL FOTO COMPROBANTE -->
-<div class="modal-overlay" id="modal-foto">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-header">
-      <h3 class="modal-title">Comprobante</h3>
-      <button class="modal-close" onclick="closeModal('modal-foto')">✕</button>
-    </div>
-    <div style="text-align:center">
-      <img id="modal-foto-img" src="" style="max-width:100%;max-height:500px;border-radius:10px;border:1px solid var(--border)">
-    </div>
-  </div>
-</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -404,7 +336,7 @@ textarea.txa{resize:vertical;min-height:70px}
           </select>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>Fecha</th><th>Comprobante</th><th>Foto</th><th>Factura</th><th>Cuota #</th><th>Casa</th><th>Deuda de</th><th>Pagó</th><th>Monto</th><th>Nota</th><th class="admin-only">Acción</th></tr></thead>
+          <table><thead><tr><th>Fecha</th><th>Comprobante</th><th>Factura</th><th>Cuota #</th><th>Casa</th><th>Deuda de</th><th>Pagó</th><th>Monto</th><th>Nota</th><th class="admin-only">Acción</th></tr></thead>
           <tbody id="pago-table-body"></tbody></table>
         </div>
       </div>
@@ -422,13 +354,12 @@ textarea.txa{resize:vertical;min-height:70px}
     <!-- CRONOGRAMA -->
     <section class="page" id="page-cronograma">
       <div class="page-header">
-        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Gantt · Calendario · Lista</p></div>
+        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Vista Gantt + lista de cuotas</p></div>
         <button class="btn btn-pdf" onclick="exportPDF()">⬇ PDF</button>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
         <div class="cron-tabs">
           <button class="cron-tab active" id="tab-gantt" onclick="switchCronTab('gantt')">📊 Gantt</button>
-          <button class="cron-tab" id="tab-calendario" onclick="switchCronTab('calendario')">📆 Calendario</button>
           <button class="cron-tab" id="tab-lista" onclick="switchCronTab('lista')">📋 Lista</button>
         </div>
         <select class="filter-sel" id="cron-person" onchange="renderCronograma()">
@@ -444,7 +375,6 @@ textarea.txa{resize:vertical;min-height:70px}
           <option value="pagado">Pagadas</option>
         </select>
       </div>
-      <!-- GANTT -->
       <div id="gantt-panel">
         <div class="gantt-legend" id="gantt-legend">
           <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,#7C3AED,#9333EA)"></div>MC pendiente</div>
@@ -457,19 +387,6 @@ textarea.txa{resize:vertical;min-height:70px}
         </div>
         <div class="gantt-wrap"><div class="gantt-container" id="gantt-container"></div></div>
       </div>
-      <!-- CALENDARIO -->
-      <div id="calendario-panel" style="display:none">
-        <div class="cal-header-row">
-          <button class="cal-nav-btn" onclick="calPrevMonth()">‹</button>
-          <div class="cal-month-title" id="cal-month-title"></div>
-          <button class="cal-nav-btn" onclick="calNextMonth()">›</button>
-          <button class="btn btn-secondary btn-sm" onclick="calToday()" style="margin-left:4px">Hoy</button>
-        </div>
-        <div class="cal-summary-strip" id="cal-summary-strip"></div>
-        <div class="cal-grid" id="cal-grid"></div>
-        <div class="cal-panel-lista" id="cal-panel-lista"></div>
-      </div>
-      <!-- LISTA -->
       <div id="lista-panel" style="display:none">
         <div id="cronograma-content"></div>
       </div>
@@ -537,9 +454,9 @@ textarea.txa{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- MODAL PAGO (con foto comprobante) -->
+<!-- MODAL PAGO (con selector de cuota) -->
 <div class="modal-overlay" id="modal-pago">
-  <div class="modal" style="max-width:560px">
+  <div class="modal" style="max-width:540px">
     <div class="modal-header">
       <h3 class="modal-title">Registrar Pago</h3>
       <button class="modal-close" onclick="closeModal('modal-pago')">✕</button>
@@ -549,8 +466,9 @@ textarea.txa{resize:vertical;min-height:70px}
         <label class="lbl">Factura *</label>
         <select class="sel" id="pago-factura" onchange="onFacturaChange()"></select>
       </div>
+      <!-- Cuotas de la factura seleccionada -->
       <div class="form-group full" id="cuotas-box" style="display:none">
-        <label class="lbl">Cuota a pagar (opcional)</label>
+        <label class="lbl">Cuota a pagar (opcional — deja en blanco para abono libre)</label>
         <div id="cuotas-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"></div>
       </div>
       <div class="form-group full" id="pago-info-box" style="background:#F0FBF5;border-radius:8px;padding:12px;font-size:13px;color:var(--accent);display:none"></div>
@@ -564,18 +482,6 @@ textarea.txa{resize:vertical;min-height:70px}
       </div>
       <div class="form-group"><label class="lbl">Monto pagado *</label><input class="inp" type="number" id="pago-monto" step="0.01" placeholder="0.00"></div>
       <div class="form-group full"><label class="lbl">Observación</label><input class="inp" id="pago-nota" placeholder="Ej: Cuota de enero..."></div>
-      <!-- NUEVA: Foto del comprobante -->
-      <div class="form-group full">
-        <label class="lbl">📷 Foto del comprobante</label>
-        <div class="foto-upload-area" id="foto-upload-area" onclick="triggerFotoInput()">
-          <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="onFotoSelected(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
-          <div class="foto-upload-icon" id="foto-icon">📎</div>
-          <div class="foto-upload-text" id="foto-text">Toca para tomar foto o adjuntar</div>
-          <div class="foto-upload-sub" id="foto-sub">JPG, PNG — máx. 5MB</div>
-          <img id="foto-preview-img" class="foto-preview-img">
-        </div>
-        <div id="foto-nombre" style="font-size:11px;color:var(--accent);margin-top:4px;display:none"></div>
-      </div>
     </div>
     <input type="hidden" id="pago-cuota-id">
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
@@ -680,11 +586,10 @@ async function showPage(p){
 let cronTab='gantt';
 function switchCronTab(t){
   cronTab=t;
-  ['gantt','calendario','lista'].forEach(x=>{
-    document.getElementById('tab-'+x)?.classList.toggle('active',t===x);
-    const panel=document.getElementById(x+'-panel');
-    if(panel)panel.style.display=t===x?'block':'none';
-  });
+  document.getElementById('tab-gantt').classList.toggle('active',t==='gantt');
+  document.getElementById('tab-lista').classList.toggle('active',t==='lista');
+  document.getElementById('gantt-panel').style.display=t==='gantt'?'block':'none';
+  document.getElementById('lista-panel').style.display=t==='lista'?'block':'none';
   renderCronograma();
 }
 
@@ -747,7 +652,7 @@ async function renderDashboard(){
   loaded();
 }
 
-// ═══════ CASAS — MEJORADO CON CARDS VISUALES ═══════
+// ═══════ CASAS ═══════
 function openNuevaCasa(){['casa-nombre','casa-logo-url','casa-desc'].forEach(id=>document.getElementById(id).value='');document.getElementById('casa-edit-id').value='';document.getElementById('modal-casa-title').textContent='Nueva Casa Comercial';document.getElementById('logo-preview').innerHTML='<span>Vista previa</span>';openModal('modal-casa')}
 function previewLogo(){const u=document.getElementById('casa-logo-url').value.trim();document.getElementById('logo-preview').innerHTML=u?`<img src="${u}" onerror="this.parentElement.innerHTML='<span>Error</span>'">`:'<span>Vista previa</span>'}
 async function saveCasa(){
@@ -762,62 +667,18 @@ async function saveCasa(){
 async function deleteCasa(id){if(!confirm('¿Eliminar?'))return;loading('...');const{error}=await sb.from('casas_comerciales').delete().eq('id',id);loaded();if(error){showToast(error.message,'err');return;}showToast('Eliminada','ok');await renderStores();await loadCasasSelect()}
 async function editCasa(id){const{data}=await sb.from('casas_comerciales').select('*').eq('id',id).single();if(!data)return;document.getElementById('modal-casa-title').textContent='Editar';document.getElementById('casa-nombre').value=data.nombre;document.getElementById('casa-logo-url').value=data.logo_url||'';document.getElementById('casa-desc').value=data.descripcion||'';document.getElementById('casa-edit-id').value=data.id;previewLogo();openModal('modal-casa')}
 async function loadCasasSelect(){const{data}=await sb.from('casas_comerciales').select('id,nombre').order('nombre');const opts=(data||[]).map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');document.getElementById('fac-casa').innerHTML='<option value="">Seleccionar...</option>'+opts}
-
 async function renderStores(){
   loading('Cargando casas...');
   const{data:casas}=await sb.from('casas_comerciales').select('*').order('nombre');
-  const{data:facturas}=await sb.from('facturas').select('id,casa_id,total,total_mc,total_richard,num_cuotas,pagos(monto),factura_items(responsable,cantidad,precio_unit,iva_porcentaje)');
+  const{data:facturas}=await sb.from('facturas').select('id,casa_id,total,pagos(monto)');
   loaded();
   const g=document.getElementById('store-grid');
   if(!casas?.length){g.innerHTML='<p style="color:var(--muted)">No hay casas.</p>';return;}
   g.innerHTML=casas.map(c=>{
-    const cfacs=(facturas||[]).filter(f=>f.casa_id===c.id);
-    const totalOriginal=cfacs.reduce((s,f)=>s+parseFloat(f.total||0),0);
-    const totalPagado=cfacs.reduce((s,f)=>{const p=(f.pagos||[]).reduce((ps,p)=>ps+parseFloat(p.monto||0),0);return s+p;},0);
-    const saldo=Math.max(0,totalOriginal-totalPagado);
-    const pct=totalOriginal>0?Math.min(100,(totalPagado/totalOriginal)*100):0;
-    // Split MC / Richard
-    let mcTotal=0,riTotal=0;
-    cfacs.forEach(f=>{
-      const t=calcTotalesPorPersona(f.factura_items);
-      const pagado=(f.pagos||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0);
-      const saldoF=Math.max(0,parseFloat(f.total||0)-pagado);
-      const ratioMC=(t.mc.sub+t.mc.iva)/(parseFloat(f.total||1)||1);
-      const ratioRi=(t.ri.sub+t.ri.iva)/(parseFloat(f.total||1)||1);
-      mcTotal+=saldoF*ratioMC;riTotal+=saldoF*ratioRi;
-    });
-    const logo=c.logo_url?`<img src="${c.logo_url}" onerror="this.style.display='none'" alt="${c.nombre}">`:'<span style="font-size:28px">🏪</span>';
-    const btns=currentRole==='admin'?`<button class="btn btn-secondary btn-sm" onclick="editCasa('${c.id}')">✏️ Editar</button><button class="btn btn-danger btn-sm" onclick="deleteCasa('${c.id}')">🗑</button>`:'';
-    const numFacs=cfacs.length;
-    const pendientes=cfacs.filter(f=>calcSaldo(f)>0).length;
-    return`<div class="store-card">
-      <div class="store-card-header">
-        <div class="store-logo-wrap">${logo}</div>
-      </div>
-      <div class="store-card-body">
-        <div class="store-name">${c.nombre}</div>
-        ${c.descripcion?`<div class="store-desc">${c.descripcion}</div>`:'<div class="store-desc">&nbsp;</div>'}
-        <div class="store-progress-wrap">
-          <div class="store-progress-label">
-            <span>Progreso de pago</span>
-            <span>${Math.round(pct)}%</span>
-          </div>
-          <div class="store-progress-bar">
-            <div class="store-progress-fill" style="width:${pct}%"></div>
-          </div>
-        </div>
-        <div class="store-debt-row">
-          <div class="store-debt">${fmt(saldo)}</div>
-          <div class="store-facturas-count">${numFacs} factura${numFacs!==1?'s':''} · ${pendientes} pendiente${pendientes!==1?'s':''}</div>
-        </div>
-        ${mcTotal>0||riTotal>0?`
-        <div class="store-split">
-          ${mcTotal>0?`<div class="store-split-item store-split-mc"><div class="store-split-label">💜 MC</div><div class="store-split-val">${fmt(mcTotal)}</div></div>`:''}
-          ${riTotal>0?`<div class="store-split-item store-split-richard"><div class="store-split-label">💙 Richard</div><div class="store-split-val">${fmt(riTotal)}</div></div>`:''}
-        </div>`:''}
-      </div>
-      ${currentRole==='admin'?`<div class="store-card-footer">${btns}</div>`:''}
-    </div>`;
+    const d=(facturas||[]).filter(f=>f.casa_id===c.id).reduce((s,f)=>{const p=(f.pagos||[]).reduce((ps,p)=>ps+parseFloat(p.monto||0),0);return s+Math.max(0,parseFloat(f.total||0)-p);},0);
+    const logo=c.logo_url?`<img src="${c.logo_url}" onerror="this.style.display='none'">`:'<span style="font-size:22px">🏪</span>';
+    const btns=currentRole==='admin'?`<div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" onclick="editCasa('${c.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteCasa('${c.id}')">🗑</button></div>`:'';
+    return`<div class="store-card"><div class="store-logo-wrap">${logo}</div><div><div class="store-name">${c.nombre}</div>${c.descripcion?`<div style="font-size:11px;color:var(--muted)">${c.descripcion}</div>`:''}</div><div class="store-debt">${fmt(d)}</div>${btns}</div>`;
   }).join('');
 }
 
@@ -1023,48 +884,15 @@ async function renderFacturas(){
     :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin resultados</td></tr>';
 }
 
-// ═══════ PAGOS CON FOTO ═══════
-let fotoBase64=null;
-function triggerFotoInput(){document.getElementById('foto-input').click()}
-function onFotoSelected(e){
-  const file=e.target.files[0];if(!file)return;
-  if(file.size>5*1024*1024){showToast('Imagen muy grande (máx. 5MB)','err');return;}
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    fotoBase64=ev.target.result;
-    const area=document.getElementById('foto-upload-area');
-    const img=document.getElementById('foto-preview-img');
-    img.src=fotoBase64;img.style.display='block';
-    document.getElementById('foto-icon').textContent='✅';
-    document.getElementById('foto-text').textContent=file.name;
-    document.getElementById('foto-sub').style.display='none';
-    area.classList.add('has-foto');
-    document.getElementById('foto-nombre').textContent='📎 '+file.name;
-    document.getElementById('foto-nombre').style.display='block';
-  };
-  reader.readAsDataURL(file);
-}
-function resetFoto(){
-  fotoBase64=null;
-  document.getElementById('foto-input').value='';
-  document.getElementById('foto-preview-img').style.display='none';
-  document.getElementById('foto-icon').textContent='📎';
-  document.getElementById('foto-text').textContent='Toca para tomar foto o adjuntar';
-  document.getElementById('foto-sub').style.display='block';
-  document.getElementById('foto-upload-area').classList.remove('has-foto');
-  document.getElementById('foto-nombre').style.display='none';
-}
-function verFoto(src){
-  document.getElementById('modal-foto-img').src=src;
-  openModal('modal-foto');
-}
-
+// ═══════ PAGOS ═══════
+// Abre el modal de pago preseleccionando factura y cuota
 function openPagarCuota(facId,cuotaId,monto,numero){
   openModalPago();
   setTimeout(()=>{
     const sel=document.getElementById('pago-factura');
     sel.value=facId;
     onFacturaChange().then(()=>{
+      // seleccionar el chip de esa cuota
       document.querySelectorAll('#cuotas-chips .cuota-chip').forEach(ch=>{
         if(ch.dataset.id===cuotaId)ch.click();
       });
@@ -1079,7 +907,6 @@ function openModalPago(){
   document.getElementById('pago-info-box').style.display='none';
   document.getElementById('pago-fecha').value=new Date().toISOString().slice(0,10);
   ['pago-comprobante','pago-nota','pago-monto'].forEach(id=>document.getElementById(id).value='');
-  resetFoto();
   openModal('modal-pago');
 }
 async function onFacturaChange(){
@@ -1093,6 +920,7 @@ async function onFacturaChange(){
     box.style.display='block';
     box.innerHTML=`<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota aprox.:</strong> ${fmt(cuotaAprox)} &nbsp;|&nbsp; <strong>Responsable:</strong> ${f.responsable}`;
     document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
+    // chips de cuotas
     const cuotas=(f.cuotas||[]).sort((a,b)=>a.numero-b.numero);
     if(cuotas.length){
       document.getElementById('cuotas-box').style.display='block';
@@ -1102,6 +930,7 @@ async function onFacturaChange(){
         const cls=c.pagada?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';
         return`<button class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${c.monto}" onclick="selectCuotaChip(this)">${c.pagada?'✓':''} C${c.numero} ${vencida?'⚠️':''}<br><small>${c.fecha_vence}</small><br><small>${fmt(c.monto)}</small></button>`;
       }).join('');
+      // estilos inline chips
       addChipStyles();
     } else {
       document.getElementById('cuotas-box').style.display='none';
@@ -1125,6 +954,7 @@ function selectCuotaChip(el){
   document.getElementById('pago-cuota-id').value=el.dataset.id;
   document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
 }
+// Marcar/desmarcar cuota directamente desde detalle
 async function toggleCuota(cuotaId,pagada,facId){
   loading(pagada?'Marcando pagada...':'Desmarcando...');
   const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);
@@ -1142,25 +972,27 @@ async function savePago(){
   if(!facId||!fecha||!monto){showToast('Completa campos obligatorios','err');return;}
   const{data:fac}=await sb.from('facturas').select('responsable,num_cuotas,total').eq('id',facId).single();
   loading('Guardando pago...');
+
+  // Determinar cuota número si hay cuota seleccionada
   let cuotaNum=null;
   if(cuotaId){
     const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
     if(c)cuotaNum=c.numero;
+    // marcar cuota como pagada
     await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
   }
-  // Guardar foto en base64 en el campo foto_url (texto largo)
+
   const{error}=await sb.from('pagos').insert({
     factura_id:facId,fecha_pago:fecha,
     num_comprobante:document.getElementById('pago-comprobante').value.trim(),
     quien_pago:quien,deuda_de:fac?.responsable||'',
     monto,observacion:document.getElementById('pago-nota').value.trim(),
     cuota_id:cuotaId||null,
-    cuota_numero:cuotaNum,
-    foto_url:fotoBase64||null
+    cuota_numero:cuotaNum
   });
   loaded();
   if(error){showToast(error.message,'err');return;}
-  showToast('Pago registrado'+(cuotaId?' y cuota marcada pagada':'')+(fotoBase64?' · foto adjunta':''),'ok');
+  showToast('Pago registrado'+(cuotaId?' y cuota marcada pagada':''),'ok');
   closeModal('modal-pago');
   await renderPagos();await renderDashboard();await renderFacturas();await renderCronograma();
 }
@@ -1181,17 +1013,9 @@ async function renderPagos(){
   if(error){showToast(error.message,'err');return;}
   document.getElementById('pago-table-body').innerHTML=(pagos||[]).length
     ?pagos.map(p=>{
-        const fotoBtn=p.foto_url
-          ?`<button class="btn btn-secondary btn-sm" onclick="verFoto('${p.foto_url.substring(0,30)}...' && verFotoReal(event,'${p.id}'))" style="padding:3px 8px;font-size:10px">🖼️</button>`
-          :'<span style="color:var(--muted);font-size:11px">—</span>';
-        const fotoCell=p.foto_url
-          ?`<td><img src="${p.foto_url}" class="foto-thumb" onclick="verFotoById('${p.id}')" title="Ver comprobante"></td>`
-          :`<td><span style="color:var(--muted);font-size:11px">—</span></td>`;
         const ab=currentRole==='admin'?`<td><button class="btn btn-danger btn-sm" onclick="deletePago('${p.id}')">🗑</button></td>`:'';
         return`<tr>
-          <td>${p.fecha_pago}</td>
-          <td>${p.num_comprobante||'—'}</td>
-          ${fotoCell}
+          <td>${p.fecha_pago}</td><td>${p.num_comprobante||'—'}</td>
           <td>${p.facturas?.numero||'—'}</td>
           <td>${p.cuota_numero?`<span class="badge badge-blue">C${p.cuota_numero}</span>`:'<span style="color:var(--muted);font-size:12px">Libre</span>'}</td>
           <td>${p.facturas?.casas_comerciales?.nombre||'—'}</td>
@@ -1201,24 +1025,18 @@ async function renderPagos(){
           <td style="font-size:11px;color:var(--muted)">${p.observacion||''}</td>${ab}
         </tr>`;
       }).join('')
-    :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
+    :'<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
   const cruzados=(pagos||[]).filter(p=>p.deuda_de&&p.deuda_de!==p.quien_pago);
   document.getElementById('cruzados-body').innerHTML=cruzados.length
     ?cruzados.map(p=>`<tr style="background:#FFFBEB"><td>${p.facturas?.numero||'—'}</td><td>${p.deuda_de}</td><td><strong>${p.quien_pago}</strong></td><td>${fmt(p.monto)}</td><td>${p.fecha_pago}</td><td style="font-size:11px;color:var(--muted)">${p.observacion||'—'}</td></tr>`).join('')
     :'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:14px">Sin abonos cruzados</td></tr>';
-  // guardar pagos en cache para verFotoById
-  window._pagosCache=pagos||[];
-}
-function verFotoById(id){
-  const p=(window._pagosCache||[]).find(x=>x.id===id);
-  if(p?.foto_url)verFoto(p.foto_url);
 }
 
-// ═══════ CRONOGRAMA ═══════
+// ═══════════════════════════════════════
+// CRONOGRAMA — GANTT + LISTA
+// ═══════════════════════════════════════
 const MESES_NOMBRES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
-let _cuotasCache=[];
 
 async function renderCronograma(){
   loading('Cargando cronograma...');
@@ -1238,121 +1056,38 @@ async function renderCronograma(){
     const r=c.facturas?.responsable||'';
     return r===personFilt||r==='Compartida';
   });
-  _cuotasCache=list;
   if(cronTab==='gantt')renderGantt(list);
-  else if(cronTab==='calendario')renderCalendario(list);
   else renderLista(list);
-}
-
-/* ─── CALENDARIO MENSUAL ─── */
-function calToday(){calYear=new Date().getFullYear();calMonth=new Date().getMonth();renderCalendario(_cuotasCache)}
-function calPrevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendario(_cuotasCache)}
-function calNextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendario(_cuotasCache)}
-
-function renderCalendario(cuotas){
-  const hoy=new Date();
-  const hoyStr=hoy.toISOString().slice(0,10);
-  document.getElementById('cal-month-title').textContent=`${MESES_FULL[calMonth]} ${calYear}`;
-  // Filtrar cuotas del mes
-  const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
-  const delMes=cuotas.filter(c=>c.fecha_vence.startsWith(key));
-  // Resumen del mes
-  const totalMes=delMes.reduce((s,c)=>s+parseFloat(c.monto||0),0);
-  const pendienteMes=delMes.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-  const pagadoMes=delMes.filter(c=>c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-  const mcMes=delMes.filter(c=>!c.pagada&&(c.facturas?.responsable==='Maria del Carmen'||c.facturas?.responsable==='Compartida')).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-  const riMes=delMes.filter(c=>!c.pagada&&(c.facturas?.responsable==='Richard'||c.facturas?.responsable==='Compartida')).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-  document.getElementById('cal-summary-strip').innerHTML=`
-    <div class="cal-sum-card"><div class="cal-sum-label">Total del mes</div><div class="cal-sum-val">${fmt(totalMes)}</div></div>
-    <div class="cal-sum-card"><div class="cal-sum-label" style="color:var(--danger)">Pendiente</div><div class="cal-sum-val" style="color:var(--danger)">${fmt(pendienteMes)}</div></div>
-    <div class="cal-sum-card"><div class="cal-sum-label" style="color:var(--accent)">Pagado</div><div class="cal-sum-val" style="color:var(--accent)">${fmt(pagadoMes)}</div></div>
-    <div class="cal-sum-card"><div class="cal-sum-label" style="color:var(--mc)">💜 MC debe</div><div class="cal-sum-val" style="color:var(--mc)">${fmt(mcMes)}</div></div>
-    <div class="cal-sum-card"><div class="cal-sum-label" style="color:var(--richard)">💙 Richard debe</div><div class="cal-sum-val" style="color:var(--richard)">${fmt(riMes)}</div></div>`;
-  // Grilla del calendario
-  const diasNombres=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const primerDia=new Date(calYear,calMonth,1).getDay();
-  const totalDias=new Date(calYear,calMonth+1,0).getDate();
-  let html=diasNombres.map(d=>`<div class="cal-day-header">${d}</div>`).join('');
-  // Celdas vacías iniciales
-  for(let i=0;i<primerDia;i++)html+=`<div class="cal-day empty"></div>`;
-  for(let d=1;d<=totalDias;d++){
-    const dStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const esHoy=dStr===hoyStr;
-    const cuotasDia=cuotas.filter(c=>c.fecha_vence===dStr);
-    let hasCuotas=cuotasDia.length>0;
-    let dotsHtml='';
-    cuotasDia.slice(0,3).forEach(c=>{
-      const resp=c.facturas?.responsable||'';
-      const vencida=!c.pagada&&c.fecha_vence<hoyStr;
-      let cls='comp-pend';
-      if(c.pagada)cls=resp==='Maria del Carmen'?'mc-paid':resp==='Richard'?'ri-paid':'mc-paid';
-      else if(vencida)cls='vencida';
-      else if(resp==='Maria del Carmen')cls='mc-pend';
-      else if(resp==='Richard')cls='ri-pend';
-      const label=`${c.facturas?.numero||'F'} C${c.numero}`;
-      dotsHtml+=`<div class="cal-cuota-dot ${cls}" title="${c.facturas?.numero} C${c.numero} — ${fmt(c.monto)} — ${c.pagada?'Pagada':vencida?'Vencida':'Pendiente'}">${label}</div>`;
-    });
-    if(cuotasDia.length>3)dotsHtml+=`<div class="cal-more">+${cuotasDia.length-3} más</div>`;
-    html+=`<div class="cal-day${esHoy?' today':''}${hasCuotas?' has-cuotas':''}">
-      <div class="cal-day-num">${d}</div>${dotsHtml}
-    </div>`;
-  }
-  document.getElementById('cal-grid').innerHTML=html;
-  // Lista de cuotas del mes debajo
-  if(delMes.length){
-    let listaHtml=`<h4 style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:10px">Cuotas de ${MESES_FULL[calMonth]} ${calYear}</h4>`;
-    listaHtml+=`<div class="table-card"><div class="tbl-wrap"><table><thead><tr><th>Día</th><th>Factura</th><th>Casa</th><th>Responsable</th><th>Cuota</th><th>Monto</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead><tbody>`;
-    delMes.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)).forEach(c=>{
-      const vencida=!c.pagada&&c.fecha_vence<hoyStr;
-      const resp=c.facturas?.responsable||'';
-      const rBadge=resp==='Maria del Carmen'?'badge-purple':resp==='Richard'?'badge-richard':'badge-green';
-      const rLabel=resp==='Maria del Carmen'?'💜 MC':resp==='Richard'?'💙 Richard':'⚖️ Comp.';
-      const dia=parseInt(c.fecha_vence.split('-')[2]);
-      const accion=currentRole==='admin'
-        ?(c.pagada
-          ?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null);renderCronograma()">↩</button>`
-          :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${c.facturas?.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
-        :'';
-      listaHtml+=`<tr style="${c.pagada?'opacity:.55':''}${vencida?'background:#FFF5F5':''}">
-        <td style="font-weight:600">${dia}</td>
-        <td>${c.facturas?.numero||'—'}</td>
-        <td>${c.facturas?.casas_comerciales?.nombre||'—'}</td>
-        <td><span class="badge ${rBadge}" style="font-size:10px">${rLabel}</span></td>
-        <td>${c.numero}/${c.facturas?.num_cuotas||'?'}</td>
-        <td><strong>${fmt(c.monto)}</strong></td>
-        <td>${c.pagada?'<span class="badge badge-green">Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>'}</td>
-        ${currentRole==='admin'?`<td>${accion}</td>`:''}
-      </tr>`;
-    });
-    listaHtml+=`</tbody></table></div></div>`;
-    document.getElementById('cal-panel-lista').innerHTML=listaHtml;
-  } else {
-    document.getElementById('cal-panel-lista').innerHTML=`<p style="color:var(--muted);text-align:center;padding:30px">Sin cuotas este mes.</p>`;
-  }
 }
 
 /* ─── GANTT ─── */
 function renderGantt(cuotas){
   const container=document.getElementById('gantt-container');
   if(!cuotas.length){container.innerHTML='<p style="padding:40px;text-align:center;color:var(--muted)">No hay cuotas programadas.</p>';return;}
+  // Rango de meses
   const fechas=cuotas.map(c=>c.fecha_vence).sort();
   const minDate=new Date(fechas[0]+'T00:00:00');
   const maxDate=new Date(fechas[fechas.length-1]+'T00:00:00');
+  // Primer día del mes mínimo, último día del mes máximo
   const startMonth=new Date(minDate.getFullYear(),minDate.getMonth(),1);
   const endMonth=new Date(maxDate.getFullYear(),maxDate.getMonth()+1,0);
+  // Generar array de meses
   const months=[];
   let cur=new Date(startMonth);
   while(cur<=endMonth){months.push({y:cur.getFullYear(),m:cur.getMonth()});cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);}
   const hoy=new Date();
   const hoyStr=hoy.toISOString().slice(0,10);
   const totalDays=(endMonth-startMonth)/(1000*60*60*24)+1;
+  // Agrupar cuotas por factura
   const facMap={};
   cuotas.forEach(c=>{
     const fid=c.facturas?.id||c.factura_id;
     if(!facMap[fid])facMap[fid]={factura:c.facturas,cuotas:[]};
     facMap[fid].cuotas.push(c);
   });
+  // Construir HTML
   let html='';
+  // Header meses
   html+=`<div class="gantt-months-row">
     <div class="gantt-label-col">Factura</div>
     <div class="gantt-months">`;
@@ -1361,6 +1096,7 @@ function renderGantt(cuotas){
     html+=`<div class="gantt-month-cell${isCur?' current':''}">${MESES_NOMBRES[mo.m]}<br><span style="font-size:9px;opacity:.7">${mo.y}</span></div>`;
   });
   html+=`</div></div>`;
+  // Filas
   Object.values(facMap).forEach(({factura,cuotas:cs})=>{
     const resp=factura?.responsable||'Compartida';
     const badgeCls=resp==='Maria del Carmen'?'badge-purple':resp==='Richard'?'badge-richard':'badge-green';
@@ -1377,11 +1113,12 @@ function renderGantt(cuotas){
       html+=`<div class="gantt-grid-line${isCur?' current':''}"></div>`;
     });
     html+=`</div><div class="gantt-cuotas">`;
+    // Cada cuota como barra posicionada
     cs.sort((a,b)=>a.numero-b.numero).forEach(c=>{
       const cuotaDate=new Date(c.fecha_vence+'T00:00:00');
       const dayOffset=(cuotaDate-startMonth)/(1000*60*60*24);
       const leftPct=(dayOffset/totalDays)*100;
-      const widthPct=Math.max(2,(1/totalDays)*100*28);
+      const widthPct=Math.max(2,(1/totalDays)*100*28); // ~28 días de ancho
       const vencida=!c.pagada&&c.fecha_vence<hoyStr;
       const colorClass=resp==='Maria del Carmen'
         ?(c.pagada?'mc-pagada':'mc-pendiente')
@@ -1404,6 +1141,8 @@ function renderGantt(cuotas){
   });
   container.innerHTML=html;
 }
+
+// Tooltip Gantt
 function showGanttTooltip(e,factura,numCuota,fecha,monto,estado,resp){
   const tt=document.getElementById('gantt-tooltip');
   const color=resp==='Maria del Carmen'?'#7C3AED':resp==='Richard'?'#0369A1':'#2D6A4F';
@@ -1512,3 +1251,5 @@ async function exportPDF(){
 </script>
 </body>
 </html>
+ENDOFFILE
+echo "Done — $(wc -l < /home/claude/gestor_v3.html) líneas, $(wc -c < /home/claude/gestor_v3.html) bytes"
