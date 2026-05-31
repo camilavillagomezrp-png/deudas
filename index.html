@@ -914,7 +914,7 @@ async function savePago(){
     fecha_pago:fecha,
     num_comprobante:document.getElementById('pago-comprobante').value.trim(),
     pago_quien:quien,
-    deuda_de:fac?.responsable||'',
+    deuda_de:fac?.responsable||'Compartida',
     monto,
     nota:document.getElementById('pago-nota').value.trim(),
     cuota_id:cuotaId||null,
