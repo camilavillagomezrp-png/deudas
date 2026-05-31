@@ -38,7 +38,8 @@ html,body{height:100%;overflow:hidden}
 body{font-family:var(--font-sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
 
 /* ── LOADER ── */
-#loader{position:fixed;inset:0;background:var(--surface);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+#loader{position:fixed;inset:0;background:var(--surface);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+#loader.on{display:flex}
 #loader.gone{opacity:0;pointer-events:none}
 .spin{width:32px;height:32px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -565,13 +566,16 @@ const sb=supabase.createClient(SURL,SKEY);
 
 /* UI */
 let loadStack=0;
-function loading(m='Cargando...'){loadStack++;document.getElementById('loader-msg').textContent=m;document.getElementById('loader').classList.remove('gone')}
-function loaded(){loadStack=Math.max(0,loadStack-1);if(!loadStack)document.getElementById('loader').classList.add('gone')}
-function toast(m,t='ok'){const el=document.createElement('div');el.className='toast toast-'+(t==='ok'?'ok':'err');el.textContent=m;document.getElementById('toast-wrap').appendChild(el);setTimeout(()=>el.remove(),3000)}
+function loading(m='Cargando...'){loadStack++;document.getElementById('loader-msg').textContent=m;const l=document.getElementById('loader');l.classList.add('on');l.classList.remove('gone')}
+function loaded(){loadStack=Math.max(0,loadStack-1);if(!loadStack){const l=document.getElementById('loader');l.classList.add('gone');setTimeout(()=>l.classList.remove('on'),350)}}
+function toast(m,t='ok'){const el=document.createElement('div');el.className='toast toast-'+(t==='ok'?'ok':'err');el.textContent=m;document.getElementById('toast-wrap').appendChild(el);setTimeout(()=>el.remove(),4000)}
 const fmt=n=>'$'+parseFloat(n||0).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});
 function openSheet(id){document.getElementById(id).classList.add('open')}
 function closeSheet(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.sheet-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+// Captura errores globales para no quedarse en blanco
+window.addEventListener('error',e=>{loaded();toast('Error JS: '+e.message,'err')});
+window.addEventListener('unhandledrejection',e=>{loaded();toast('Error: '+(e.reason?.message||e.reason||'desconocido'),'err')});
 
 /* AUTH */
 let role='viewer';
@@ -594,8 +598,10 @@ async function doLogin(){
   const chip=document.getElementById('role-chip');
   if(role==='admin'){chip.textContent='Admin';chip.className='role-chip chip-admin';document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');}
   else{chip.textContent='Lector';chip.className='role-chip chip-viewer';document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none');}
-  await Promise.all([loadCasasSelect(),loadFacSelect()]);
-  await renderHome();
+  try{
+    await Promise.all([loadCasasSelect(),loadFacSelect()]);
+    await renderHome();
+  }catch(e){loaded();toast('Error al cargar: '+e.message,'err');}
 }
 function doLogout(){
   document.getElementById('login-screen').style.display='flex';
@@ -636,6 +642,8 @@ async function reloadAll(){
     sb.from('pagos').select('*').order('fecha_pago',{ascending:false}),
     sb.from('cuotas').select('*').order('fecha_vence'),
   ]);
+  // Mostrar errores de Supabase si los hay
+  [r1,r2,r3,r4,r5].forEach(r=>{if(r.error)toast('Error BD: '+r.error.message,'err');});
   _casas={};(r1.data||[]).forEach(c=>_casas[c.id]=c);
   _facturas={};(r2.data||[]).forEach(f=>_facturas[f.id]=f);
   _items={};(r3.data||[]).forEach(it=>{if(!_items[it.factura_id])_items[it.factura_id]=[];_items[it.factura_id].push(it);});
