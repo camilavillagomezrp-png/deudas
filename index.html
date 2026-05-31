@@ -256,6 +256,24 @@ textarea.txa{resize:vertical;min-height:70px}
 .stat-value{font-family:'DM Serif Display',serif;font-size:24px}
 .stat-value.green{color:var(--accent)}.stat-value.red{color:var(--danger)}.stat-value.amber{color:var(--warn)}.stat-value.purple{color:var(--mc)}.stat-value.blue{color:var(--richard)}
 
+/* PRINT / PDF */
+@media print{
+  body{background:#fff !important}
+  #loader,#toast,#lightbox,.topbar,.cron-filters,#cron-resumen .no-print,
+  .btn-pagar-cuota,.btn-desmarcar,.admin-only{display:none !important}
+  .main{padding:0 !important;max-width:100% !important}
+  .page{display:none !important}
+  #page-cronograma{display:block !important}
+  .page-header{margin-bottom:12px}
+  .month-block{break-inside:avoid;box-shadow:none !important;border:1px solid #ccc !important;margin-bottom:12px}
+  .month-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table{font-size:11px}
+  td,th{padding:6px 8px}
+  #pdf-print-header{display:block !important}
+  #cron-resumen{display:block !important}
+}
+#pdf-print-header{display:none;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #2D6A4F}
+
 @media(max-width:900px){
   .dash-grid{grid-template-columns:repeat(3,1fr)}
   .proximas-section{grid-template-columns:1fr}
@@ -281,6 +299,21 @@ textarea.txa{resize:vertical;min-height:70px}
   <div class="lightbox-bar">
     <button class="lightbox-open" onclick="window.open(document.getElementById('lightbox-img').src,'_blank')">↗ Abrir original</button>
     <button class="lightbox-close" onclick="closeLightbox()">✕ Cerrar</button>
+  </div>
+</div>
+
+<!-- PRINT HEADER (visible solo al imprimir) -->
+<div id="pdf-print-header">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#2D6A4F,#52B788);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">💳</div>
+    <div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#1A1A1A">GestorDeudas</div>
+      <div style="font-size:11px;color:#6B7280" id="pdf-subtitle">Cronograma de Pagos</div>
+    </div>
+    <div style="margin-left:auto;text-align:right;font-size:11px;color:#6B7280">
+      <div id="pdf-fecha-gen"></div>
+      <div id="pdf-rango"></div>
+    </div>
   </div>
 </div>
 
@@ -405,20 +438,38 @@ textarea.txa{resize:vertical;min-height:70px}
     <!-- CRONOGRAMA -->
     <section class="page" id="page-cronograma">
       <div class="page-header">
-        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Cuotas mes a mes</p></div>
+        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Planilla mes a mes · exportable a PDF</p></div>
+        <button class="btn btn-primary" onclick="exportCronogramaPDF()" style="gap:7px">🖨️ Exportar PDF</button>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
-        <select class="filter-sel" id="cron-person" onchange="renderCronograma()">
-          <option value="">Todas las personas</option>
-          <option value="Maria del Carmen">María del Carmen</option>
-          <option value="Richard">Richard</option>
-        </select>
-        <select class="filter-sel" id="cron-estado" onchange="renderCronograma()">
-          <option value="">Todos</option>
-          <option value="pendiente">Pendientes</option>
-          <option value="pagado">Pagadas</option>
-        </select>
+      <div class="cron-filters" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;background:#fff;padding:12px 16px;border-radius:12px;border:1px solid var(--border)">
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Desde</label>
+          <input type="month" class="filter-sel" id="cron-desde" onchange="renderCronograma()" style="padding:6px 10px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Hasta</label>
+          <input type="month" class="filter-sel" id="cron-hasta" onchange="renderCronograma()" style="padding:6px 10px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Persona</label>
+          <select class="filter-sel" id="cron-person" onchange="renderCronograma()">
+            <option value="">Todas</option>
+            <option value="Maria del Carmen">María del Carmen</option>
+            <option value="Richard">Richard</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <label style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Estado</label>
+          <select class="filter-sel" id="cron-estado" onchange="renderCronograma()">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="pagado">Pagadas</option>
+          </select>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="limpiarFiltrosCron()" style="margin-top:16px">✕ Limpiar</button>
       </div>
+      <!-- RESUMEN TOTALES DEL RANGO -->
+      <div id="cron-resumen" style="display:none;margin-bottom:16px"></div>
       <div id="cronograma-content"></div>
     </section>
 
@@ -1313,54 +1364,154 @@ async function abrirEditarPago(id){
 
 /* ── CRONOGRAMA ── */
 const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function limpiarFiltrosCron(){
+  document.getElementById('cron-desde').value='';
+  document.getElementById('cron-hasta').value='';
+  document.getElementById('cron-person').value='';
+  document.getElementById('cron-estado').value='';
+  renderCronograma();
+}
+
+function exportCronogramaPDF(){
+  // Actualizar encabezado de impresión
+  const desde=document.getElementById('cron-desde').value;
+  const hasta=document.getElementById('cron-hasta').value;
+  const person=document.getElementById('cron-person').value;
+  const estado=document.getElementById('cron-estado').value;
+  const hoy=new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('pdf-fecha-gen').textContent='Generado: '+hoy;
+  let rangoTxt='Todos los períodos';
+  if(desde&&hasta)rangoTxt=`Período: ${desde} al ${hasta}`;
+  else if(desde)rangoTxt=`Desde: ${desde}`;
+  else if(hasta)rangoTxt=`Hasta: ${hasta}`;
+  document.getElementById('pdf-rango').textContent=rangoTxt;
+  let subtituloTxt='Cronograma de Pagos';
+  if(person)subtituloTxt+=` — ${person==='Maria del Carmen'?'María del Carmen':person}`;
+  if(estado)subtituloTxt+=` — ${estado==='pendiente'?'Pendientes':'Pagadas'}`;
+  document.getElementById('pdf-subtitle').textContent=subtituloTxt;
+  window.print();
+}
+
 async function renderCronograma(){
   loading();await reloadAll();loaded();
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
+  const desdeVal=document.getElementById('cron-desde').value; // 'YYYY-MM'
+  const hastaVal=document.getElementById('cron-hasta').value;
   const hoyStr=new Date().toISOString().slice(0,10);
+
   let list=_cuotas.filter(c=>{
     const fac=_facturas[c.factura_id]||{};
     if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
     if(estadoFilt==='pendiente'&&c.pagada)return false;
     if(estadoFilt==='pagado'&&!c.pagada)return false;
+    const mes=c.fecha_vence.slice(0,7);
+    if(desdeVal&&mes<desdeVal)return false;
+    if(hastaVal&&mes>hastaVal)return false;
     return true;
   });
-  if(!list.length){document.getElementById('cronograma-content').innerHTML='<p style="color:var(--muted);text-align:center;padding:40px">No hay cuotas programadas.</p>';return;}
+
+  // ── RESUMEN DEL RANGO ──
+  const totalRango=list.reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const pagadoRango=list.filter(c=>c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const pendRango=list.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const vencidasRango=list.filter(c=>!c.pagada&&c.fecha_vence<hoyStr).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+  const nPagadas=list.filter(c=>c.pagada).length;
+  const nPend=list.filter(c=>!c.pagada).length;
+
+  const resumenEl=document.getElementById('cron-resumen');
+  if(list.length){
+    resumenEl.style.display='block';
+    resumenEl.innerHTML=`
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-left:4px solid var(--accent)">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-bottom:4px">Total en rango</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent)">${fmt(totalRango)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${list.length} cuota${list.length!==1?'s':''}</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-left:4px solid #059669">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-bottom:4px">Pagado</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#059669">${fmt(pagadoRango)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${nPagadas} cuota${nPagadas!==1?'s':''}</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-left:4px solid var(--warn)">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-bottom:4px">Pendiente</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--warn)">${fmt(pendRango)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${nPend} cuota${nPend!==1?'s':''}</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-left:4px solid var(--danger)">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-bottom:4px">Vencidas</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--danger)">${fmt(vencidasRango)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${list.filter(c=>!c.pagada&&c.fecha_vence<hoyStr).length} cuota${list.filter(c=>!c.pagada&&c.fecha_vence<hoyStr).length!==1?'s':''}</div>
+        </div>
+      </div>`;
+  } else {
+    resumenEl.style.display='none';
+  }
+
+  if(!list.length){
+    document.getElementById('cronograma-content').innerHTML='<div style="background:#fff;border-radius:14px;border:1px solid var(--border);padding:48px;text-align:center;color:var(--muted)">📅 No hay cuotas en el rango seleccionado</div>';
+    return;
+  }
+
   const meses={};
   list.forEach(c=>{const k=c.fecha_vence.slice(0,7);if(!meses[k])meses[k]=[];meses[k].push(c);});
+
   document.getElementById('cronograma-content').innerHTML=Object.keys(meses).sort().map(key=>{
     const[yr,mo]=key.split('-');
     const items=meses[key];
-    const pend=items.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-    const total=items.reduce((s,c)=>s+parseFloat(c.monto||0),0);
+    const pagadoMes=items.filter(c=>c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+    const pendMes=items.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
+    const totalMes=items.reduce((s,c)=>s+parseFloat(c.monto||0),0);
+    const todoPagado=items.every(c=>c.pagada);
+    const hayVencidas=items.some(c=>!c.pagada&&c.fecha_vence<hoyStr);
+    const headerGrad=todoPagado?'linear-gradient(135deg,#059669,#34D399)':hayVencidas?'linear-gradient(135deg,#DC2626,#EF4444)':'linear-gradient(135deg,var(--accent),var(--accent2))';
+
     return`<div class="month-block">
-      <div class="month-header">
-        <span class="month-name">${MESES_FULL[parseInt(mo)-1]} ${yr}</span>
-        <span style="font-size:13px;font-weight:600;opacity:.9">Total: ${fmt(total)} | Pendiente: ${fmt(pend)}</span>
+      <div class="month-header" style="background:${headerGrad}">
+        <div>
+          <span class="month-name">${MESES_FULL[parseInt(mo)-1]} ${yr}</span>
+          ${todoPagado?'<span style="font-size:11px;opacity:.85;margin-left:8px">✓ Todo pagado</span>':hayVencidas?'<span style="font-size:11px;opacity:.85;margin-left:8px">⚠ Hay vencidas</span>':''}
+        </div>
+        <div style="text-align:right;font-size:12px;font-weight:600;opacity:.95;line-height:1.6">
+          <div>Total: ${fmt(totalMes)}</div>
+          <div style="opacity:.8;font-size:11px">✅ ${fmt(pagadoMes)} pagado &nbsp;·&nbsp; ⏳ ${fmt(pendMes)} pendiente</div>
+        </div>
       </div>
       <div class="tbl-wrap"><table>
-        <thead><tr><th>Vence</th><th>Factura</th><th>Casa</th><th>Responsable</th><th>Cuota</th><th>Monto</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead>
-        <tbody>${items.map(c=>{
+        <thead><tr>
+          <th>Vence</th><th>Factura</th><th>Casa</th><th>Responsable</th>
+          <th>Cuota</th><th>Monto</th><th>Estado</th>
+          ${currentRole==='admin'?'<th class="no-print">Acción</th>':''}
+        </tr></thead>
+        <tbody>${items.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)).map(c=>{
           const fac=_facturas[c.factura_id]||{};
           const casa=_casas[fac.casa_id]||{};
           const vencida=!c.pagada&&c.fecha_vence<hoyStr;
           const resp=fac.responsable||'';
           const rBadge=resp==='Maria del Carmen'?'badge-purple':resp==='Richard'?'badge-richard':'badge-green';
-          const rLabel=resp==='Maria del Carmen'?'💜 MC':resp==='Richard'?'💙 Richard':'⚖️ Comp.';
+          const rLabel=resp==='Maria del Carmen'?'MC':resp==='Richard'?'Richard':'Comp.';
           const accion=currentRole==='admin'
             ?(c.pagada
               ?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
               :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
             :'';
-          return`<tr style="${c.pagada?'opacity:.55':''}${vencida?';background:#FFF5F5':''}">
-            <td>${c.fecha_vence}${vencida?'<span style="color:var(--danger);margin-left:4px;font-size:10px">VENCIDA</span>':''}</td>
-            <td>${fac.numero||'—'}</td>
+          const rowBg=c.pagada?'background:#F0FBF5':vencida?'background:#FFF5F5':'';
+          return`<tr style="${rowBg}">
+            <td>${c.fecha_vence}${vencida?'<span style="color:var(--danger);margin-left:4px;font-size:10px;font-weight:600">VENCIDA</span>':''}</td>
+            <td><strong>${fac.numero||'—'}</strong></td>
             <td>${casa.nombre||'—'}</td>
-            <td><span class="badge ${rBadge}">${rLabel}</span></td>
-            <td>${c.numero}/${fac.num_cuotas||'?'}</td>
+            <td><span class="badge ${rBadge}" style="font-size:10px">${rLabel}</span></td>
+            <td style="font-weight:600">C${c.numero}/${fac.num_cuotas||'?'}</td>
             <td><strong>${fmt(c.monto)}</strong></td>
-            <td>${c.pagada?'<span class="badge badge-green">Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>'}</td>
-            ${currentRole==='admin'?`<td>${accion}</td>`:''}
+            <td>${c.pagada
+              ?'<span class="badge badge-green">✓ Pagada</span>'
+              :vencida
+                ?'<span class="badge badge-red">Vencida</span>'
+                :'<span class="badge badge-amber">Pendiente</span>'
+            }</td>
+            ${currentRole==='admin'?`<td class="no-print">${accion}</td>`:''}
           </tr>`;
         }).join('')}</tbody>
       </table></div>
