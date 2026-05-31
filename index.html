@@ -913,10 +913,10 @@ async function savePago(){
     factura_id:facId,
     fecha_pago:fecha,
     num_comprobante:document.getElementById('pago-comprobante').value.trim(),
-    quien_pago:quien,
+    pago_quien:quien,
     deuda_de:fac?.responsable||'',
     monto,
-    observacion:document.getElementById('pago-nota').value.trim(),
+    nota:document.getElementById('pago-nota').value.trim(),
     cuota_id:cuotaId||null,
     cuota_numero:cuotaNum,
     foto_url:fotoUrl
