@@ -201,10 +201,8 @@ textarea.txa{resize:vertical;min-height:70px}
 .chip-vencida{background:#FEF2F2;border-color:#FECACA;color:var(--danger)}
 .chip-pagada{background:#F3F4F6;border-color:var(--border);color:var(--muted);cursor:not-allowed;opacity:.6}
 .chip-sel{border-color:var(--accent);background:var(--accent);color:#fff;transform:scale(1.05)}
-
-/* ══════════════════════════════════════
-   CRONOGRAMA V2 — ESTILOS COMPLETOS
-   ══════════════════════════════════════ */
+/* ── DIA PAGO BADGE ── */
+.dia-pago-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;background:#FEF3C7;color:#92400E;border:1px solid #FDE68A}
 .cron-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end;background:#fff;padding:16px 20px;border-radius:14px;border:1px solid var(--border);box-shadow:var(--sh)}
 .cron-field{display:flex;flex-direction:column;gap:4px}
 .cron-field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
@@ -266,15 +264,10 @@ textarea.txa{resize:vertical;min-height:70px}
 .col-mc{color:var(--mc);font-weight:600}
 .col-ri{color:var(--richard);font-weight:600}
 .col-comp{color:var(--accent);font-weight:600}
-
-/* ── PRINT / PDF ── */
 @media print{
   @page{size:A4 landscape;margin:10mm 14mm}
   body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  #loader,#toast,#lightbox,.topbar,
-  .cron-toolbar,.cron-actions,
-  .admin-only,.btn-pagar-cuota,.btn-desmarcar,
-  .no-print{display:none!important}
+  #loader,#toast,#lightbox,.topbar,.cron-toolbar,.cron-actions,.admin-only,.btn-pagar-cuota,.btn-desmarcar,.no-print{display:none!important}
   .main{padding:0!important;max-width:100%!important}
   .page{display:none!important}
   #page-cronograma{display:block!important}
@@ -307,30 +300,13 @@ textarea.txa{resize:vertical;min-height:70px}
 .pdf-brand-name{font-family:'DM Serif Display',serif;font-size:20px;color:#1A1A1A}
 .pdf-meta{text-align:right;font-size:10px;color:#6B7280}
 .pdf-meta b{color:#1A1A1A;font-size:11px;display:block;margin-bottom:2px}
-
-@media(max-width:900px){
-  .dash-grid{grid-template-columns:repeat(3,1fr)}
-  .proximas-section{grid-template-columns:1fr}
-  .cron-resumen-grid{grid-template-columns:1fr 1fr}
-  .cron-persona-bar{grid-template-columns:1fr}
-}
-@media(max-width:700px){
-  .main{padding:14px}.form-grid{grid-template-columns:1fr}
-  .topbar{padding:0 14px}.topbar-nav .nav-btn span{display:none}
-  .item-row,.items-header{grid-template-columns:2fr 48px 80px 56px 110px 28px}
-  .totals-split{grid-template-columns:1fr}
-  .dash-grid{grid-template-columns:1fr 1fr}
-  .cron-resumen-grid{grid-template-columns:1fr 1fr}
-  .cron-persona-bar{grid-template-columns:1fr}
-  .mes-head{grid-template-columns:6px auto 1fr}
-}
+@media(max-width:900px){.dash-grid{grid-template-columns:repeat(3,1fr)}.proximas-section{grid-template-columns:1fr}.cron-resumen-grid{grid-template-columns:1fr 1fr}.cron-persona-bar{grid-template-columns:1fr}}
+@media(max-width:700px){.main{padding:14px}.form-grid{grid-template-columns:1fr}.topbar{padding:0 14px}.topbar-nav .nav-btn span{display:none}.item-row,.items-header{grid-template-columns:2fr 48px 80px 56px 110px 28px}.totals-split{grid-template-columns:1fr}.dash-grid{grid-template-columns:1fr 1fr}.cron-resumen-grid{grid-template-columns:1fr 1fr}.cron-persona-bar{grid-template-columns:1fr}.mes-head{grid-template-columns:6px auto 1fr}}
 </style>
 </head>
 <body>
-
 <div id="loader"><div class="spinner"></div><div class="loader-msg" id="loader-msg">Cargando...</div></div>
 <div id="toast"></div>
-
 <div id="lightbox" onclick="if(event.target===this)closeLightbox()">
   <img id="lightbox-img" src="" alt="Comprobante">
   <div class="lightbox-label" id="lightbox-label">Comprobante de pago</div>
@@ -339,24 +315,13 @@ textarea.txa{resize:vertical;min-height:70px}
     <button class="lightbox-close" onclick="closeLightbox()">✕ Cerrar</button>
   </div>
 </div>
-
-<!-- CABECERA PDF (solo visible al imprimir) -->
 <div id="pdf-header">
   <div class="pdf-brand">
     <div class="pdf-logo-sq">💳</div>
-    <div>
-      <div class="pdf-brand-name">GestorDeudas</div>
-      <div style="font-size:11px;color:#6B7280" id="pdf-subtitulo">Cronograma de Pagos</div>
-    </div>
+    <div><div class="pdf-brand-name">GestorDeudas</div><div style="font-size:11px;color:#6B7280" id="pdf-subtitulo">Cronograma de Pagos</div></div>
   </div>
-  <div class="pdf-meta">
-    <b id="pdf-generado"></b>
-    <span id="pdf-rango-txt"></span><br>
-    <span id="pdf-persona-txt"></span>
-  </div>
+  <div class="pdf-meta"><b id="pdf-generado"></b><span id="pdf-rango-txt"></span><br><span id="pdf-persona-txt"></span></div>
 </div>
-
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">💳</div>
@@ -373,14 +338,9 @@ textarea.txa{resize:vertical;min-height:70px}
     <button class="btn-enter" onclick="doLogin()">Ingresar →</button>
   </div>
 </div>
-
-<!-- APP -->
 <div id="app">
   <header class="topbar">
-    <div class="topbar-brand">
-      <div class="topbar-logo">💳</div>
-      <span class="topbar-name">GestorDeudas</span>
-    </div>
+    <div class="topbar-brand"><div class="topbar-logo">💳</div><span class="topbar-name">GestorDeudas</span></div>
     <nav class="topbar-nav">
       <button class="nav-btn active" onclick="showPage('dashboard')" id="nav-dashboard">📊 <span>Resumen</span></button>
       <button class="nav-btn" onclick="showPage('facturas')" id="nav-facturas">📄 <span>Facturas</span></button>
@@ -394,8 +354,6 @@ textarea.txa{resize:vertical;min-height:70px}
     </div>
   </header>
   <main class="main">
-
-    <!-- DASHBOARD -->
     <section class="page active" id="page-dashboard">
       <div class="page-header">
         <div><h2 class="page-title">Resumen General</h2><p class="page-sub">Vista consolidada de todas las deudas</p></div>
@@ -411,9 +369,7 @@ textarea.txa{resize:vertical;min-height:70px}
           <div class="card-head">
             <span class="card-head-title">📅 Próximas cuotas — ordenadas por vencimiento</span>
             <select class="filter-sel" id="dash-filter-estado" onchange="renderDashboard()" style="font-size:12px;padding:5px 10px">
-              <option value="">Todas</option>
-              <option value="pendiente">Pendientes</option>
-              <option value="vencida">Vencidas</option>
+              <option value="">Todas</option><option value="pendiente">Pendientes</option><option value="vencida">Vencidas</option>
             </select>
           </div>
           <div id="proximas-list" style="max-height:420px;overflow-y:auto"></div>
@@ -424,8 +380,6 @@ textarea.txa{resize:vertical;min-height:70px}
         </div>
       </div>
     </section>
-
-    <!-- FACTURAS -->
     <section class="page" id="page-facturas">
       <div class="page-header">
         <div><h2 class="page-title">Facturas y Créditos</h2><p class="page-sub">IVA y responsable por ítem</p></div>
@@ -447,8 +401,6 @@ textarea.txa{resize:vertical;min-height:70px}
         </div>
       </div>
     </section>
-
-    <!-- PAGOS -->
     <section class="page" id="page-pagos">
       <div class="page-header">
         <div><h2 class="page-title">Registro de Pagos</h2><p class="page-sub">Clic en una fila para ver o editar</p></div>
@@ -466,37 +418,21 @@ textarea.txa{resize:vertical;min-height:70px}
         </div>
       </div>
     </section>
-
-    <!-- CRONOGRAMA V2 -->
     <section class="page" id="page-cronograma">
       <div class="page-header">
         <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Planilla mes a mes con desglose por persona · exportable a PDF</p></div>
       </div>
-
-      <!-- TOOLBAR -->
       <div class="cron-toolbar">
-        <div class="cron-field">
-          <label>Desde</label>
-          <input type="month" id="cron-desde" onchange="renderCronograma()">
-        </div>
-        <div class="cron-field">
-          <label>Hasta</label>
-          <input type="month" id="cron-hasta" onchange="renderCronograma()">
-        </div>
-        <div class="cron-field">
-          <label>Persona</label>
+        <div class="cron-field"><label>Desde</label><input type="month" id="cron-desde" onchange="renderCronograma()"></div>
+        <div class="cron-field"><label>Hasta</label><input type="month" id="cron-hasta" onchange="renderCronograma()"></div>
+        <div class="cron-field"><label>Persona</label>
           <select id="cron-person" onchange="renderCronograma()">
-            <option value="">Todas</option>
-            <option value="Maria del Carmen">María del Carmen</option>
-            <option value="Richard">Richard</option>
+            <option value="">Todas</option><option value="Maria del Carmen">María del Carmen</option><option value="Richard">Richard</option>
           </select>
         </div>
-        <div class="cron-field">
-          <label>Estado</label>
+        <div class="cron-field"><label>Estado</label>
           <select id="cron-estado" onchange="renderCronograma()">
-            <option value="">Todos</option>
-            <option value="pendiente">Pendientes</option>
-            <option value="pagado">Pagadas</option>
+            <option value="">Todos</option><option value="pendiente">Pendientes</option><option value="pagado">Pagadas</option>
           </select>
         </div>
         <div class="cron-actions">
@@ -504,14 +440,9 @@ textarea.txa{resize:vertical;min-height:70px}
           <button class="btn-pdf" onclick="exportCronogramaPDF()">🖨️ Exportar PDF</button>
         </div>
       </div>
-
-      <!-- RESUMEN RANGO -->
       <div id="cron-resumen-wrap"></div>
-      <!-- CONTENIDO MESES -->
       <div id="cronograma-content"></div>
     </section>
-
-    <!-- CASAS -->
     <section class="page" id="page-casas">
       <div class="page-header">
         <div><h2 class="page-title">Casas Comerciales</h2></div>
@@ -519,12 +450,11 @@ textarea.txa{resize:vertical;min-height:70px}
       </div>
       <div class="table-card">
         <div class="tbl-wrap">
-          <table><thead><tr><th>Nombre</th><th>Descripción</th><th class="admin-only">Acciones</th></tr></thead>
+          <table><thead><tr><th>Nombre</th><th>Día de pago</th><th>Descripción</th><th class="admin-only">Acciones</th></tr></thead>
           <tbody id="casas-table-body"></tbody></table>
         </div>
       </div>
     </section>
-
   </main>
 </div>
 
@@ -537,10 +467,14 @@ textarea.txa{resize:vertical;min-height:70px}
     </div>
     <div class="form-grid">
       <div class="form-group"><label class="lbl">N° Factura *</label><input class="inp" id="fac-numero" placeholder="FAC-001"></div>
-      <div class="form-group"><label class="lbl">Casa comercial *</label><select class="sel" id="fac-casa"></select></div>
+      <div class="form-group"><label class="lbl">Casa comercial *</label><select class="sel" id="fac-casa" onchange="onCasaChange()"></select></div>
       <div class="form-group"><label class="lbl">Fecha de emisión *</label><input class="inp" type="date" id="fac-fecha"></div>
       <div class="form-group"><label class="lbl">N° cuotas</label><input class="inp" type="number" id="fac-cuotas" value="1" min="1" oninput="previewCuotas()"></div>
-      <div class="form-group"><label class="lbl">Fecha primera cuota</label><input class="inp" type="date" id="fac-primera-cuota" oninput="previewCuotas()"></div>
+      <div class="form-group">
+        <label class="lbl">Fecha primera cuota</label>
+        <input class="inp" type="date" id="fac-primera-cuota" oninput="previewCuotas()">
+        <span id="fac-dia-pago-hint" style="font-size:11px;color:var(--accent);margin-top:3px;display:none">📅 Calculado automáticamente según día de pago de la casa</span>
+      </div>
       <div class="form-group"><label class="lbl">Notas</label><input class="inp" id="fac-notas" placeholder="Opcional..."></div>
       <div class="form-group full" id="cuotas-preview-box" style="display:none">
         <label class="lbl">Vista previa de cuotas</label>
@@ -645,6 +579,12 @@ textarea.txa{resize:vertical;min-height:70px}
       <button class="modal-close" onclick="closeModal('modal-casa')">✕</button>
     </div>
     <div class="form-group" style="margin-bottom:14px"><label class="lbl">Nombre *</label><input class="inp" id="casa-nombre" placeholder="Ej: La Ganga"></div>
+    <!-- ▼ NUEVO: Día de pago -->
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="lbl">Día de pago mensual</label>
+      <input class="inp" type="number" id="casa-dia-pago" placeholder="Ej: 15" min="1" max="31">
+      <span style="font-size:11px;color:var(--muted);margin-top:3px">El día del mes en que vencen las cuotas (1-31). Se usará para calcular fechas automáticamente.</span>
+    </div>
     <div class="form-group" style="margin-bottom:14px"><label class="lbl">Descripción</label><textarea class="txa" id="casa-desc"></textarea></div>
     <input type="hidden" id="casa-edit-id">
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
@@ -670,7 +610,6 @@ const SURL='https://rzzwubgzzcxqkkvcifow.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6end1Ymd6emN4cWtrdmNpZm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyOTY2MjEsImV4cCI6MjA5NDg3MjYyMX0.sUv6VsuMvyIjUBYDpPxd8WyTdd9L6LuKGsoc0vXlLT8';
 const sb=supabase.createClient(SURL,SKEY);
 
-/* ── UI ── */
 function loading(m='Cargando...'){document.getElementById('loader-msg').textContent=m;document.getElementById('loader').classList.add('on')}
 function loaded(){document.getElementById('loader').classList.remove('on')}
 function showToast(msg,type='ok'){const el=document.createElement('div');el.className='toast-item '+(type==='ok'?'toast-ok':'toast-err');el.textContent=msg;document.getElementById('toast').appendChild(el);setTimeout(()=>el.remove(),4000)}
@@ -680,12 +619,10 @@ function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 
-/* ── LIGHTBOX ── */
 function verFoto(url,label='Comprobante de pago'){if(!url)return;document.getElementById('lightbox-img').src=url;document.getElementById('lightbox-label').textContent=label;document.getElementById('lightbox').classList.add('open')}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lightbox-img').src=''}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox()});
 
-/* ── AUTH ── */
 let currentRole='viewer';let fotoBase64=null;const ADMIN_PIN='1995';
 function selectRole(r){currentRole=r;document.getElementById('btn-viewer').classList.toggle('active',r==='viewer');document.getElementById('btn-admin').classList.toggle('active',r==='admin');document.getElementById('admin-pin-area').style.display=r==='admin'?'block':'none'}
 function clearPinError(){document.getElementById('pin-error').style.display='none'}
@@ -699,7 +636,6 @@ async function doLogin(){
 }
 function doLogout(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pin-input').value='';selectRole('viewer')}
 
-/* ── NAV ── */
 async function showPage(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
@@ -712,7 +648,6 @@ async function showPage(p){
   else if(p==='casas')await renderCasas();
 }
 
-/* ── CACHE ── */
 let _casas={},_facturas={},_items={},_pagosMap={},_cuotas=[],_cuotasByFac={};
 async function reloadAll(){
   const[r1,r2,r3,r4,r5]=await Promise.all([
@@ -731,8 +666,6 @@ async function reloadAll(){
   _cuotasByFac={};_cuotas.forEach(c=>{if(!_cuotasByFac[c.factura_id])_cuotasByFac[c.factura_id]=[];_cuotasByFac[c.factura_id].push(c)});
 }
 function enrich(f){return{...f,casa:_casas[f.casa_id]||{},factura_items:_items[f.id]||[],pagos:_pagosMap[f.id]||[],cuotas:_cuotasByFac[f.id]||[]}}
-
-/* ── CALCS ── */
 function calcPagado(f){return(f.pagos||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0)}
 function calcSaldo(f){return Math.max(0,parseFloat(f.total||0)-calcPagado(f))}
 function getEstado(f){const s=calcSaldo(f),p=calcPagado(f);if(s<=0)return'pagado';if(p>0)return'parcial';return'pendiente'}
@@ -750,36 +683,83 @@ function calcPersonas(items){
   return{mc,ri};
 }
 function diasParaVencer(fechaStr){const hoy=new Date();hoy.setHours(0,0,0,0);const f=new Date(fechaStr+'T00:00:00');return Math.round((f-hoy)/(1000*60*60*24))}
-
-/* Calcula cuánto de una cuota corresponde a MC y cuánto a Richard
-   según el desglose de ítems de la factura */
-function cuotaPersonas(cuota, fac){
-  const items=_items[fac.id]||[];
-  const t=calcPersonas(items);
+function cuotaPersonas(cuota,fac){
+  const items=_items[fac.id]||[];const t=calcPersonas(items);
   const grand=t.mc.s+t.mc.i+t.ri.s+t.ri.i;
-  if(grand===0) return{mc:cuota.monto/2, ri:cuota.monto/2};
+  if(grand===0)return{mc:cuota.monto/2,ri:cuota.monto/2};
   const mc=(t.mc.s+t.mc.i)/grand*parseFloat(cuota.monto||0);
   const ri=(t.ri.s+t.ri.i)/grand*parseFloat(cuota.monto||0);
   return{mc,ri};
 }
 
-/* ── SELECTS ── */
+/* ── CALCULA FECHA DE CUOTA respetando día fijo de la casa ──
+   Si la casa tiene dia_pago=15 y la factura es de mayo,
+   la primera cuota es el 15 del mes siguiente (o mismo mes si no ha pasado).
+   Las siguientes cuotas son día 15 de cada mes. */
+function calcFechaCuota(base, i, diaPago) {
+  // base: Date objeto de la fecha de emisión
+  // i: índice 0-based (0 = primera cuota)
+  // diaPago: número 1-31 o null
+  if (diaPago) {
+    // Mes base: mismo mes de la factura + i meses
+    const yr = base.getFullYear();
+    const mo = base.getMonth() + i; // puede ser > 11, Date lo maneja
+    const dia = diaPago;
+    // Crear fecha en ese año/mes con el día de pago
+    let d = new Date(yr, mo, dia);
+    // Si el día no existe en ese mes (ej: 31 en abril), usar último día del mes
+    if (d.getMonth() !== ((yr + Math.floor(mo/12)*0) , (mo % 12 + 12) % 12)) {
+      d = new Date(yr, mo + 1, 0); // último día del mes
+    }
+    // Si la primera cuota cae ANTES o EN el mismo día de emisión, mover al mes siguiente
+    if (i === 0 && d <= base) {
+      d = new Date(base.getFullYear(), base.getMonth() + 1, dia);
+      if (d.getDate() !== dia) d = new Date(base.getFullYear(), base.getMonth() + 2, 0);
+    }
+    return d;
+  } else {
+    // Sin día fijo: sumar meses normalmente
+    const yr = base.getFullYear();
+    const mo = base.getMonth() + i;
+    const dia = base.getDate();
+    let d = new Date(yr, mo, dia);
+    // Corrección si el día no existe en ese mes
+    if (d.getDate() !== dia) d = new Date(yr, mo + 1, 0);
+    return d;
+  }
+}
+
 async function loadCasasSelect(){
-  const{data}=await sb.from('casas_comerciales').select('id,nombre').order('nombre');
-  const opts=(data||[]).map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  const{data}=await sb.from('casas_comerciales').select('id,nombre,dia_pago').order('nombre');
+  const opts=(data||[]).map(c=>`<option value="${c.id}" data-dia="${c.dia_pago||''}">${c.nombre}${c.dia_pago?' (día '+c.dia_pago+')':''}</option>`).join('');
   document.getElementById('fac-casa').innerHTML='<option value="">Seleccionar...</option>'+opts;
 }
 async function loadFacSelect(){
-  const[r1,r2]=await Promise.all([
-    sb.from('facturas').select('id,numero,casa_id').order('numero'),
-    sb.from('casas_comerciales').select('id,nombre')
-  ]);
+  const[r1,r2]=await Promise.all([sb.from('facturas').select('id,numero,casa_id').order('numero'),sb.from('casas_comerciales').select('id,nombre')]);
   const cm={};(r2.data||[]).forEach(c=>cm[c.id]=c.nombre);
   const opts=(r1.data||[]).map(f=>`<option value="${f.id}">${f.numero}${cm[f.casa_id]?' — '+cm[f.casa_id]:''}</option>`).join('');
   document.getElementById('pago-factura').innerHTML='<option value="">Seleccionar...</option>'+opts;
 }
 
-/* ── DASHBOARD ── */
+/* ── AUTO-CALCULAR fecha primera cuota al elegir casa ── */
+function onCasaChange(){
+  const sel=document.getElementById('fac-casa');
+  const opt=sel.options[sel.selectedIndex];
+  const diaPago=parseInt(opt.dataset.dia)||0;
+  const hint=document.getElementById('fac-dia-pago-hint');
+  if(diaPago){
+    // Calcular fecha de primera cuota automáticamente
+    const fechaEmision=document.getElementById('fac-fecha').value;
+    const base=fechaEmision?new Date(fechaEmision+'T00:00:00'):new Date();
+    const primera=calcFechaCuota(base,0,diaPago);
+    document.getElementById('fac-primera-cuota').value=primera.toISOString().slice(0,10);
+    hint.style.display='block';
+  }else{
+    hint.style.display='none';
+  }
+  previewCuotas();
+}
+
 async function renderDashboard(){
   loading('Cargando resumen...');await reloadAll();loaded();
   const pf=document.getElementById('dash-filter-person').value;
@@ -846,11 +826,19 @@ async function renderDashboard(){
 }
 
 /* ── CASAS ── */
-function openNuevaCasa(){document.getElementById('casa-nombre').value='';document.getElementById('casa-desc').value='';document.getElementById('casa-edit-id').value='';document.getElementById('modal-casa-title').textContent='Nueva Casa Comercial';openModal('modal-casa')}
+function openNuevaCasa(){
+  document.getElementById('casa-nombre').value='';
+  document.getElementById('casa-dia-pago').value='';
+  document.getElementById('casa-desc').value='';
+  document.getElementById('casa-edit-id').value='';
+  document.getElementById('modal-casa-title').textContent='Nueva Casa Comercial';
+  openModal('modal-casa');
+}
 async function saveCasa(){
   const n=document.getElementById('casa-nombre').value.trim();if(!n){showToast('Ingresa nombre','err');return}
+  const diaPago=parseInt(document.getElementById('casa-dia-pago').value)||null;
   const eid=document.getElementById('casa-edit-id').value;
-  const obj={nombre:n,descripcion:document.getElementById('casa-desc').value.trim()};
+  const obj={nombre:n,dia_pago:diaPago,descripcion:document.getElementById('casa-desc').value.trim()};
   loading('Guardando...');let error;
   if(eid){({error}=await sb.from('casas_comerciales').update(obj).eq('id',eid))}
   else{({error}=await sb.from('casas_comerciales').insert(obj))}
@@ -861,14 +849,22 @@ async function deleteCasa(id){if(!confirm('¿Eliminar?'))return;loading();const{
 async function editCasa(id){
   const c=_casas[id];if(!c)return;
   document.getElementById('modal-casa-title').textContent='Editar';
-  document.getElementById('casa-nombre').value=c.nombre;document.getElementById('casa-desc').value=c.descripcion||'';document.getElementById('casa-edit-id').value=c.id;openModal('modal-casa');
+  document.getElementById('casa-nombre').value=c.nombre;
+  document.getElementById('casa-dia-pago').value=c.dia_pago||'';
+  document.getElementById('casa-desc').value=c.descripcion||'';
+  document.getElementById('casa-edit-id').value=c.id;
+  openModal('modal-casa');
 }
 async function renderCasas(){
   loading();await reloadAll();loaded();
   document.getElementById('casas-table-body').innerHTML=Object.values(_casas).length
-    ?Object.values(_casas).map(c=>`<tr><td><strong>${c.nombre}</strong></td><td style="font-size:12px;color:var(--muted)">${c.descripcion||'—'}</td>
-      ${currentRole==='admin'?`<td><button class="btn btn-secondary btn-sm" onclick="editCasa('${c.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="deleteCasa('${c.id}')">🗑</button></td>`:'<td></td>'}</tr>`).join('')
-    :'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Sin casas</td></tr>';
+    ?Object.values(_casas).map(c=>`<tr>
+        <td><strong>${c.nombre}</strong></td>
+        <td>${c.dia_pago?`<span class="dia-pago-badge">📅 Día ${c.dia_pago}</span>`:'<span style="color:var(--muted);font-size:12px">Sin día fijo</span>'}</td>
+        <td style="font-size:12px;color:var(--muted)">${c.descripcion||'—'}</td>
+        ${currentRole==='admin'?`<td><button class="btn btn-secondary btn-sm" onclick="editCasa('${c.id}')">✏️</button> <button class="btn btn-danger btn-sm" onclick="deleteCasa('${c.id}')">🗑</button></td>`:'<td></td>'}
+      </tr>`).join('')
+    :'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Sin casas</td></tr>';
 }
 
 /* ── FACTURAS ── */
@@ -910,9 +906,27 @@ function previewCuotas(){
   if(!primera||n<1){box.style.display='none';return}
   box.style.display='block';
   const totalVal=parseFloat(document.getElementById('g-total').textContent.replace(/[$,]/g,''))||0;
-  const cuota=totalVal/n;const base=new Date(primera+'T00:00:00');
+  const cuota=totalVal/n;
+
+  // Obtener día de pago de la casa seleccionada
+  const casaSel=document.getElementById('fac-casa');
+  const opt=casaSel.options[casaSel.selectedIndex];
+  const diaPago=parseInt(opt?.dataset?.dia)||0;
+  const base=new Date(primera+'T00:00:00');
+
   prev.innerHTML=Array.from({length:n},(_,i)=>{
-    const d=new Date(base);d.setMonth(d.getMonth()+i);const ds=d.toISOString().slice(0,10);
+    let d;
+    if(diaPago){
+      // Usar día fijo de la casa a partir del mes de la primera cuota
+      const yr=base.getFullYear();
+      const mo=base.getMonth()+i;
+      d=new Date(yr,mo,diaPago);
+      if(d.getDate()!==diaPago)d=new Date(yr,mo+1,0);
+    }else{
+      const yr=base.getFullYear();const mo=base.getMonth()+i;const dia=base.getDate();
+      d=new Date(yr,mo,dia);if(d.getDate()!==dia)d=new Date(yr,mo+1,0);
+    }
+    const ds=d.toISOString().slice(0,10);
     return`<div style="background:#F0FBF5;border:1px solid var(--accent3);border-radius:8px;padding:6px 10px;font-size:11px;text-align:center"><div style="font-weight:600;color:var(--accent)">C${i+1}</div><div style="color:var(--muted)">${ds}</div><div style="font-weight:700">${fmt(cuota)}</div></div>`;
   }).join('');
 }
@@ -921,6 +935,7 @@ async function openNuevaFactura(){
   ['fac-numero','fac-notas'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fac-fecha').value=new Date().toISOString().slice(0,10);
   document.getElementById('fac-cuotas').value=1;document.getElementById('fac-primera-cuota').value='';
+  document.getElementById('fac-dia-pago-hint').style.display='none';
   document.getElementById('items-container').innerHTML='';document.getElementById('cuotas-preview-box').style.display='none';
   await loadCasasSelect();addItemRow();recalcTotals();openModal('modal-factura');
 }
@@ -936,28 +951,56 @@ async function saveFactura(){
     const desc=inp[0].value.trim(),qty=parseFloat(inp[1].value)||0,price=parseFloat(inp[2].value)||0,iva=parseFloat(inp[3].value)||0,resp=sel?sel.value:'Maria del Carmen';
     if(desc||price){
       items.push({descripcion:desc,cantidad:qty,precio_unit:price,iva_porcentaje:iva,responsable:resp,orden:idx});
-      const s=qty*price,i=s*iva/100;
-      if(resp==='Maria del Carmen'){mcS+=s;mcI+=i}else if(resp==='Richard'){riS+=s;riI+=i}else{mcS+=s/2;mcI+=i/2;riS+=s/2;riI+=i/2}
+      const s=qty*price,iv=s*iva/100;
+      if(resp==='Maria del Carmen'){mcS+=s;mcI+=iv}else if(resp==='Richard'){riS+=s;riI+=iv}else{mcS+=s/2;mcI+=iv/2;riS+=s/2;riI+=iv/2}
     }
   });
   const subtotal=+(mcS+riS).toFixed(2),ivaTotal=+(mcI+riI).toFixed(2),total=+(subtotal+ivaTotal).toFixed(2);
   const numCuotas=parseInt(document.getElementById('fac-cuotas').value)||1;
   const primeraCuota=document.getElementById('fac-primera-cuota').value||null;
+
+  // Obtener día de pago de la casa
+  const casaSel=document.getElementById('fac-casa');
+  const opt=casaSel.options[casaSel.selectedIndex];
+  const diaPago=parseInt(opt?.dataset?.dia)||0;
+
   let respFac='Compartida';
   if(mcS+mcI>0&&riS+riI===0)respFac='Maria del Carmen';
   else if(riS+riI>0&&mcS+mcI===0)respFac='Richard';
+
+  // ── GENERAR CUOTAS con fechas correctas ──
   const cuotasArr=[];
   if(primeraCuota){
-    const mc=+(total/numCuotas).toFixed(2);const base=new Date(primeraCuota+'T00:00:00');
-    for(let i=0;i<numCuotas;i++){const d=new Date(base);d.setMonth(d.getMonth()+i);cuotasArr.push({numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:mc,pagada:false})}
+    const mc=+(total/numCuotas).toFixed(2);
+    const base=new Date(primeraCuota+'T00:00:00');
+    for(let i=0;i<numCuotas;i++){
+      let d;
+      if(diaPago){
+        // Usar día fijo: primer mes = mes de primeraCuota, siguientes +1 mes
+        const yr=base.getFullYear();
+        const mo=base.getMonth()+i;
+        d=new Date(yr,mo,diaPago);
+        // Si el día no existe en ese mes, usar el último día
+        if(d.getDate()!==diaPago)d=new Date(yr,mo+1,0);
+      }else{
+        // Sin día fijo: mismo día cada mes (corrigiendo meses cortos)
+        const yr=base.getFullYear();const mo=base.getMonth()+i;const dia=base.getDate();
+        d=new Date(yr,mo,dia);if(d.getDate()!==dia)d=new Date(yr,mo+1,0);
+      }
+      cuotasArr.push({numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:mc,pagada:false});
+    }
   }
+
   const facObj={numero,casa_id:casaId,fecha_emision:fecha,responsable:respFac,subtotal,iva_porcentaje:0,iva_valor:ivaTotal,total,total_mc:+(mcS+mcI).toFixed(2),total_richard:+(riS+riI).toFixed(2),num_cuotas:numCuotas,fecha_primera_cuota:primeraCuota,notas:document.getElementById('fac-notas').value.trim()};
   loading('Guardando...');let facId=editingFacturaId;
   if(editingFacturaId){
     const{error}=await sb.from('facturas').update(facObj).eq('id',editingFacturaId);
     if(error){loaded();showToast(error.message,'err');return}
     await sb.from('factura_items').delete().eq('factura_id',editingFacturaId);
-    await sb.from('cuotas').delete().eq('factura_id',editingFacturaId);
+    // Solo borrar cuotas NO pagadas para preservar historial
+    if(primeraCuota){
+      await sb.from('cuotas').delete().eq('factura_id',editingFacturaId).eq('pagada',false);
+    }
   }else{
     const{data,error}=await sb.from('facturas').insert(facObj).select().single();
     if(error){loaded();showToast(error.message,'err');return}
@@ -987,6 +1030,10 @@ async function editFactura(id){
   document.getElementById('fac-numero').value=f.numero;document.getElementById('fac-casa').value=f.casa_id;
   document.getElementById('fac-fecha').value=f.fecha_emision;document.getElementById('fac-cuotas').value=f.num_cuotas;
   document.getElementById('fac-primera-cuota').value=f.fecha_primera_cuota||'';document.getElementById('fac-notas').value=f.notas||'';
+  // Mostrar hint si la casa tiene día de pago
+  const casaSel=document.getElementById('fac-casa');
+  const opt=casaSel.options[casaSel.selectedIndex];
+  document.getElementById('fac-dia-pago-hint').style.display=(parseInt(opt?.dataset?.dia)||0)?'block':'none';
   document.getElementById('items-container').innerHTML='';
   (r2.data||[]).forEach(it=>addItemRow(it.descripcion,it.cantidad,it.precio_unit,it.iva_porcentaje??12,it.responsable||'Maria del Carmen'));
   recalcTotals();openModal('modal-factura');
@@ -1036,7 +1083,7 @@ async function verDetalle(id){
   document.getElementById('detalle-titulo').textContent=`Factura ${f.numero}`;
   document.getElementById('detalle-content').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:13px">
-      <div><span style="color:var(--muted)">Casa:</span> <strong>${casa.nombre||'—'}</strong></div>
+      <div><span style="color:var(--muted)">Casa:</span> <strong>${casa.nombre||'—'}${casa.dia_pago?' <span class="dia-pago-badge">Día '+casa.dia_pago+'</span>':''}</strong></div>
       <div><span style="color:var(--muted)">Fecha:</span> <strong>${f.fecha_emision}</strong></div>
       <div><span style="color:var(--muted)">Cuotas:</span> <strong>${f.num_cuotas}</strong></div>
       ${f.notas?`<div><span style="color:var(--muted)">Notas:</span> <strong>${f.notas}</strong></div>`:''}
@@ -1257,29 +1304,20 @@ async function abrirEditarPago(id){
   await loadFacSelect();openModalPago(data);
 }
 
-/* ══════════════════════════════════════════
-   CRONOGRAMA V2 — LÓGICA COMPLETA
-   ══════════════════════════════════════════ */
+/* ── CRONOGRAMA ── */
 const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
 function limpiarFiltrosCron(){
   ['cron-desde','cron-hasta'].forEach(id=>document.getElementById(id).value='');
   ['cron-person','cron-estado'].forEach(id=>document.getElementById(id).value='');
   renderCronograma();
 }
-
 function exportCronogramaPDF(){
-  // Actualizar cabecera para impresión
-  const desde=document.getElementById('cron-desde').value;
-  const hasta=document.getElementById('cron-hasta').value;
-  const person=document.getElementById('cron-person').value;
-  const estado=document.getElementById('cron-estado').value;
+  const desde=document.getElementById('cron-desde').value;const hasta=document.getElementById('cron-hasta').value;
+  const person=document.getElementById('cron-person').value;const estado=document.getElementById('cron-estado').value;
   const hoy=new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
   document.getElementById('pdf-generado').textContent='Generado: '+hoy;
   let rango='Todos los períodos';
-  if(desde&&hasta)rango=`Período: ${desde} al ${hasta}`;
-  else if(desde)rango=`Desde: ${desde}`;
-  else if(hasta)rango=`Hasta: ${hasta}`;
+  if(desde&&hasta)rango=`Período: ${desde} al ${hasta}`;else if(desde)rango=`Desde: ${desde}`;else if(hasta)rango=`Hasta: ${hasta}`;
   document.getElementById('pdf-rango-txt').textContent=rango;
   let pTxt='';
   if(person)pTxt=person==='Maria del Carmen'?'María del Carmen':'Richard';
@@ -1291,195 +1329,89 @@ function exportCronogramaPDF(){
   document.getElementById('pdf-subtitulo').textContent=subtitulo;
   window.print();
 }
-
 async function renderCronograma(){
   loading('Cargando cronograma...');await reloadAll();loaded();
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
-  const desdeVal=document.getElementById('cron-desde').value; // 'YYYY-MM'
-  const hastaVal=document.getElementById('cron-hasta').value; // 'YYYY-MM'
+  const desdeVal=document.getElementById('cron-desde').value;
+  const hastaVal=document.getElementById('cron-hasta').value;
   const hoyStr=new Date().toISOString().slice(0,10);
-
-  /* ── FILTRO ROBUSTO ── */
   let list=_cuotas.filter(c=>{
-    // Estado
     if(estadoFilt==='pendiente'&&c.pagada)return false;
     if(estadoFilt==='pagado'&&!c.pagada)return false;
-    // Persona: comparar responsable de la factura
-    if(personFilt){
-      const fac=_facturas[c.factura_id]||{};
-      const resp=fac.responsable||'';
-      // Incluir si es exactamente esa persona O si es Compartida (ambos participan)
-      if(resp!==personFilt&&resp!=='Compartida')return false;
-    }
-    // Rango YYYY-MM vs YYYY-MM de la cuota
-    const mesCuota=c.fecha_vence.slice(0,7); // 'YYYY-MM'
+    if(personFilt){const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'';if(resp!==personFilt&&resp!=='Compartida')return false}
+    const mesCuota=c.fecha_vence.slice(0,7);
     if(desdeVal&&mesCuota<desdeVal)return false;
     if(hastaVal&&mesCuota>hastaVal)return false;
     return true;
   });
-
-  /* ── RESUMEN TOTALES ── */
   const wrap=document.getElementById('cron-resumen-wrap');
   if(!list.length){
     wrap.innerHTML='';
     document.getElementById('cronograma-content').innerHTML=`<div style="background:#fff;border-radius:14px;border:1px solid var(--border);padding:48px;text-align:center;color:var(--muted)">📅 No hay cuotas en el rango seleccionado</div>`;
     return;
   }
-
-  // Totales generales
   const totalRango=list.reduce((s,c)=>s+parseFloat(c.monto||0),0);
   const pagadoRango=list.filter(c=>c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
   const pendRango=list.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
   const vencidasList=list.filter(c=>!c.pagada&&c.fecha_vence<hoyStr);
   const vencidasRango=vencidasList.reduce((s,c)=>s+parseFloat(c.monto||0),0);
-
-  // Totales por persona (desglosando cuotas compartidas)
   let mcTotal=0,riTotal=0,mcPag=0,riPag=0,mcPend=0,riPend=0;
-  list.forEach(c=>{
-    const fac=_facturas[c.factura_id]||{};
-    const p=cuotaPersonas(c,fac);
-    mcTotal+=p.mc;riTotal+=p.ri;
-    if(c.pagada){mcPag+=p.mc;riPag+=p.ri}
-    else{mcPend+=p.mc;riPend+=p.ri}
-  });
-
+  list.forEach(c=>{const fac=_facturas[c.factura_id]||{};const p=cuotaPersonas(c,fac);mcTotal+=p.mc;riTotal+=p.ri;if(c.pagada){mcPag+=p.mc;riPag+=p.ri}else{mcPend+=p.mc;riPend+=p.ri}});
   wrap.innerHTML=`
     <div class="cron-resumen-grid">
-      <div class="cron-kpi total">
-        <div class="cron-kpi-label">Total en rango</div>
-        <div class="cron-kpi-val">${fmt(totalRango)}</div>
-        <div class="cron-kpi-sub">${list.length} cuota${list.length!==1?'s':''}</div>
-      </div>
-      <div class="cron-kpi pago">
-        <div class="cron-kpi-label">Pagado</div>
-        <div class="cron-kpi-val">${fmt(pagadoRango)}</div>
-        <div class="cron-kpi-sub">${list.filter(c=>c.pagada).length} cuota${list.filter(c=>c.pagada).length!==1?'s':''}</div>
-      </div>
-      <div class="cron-kpi pend">
-        <div class="cron-kpi-label">Pendiente</div>
-        <div class="cron-kpi-val">${fmt(pendRango)}</div>
-        <div class="cron-kpi-sub">${list.filter(c=>!c.pagada).length} cuota${list.filter(c=>!c.pagada).length!==1?'s':''}</div>
-      </div>
-      <div class="cron-kpi venc">
-        <div class="cron-kpi-label">Vencidas sin pagar</div>
-        <div class="cron-kpi-val">${fmt(vencidasRango)}</div>
-        <div class="cron-kpi-sub">${vencidasList.length} cuota${vencidasList.length!==1?'s':''}</div>
-      </div>
+      <div class="cron-kpi total"><div class="cron-kpi-label">Total en rango</div><div class="cron-kpi-val">${fmt(totalRango)}</div><div class="cron-kpi-sub">${list.length} cuota${list.length!==1?'s':''}</div></div>
+      <div class="cron-kpi pago"><div class="cron-kpi-label">Pagado</div><div class="cron-kpi-val">${fmt(pagadoRango)}</div><div class="cron-kpi-sub">${list.filter(c=>c.pagada).length} cuotas</div></div>
+      <div class="cron-kpi pend"><div class="cron-kpi-label">Pendiente</div><div class="cron-kpi-val">${fmt(pendRango)}</div><div class="cron-kpi-sub">${list.filter(c=>!c.pagada).length} cuotas</div></div>
+      <div class="cron-kpi venc"><div class="cron-kpi-label">Vencidas sin pagar</div><div class="cron-kpi-val">${fmt(vencidasRango)}</div><div class="cron-kpi-sub">${vencidasList.length} cuotas</div></div>
     </div>
     <div class="cron-persona-bar">
-      <div class="cpbar cpbar-mc">
-        <div>
-          <div class="cpbar-name">💜 María del Carmen</div>
-          <div class="cpbar-stats">
-            <div class="cpbar-stat"><strong>${fmt(mcTotal)}</strong>Total</div>
-            <div class="cpbar-stat"><strong>${fmt(mcPag)}</strong>Pagado</div>
-            <div class="cpbar-stat"><strong>${fmt(mcPend)}</strong>Pendiente</div>
-          </div>
-        </div>
-      </div>
-      <div class="cpbar cpbar-ri">
-        <div>
-          <div class="cpbar-name">💙 Richard</div>
-          <div class="cpbar-stats">
-            <div class="cpbar-stat"><strong>${fmt(riTotal)}</strong>Total</div>
-            <div class="cpbar-stat"><strong>${fmt(riPag)}</strong>Pagado</div>
-            <div class="cpbar-stat"><strong>${fmt(riPend)}</strong>Pendiente</div>
-          </div>
-        </div>
-      </div>
+      <div class="cpbar cpbar-mc"><div><div class="cpbar-name">💜 María del Carmen</div><div class="cpbar-stats"><div class="cpbar-stat"><strong>${fmt(mcTotal)}</strong>Total</div><div class="cpbar-stat"><strong>${fmt(mcPag)}</strong>Pagado</div><div class="cpbar-stat"><strong>${fmt(mcPend)}</strong>Pendiente</div></div></div></div>
+      <div class="cpbar cpbar-ri"><div><div class="cpbar-name">💙 Richard</div><div class="cpbar-stats"><div class="cpbar-stat"><strong>${fmt(riTotal)}</strong>Total</div><div class="cpbar-stat"><strong>${fmt(riPag)}</strong>Pagado</div><div class="cpbar-stat"><strong>${fmt(riPend)}</strong>Pendiente</div></div></div></div>
     </div>`;
-
-  /* ── AGRUPAR POR MES ── */
   const meses={};
   list.forEach(c=>{const k=c.fecha_vence.slice(0,7);if(!meses[k])meses[k]=[];meses[k].push(c)});
-
-  /* ── SECCIONES PDF POR PERSONA ── */
-  // Si hay filtro de persona, no mostrar divisor; si no, mostrar sección para MC y Richard
-  const mostrarSecciones=!personFilt;
-  // Mapear cuotas por persona para secciones PDF
-  function personaDeCuota(c){
-    const fac=_facturas[c.factura_id]||{};
-    const resp=fac.responsable||'';
-    if(resp==='Maria del Carmen')return'mc';
-    if(resp==='Richard')return'ri';
-    return'ambos';
-  }
-
   document.getElementById('cronograma-content').innerHTML=Object.keys(meses).sort().map(key=>{
     const[yr,mo]=key.split('-');
     const items=meses[key];
-    const todoPagado=items.every(c=>c.pagada);
-    const hayVencidas=items.some(c=>!c.pagada&&c.fecha_vence<hoyStr);
+    const todoPagado=items.every(c=>c.pagada);const hayVencidas=items.some(c=>!c.pagada&&c.fecha_vence<hoyStr);
     const colorCls=todoPagado?'mes-head-ok':hayVencidas?'mes-head-venc':'mes-head-pend';
     const badgeTxt=todoPagado?'✓ Pagado':hayVencidas?'⚠ Vencidas':'En curso';
     const badgeCls=todoPagado?'mes-badge-ok':hayVencidas?'mes-badge-venc':'mes-badge-pend';
     const totalMes=items.reduce((s,c)=>s+parseFloat(c.monto||0),0);
     const pagMes=items.filter(c=>c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
     const pendMes=totalMes-pagMes;
-
-    // Desglose MC/Richard del mes
     let mcMes=0,riMes=0;
     items.forEach(c=>{const fac=_facturas[c.factura_id]||{};const p=cuotaPersonas(c,fac);mcMes+=p.mc;riMes+=p.ri});
-
     return`<div class="mes-block">
       <div class="mes-head">
         <div class="mes-head-color ${colorCls}"></div>
-        <div class="mes-head-title">
-          <span class="mes-nombre">${MESES_FULL[parseInt(mo)-1]} ${yr}</span>
-          <span class="mes-badge ${badgeCls}">${badgeTxt}</span>
-        </div>
+        <div class="mes-head-title"><span class="mes-nombre">${MESES_FULL[parseInt(mo)-1]} ${yr}</span><span class="mes-badge ${badgeCls}">${badgeTxt}</span></div>
         <div class="mes-head-personas">
-          <div class="mes-persona-pill pp-mc">
-            <span class="pp-label">💜 MC</span>
-            <span class="pp-val">${fmt(mcMes)}</span>
-          </div>
+          <div class="mes-persona-pill pp-mc"><span class="pp-label">💜 MC</span><span class="pp-val">${fmt(mcMes)}</span></div>
           <div class="mes-divider-v"></div>
-          <div class="mes-persona-pill pp-ri">
-            <span class="pp-label">💙 Richard</span>
-            <span class="pp-val">${fmt(riMes)}</span>
-          </div>
+          <div class="mes-persona-pill pp-ri"><span class="pp-label">💙 Richard</span><span class="pp-val">${fmt(riMes)}</span></div>
         </div>
-        <div class="mes-head-total">
-          <div class="mes-total-val">${fmt(totalMes)}</div>
-          <div class="mes-total-sub">✅ ${fmt(pagMes)} pagado<br>⏳ ${fmt(pendMes)} pendiente</div>
-        </div>
+        <div class="mes-head-total"><div class="mes-total-val">${fmt(totalMes)}</div><div class="mes-total-sub">✅ ${fmt(pagMes)} pagado<br>⏳ ${fmt(pendMes)} pendiente</div></div>
       </div>
       <table class="mes-table">
-        <thead><tr>
-          <th>Vence</th><th>Factura</th><th>Casa</th><th>Responsable</th>
-          <th>Cuota</th><th>Monto total</th><th>MC</th><th>Richard</th><th>Estado</th>
-          ${currentRole==='admin'?'<th class="no-print">Acción</th>':''}
-        </tr></thead>
+        <thead><tr><th>Vence</th><th>Factura</th><th>Casa</th><th>Responsable</th><th>Cuota</th><th>Monto total</th><th>MC</th><th>Richard</th><th>Estado</th>${currentRole==='admin'?'<th class="no-print">Acción</th>':''}</tr></thead>
         <tbody>${items.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)).map(c=>{
-          const fac=_facturas[c.factura_id]||{};
-          const casa=_casas[fac.casa_id]||{};
-          const vencida=!c.pagada&&c.fecha_vence<hoyStr;
-          const resp=fac.responsable||'';
+          const fac=_facturas[c.factura_id]||{};const casa=_casas[fac.casa_id]||{};
+          const vencida=!c.pagada&&c.fecha_vence<hoyStr;const resp=fac.responsable||'';
           const rBadge=resp==='Maria del Carmen'?'badge-purple':resp==='Richard'?'badge-richard':'badge-green';
           const rLabel=resp==='Maria del Carmen'?'💜 MC':resp==='Richard'?'💙 Richard':'⚖️ Comp.';
           const rowCls=c.pagada?'row-pagada':vencida?'row-vencida':'';
           const p=cuotaPersonas(c,fac);
-          const accion=currentRole==='admin'
-            ?(c.pagada
-              ?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩ Desmarcar</button>`
-              :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
-            :'';
+          const accion=currentRole==='admin'?(c.pagada?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩ Desmarcar</button>`:`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`):'';
           return`<tr class="${rowCls}">
             <td>${c.fecha_vence}${vencida?'<span class="tag-venc">VENC.</span>':''}</td>
-            <td><strong>${fac.numero||'—'}</strong></td>
-            <td>${casa.nombre||'—'}</td>
+            <td><strong>${fac.numero||'—'}</strong></td><td>${casa.nombre||'—'}</td>
             <td><span class="badge ${rBadge}" style="font-size:10px">${rLabel}</span></td>
             <td style="font-weight:600">C${c.numero}/${fac.num_cuotas||'?'}</td>
             <td><strong>${fmt(c.monto)}</strong></td>
-            <td class="col-mc">${fmt(p.mc)}</td>
-            <td class="col-ri">${fmt(p.ri)}</td>
-            <td>${c.pagada
-              ?'<span class="badge badge-green">✓ Pagada</span>'
-              :vencida
-                ?'<span class="badge badge-red">Vencida</span>'
-                :'<span class="badge badge-amber">Pendiente</span>'
-            }</td>
+            <td class="col-mc">${fmt(p.mc)}</td><td class="col-ri">${fmt(p.ri)}</td>
+            <td>${c.pagada?'<span class="badge badge-green">✓ Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>'}</td>
             ${currentRole==='admin'?`<td class="no-print">${accion}</td>`:''}
           </tr>`;
         }).join('')}</tbody>
