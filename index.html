@@ -730,9 +730,12 @@ function calcFechaCuota(base, i, diaPago) {
 }
 
 async function loadCasasSelect(){
-  const{data}=await sb.from('casas_comerciales').select('id,nombre,dia_pago').order('nombre');
+  const{data,error}=await sb.from('casas_comerciales').select('id,nombre,dia_pago').order('nombre');
+  console.log('🏪 loadCasasSelect →', data, error);
+  if(error){showToast('Error cargando casas: '+error.message,'err');return;}
   const opts=(data||[]).map(c=>`<option value="${c.id}" data-dia="${c.dia_pago||''}">${c.nombre}${c.dia_pago?' (día '+c.dia_pago+')':''}</option>`).join('');
   document.getElementById('fac-casa').innerHTML='<option value="">Seleccionar...</option>'+opts;
+  console.log('🏪 opciones generadas:', opts);
 }
 async function loadFacSelect(){
   const[r1,r2]=await Promise.all([sb.from('facturas').select('id,numero,casa_id').order('numero'),sb.from('casas_comerciales').select('id,nombre')]);
