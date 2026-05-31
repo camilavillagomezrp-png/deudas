@@ -1006,8 +1006,14 @@ async function saveFactura(){
     if(error){loaded();showToast(error.message,'err');return}
     facId=data.id;
   }
-  if(items.length)await sb.from('factura_items').insert(items.map(it=>({...it,factura_id:facId})));
-  if(cuotasArr.length)await sb.from('cuotas').insert(cuotasArr.map(c=>({...c,factura_id:facId})));
+if(items.length){
+    const{error:eItems}=await sb.from('factura_items').insert(items.map(it=>({...it,factura_id:facId})));
+    if(eItems)showToast('Error ítems: '+eItems.message,'err');
+  }
+  if(cuotasArr.length){
+    const{error:eCuotas}=await sb.from('cuotas').insert(cuotasArr.map(c=>({...c,factura_id:facId})));
+    if(eCuotas){loaded();showToast('Error al guardar cuotas: '+eCuotas.message,'err');return;}
+  }
   loaded();showToast(editingFacturaId?'Actualizada':'Guardada','ok');
   closeModal('modal-factura');await loadFacSelect();await renderFacturas();await renderDashboard();
 }
@@ -1022,12 +1028,17 @@ async function deleteFactura(id){
 }
 async function editFactura(id){
   loading('...');
-  const[r1,r2]=await Promise.all([sb.from('facturas').select('*').eq('id',id).single(),sb.from('factura_items').select('*').eq('factura_id',id).order('orden')]);
-  await loadCasasSelect();loaded();
+  const[r1,r2]=await Promise.all([
+    sb.from('facturas').select('*').eq('id',id).single(),
+    sb.from('factura_items').select('*').eq('factura_id',id).order('orden'),
+    loadCasasSelect()
+  ]);
+  loaded();
   const f=r1.data;if(!f)return;
   editingFacturaId=id;
   document.getElementById('modal-fac-title').textContent='Editar Factura';
-  document.getElementById('fac-numero').value=f.numero;document.getElementById('fac-casa').value=f.casa_id;
+  document.getElementById('fac-numero').value=f.numero;
+  setTimeout(()=>{ document.getElementById('fac-casa').value=f.casa_id; onCasaChange(); }, 50);
   document.getElementById('fac-fecha').value=f.fecha_emision;document.getElementById('fac-cuotas').value=f.num_cuotas;
   document.getElementById('fac-primera-cuota').value=f.fecha_primera_cuota||'';document.getElementById('fac-notas').value=f.notas||'';
   // Mostrar hint si la casa tiene día de pago
@@ -1331,20 +1342,35 @@ function exportCronogramaPDF(){
 }
 async function renderCronograma(){
   loading('Cargando cronograma...');await reloadAll();loaded();
+
+  // ── DEBUG (quitar después de confirmar que funciona)
+  console.log('🔍 _cuotas:', _cuotas.length, _cuotas);
+  console.log('🔍 _facturas:', Object.keys(_facturas).length, _facturas);
+
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
   const desdeVal=document.getElementById('cron-desde').value;
   const hastaVal=document.getElementById('cron-hasta').value;
   const hoyStr=new Date().toISOString().slice(0,10);
+
   let list=_cuotas.filter(c=>{
     if(estadoFilt==='pendiente'&&c.pagada)return false;
     if(estadoFilt==='pagado'&&!c.pagada)return false;
-    if(personFilt){const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'';if(resp!==personFilt&&resp!=='Compartida')return false}
-    const mesCuota=c.fecha_vence.slice(0,7);
-    if(desdeVal&&mesCuota<desdeVal)return false;
-    if(hastaVal&&mesCuota>hastaVal)return false;
+    if(personFilt){
+      const fac=_facturas[c.factura_id]||{};
+      const resp=fac.responsable||'';
+      if(resp!==personFilt&&resp!=='Compartida')return false;
+    }
+    // ── FIX: si hay rango de fechas, comparar correctamente
+    if(desdeVal||hastaVal){
+      const mesCuota=c.fecha_vence?c.fecha_vence.slice(0,7):'';
+      if(!mesCuota)return false;
+      if(desdeVal&&mesCuota<desdeVal)return false;
+      if(hastaVal&&mesCuota>hastaVal)return false;
+    }
     return true;
   });
+  console.log('🔍 list después de filtros:', list.length, 'personFilt:', personFilt, 'desdeVal:', desdeVal, 'hastaVal:', hastaVal);
   const wrap=document.getElementById('cron-resumen-wrap');
   if(!list.length){
     wrap.innerHTML='';
