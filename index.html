@@ -4,19 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GestorDeudas</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --bg:#F9F8F4;--surface:#fff;--accent:#2D6A4F;--accent2:#52B788;--accent3:#B7E4C7;
+  --bg:#F4F3EE;--surface:#fff;--accent:#2D6A4F;--accent2:#52B788;--accent3:#B7E4C7;
   --text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;
   --danger:#DC2626;--warn:#D97706;--info:#2563EB;
   --mc:#7C3AED;--richard:#0369A1;
-  --r:12px;--sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+  --r:12px;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 20px rgba(0,0,0,.05);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOGIN */
 #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B4332,#2D6A4F,#40916C)}
 .login-card{background:#fff;border-radius:20px;padding:48px 40px;width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .login-logo{width:64px;height:64px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
@@ -31,6 +32,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #admin-pin-area input:focus{outline:none;border-color:var(--accent)}
 .btn-enter{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
 .pin-error{color:var(--danger);font-size:12px;margin-top:8px;display:none}
+
+/* APP */
 #app{display:none;min-height:100vh}
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .topbar-brand{display:flex;align-items:center;gap:12px}
@@ -46,49 +49,113 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .badge-viewer{background:#DBEAFE;color:#1E40AF}
 .btn-logout{padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;color:var(--muted)}
 .btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+
+/* LOADER */
 #loader{position:fixed;inset:0;background:rgba(255,255,255,.75);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 #loader.on{display:flex}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-msg{font-size:13px;color:var(--muted)}
+
+/* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
 .toast-item{padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.15);animation:slide-in .25s ease;max-width:320px}
 .toast-ok{background:#D1FAE5;color:#065F46}
 .toast-err{background:#FEE2E2;color:#991B1B}
 @keyframes slide-in{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
-.main{padding:32px;max-width:1280px;margin:0 auto}
+
+/* LAYOUT */
+.main{padding:28px 32px;max-width:1320px;margin:0 auto}
 .page{display:none}.page.active{display:block}
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .page-title{font-family:'DM Serif Display',serif;font-size:28px}
 .page-sub{font-size:13px;color:var(--muted);margin-top:2px}
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
-.stat-card{background:#fff;border-radius:var(--r);padding:18px;border:1px solid var(--border);box-shadow:var(--sh)}
-.stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
-.stat-value{font-family:'DM Serif Display',serif;font-size:24px}
-.stat-value.green{color:var(--accent)}.stat-value.red{color:var(--danger)}.stat-value.amber{color:var(--warn)}.stat-value.purple{color:var(--mc)}.stat-value.blue{color:var(--richard)}
-.table-card{background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden}
-.table-toolbar{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.search-input{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);width:180px}
+
+/* DASHBOARD — visual cards */
+.dash-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px}
+.kpi-card{background:#fff;border-radius:14px;padding:20px 18px;border:1px solid var(--border);box-shadow:var(--sh);position:relative;overflow:hidden;transition:transform .15s}
+.kpi-card:hover{transform:translateY(-2px)}
+.kpi-bar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:14px 0 0 14px}
+.kpi-bar.green{background:linear-gradient(180deg,var(--accent),var(--accent2))}
+.kpi-bar.red{background:linear-gradient(180deg,#DC2626,#EF4444)}
+.kpi-bar.amber{background:linear-gradient(180deg,#D97706,#F59E0B)}
+.kpi-bar.purple{background:linear-gradient(180deg,#7C3AED,#A78BFA)}
+.kpi-bar.blue{background:linear-gradient(180deg,#0369A1,#38BDF8)}
+.kpi-icon{font-size:22px;margin-bottom:10px}
+.kpi-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px}
+.kpi-value{font-family:'DM Serif Display',serif;font-size:22px;line-height:1}
+.kpi-value.green{color:var(--accent)}.kpi-value.red{color:var(--danger)}.kpi-value.amber{color:var(--warn)}.kpi-value.purple{color:var(--mc)}.kpi-value.blue{color:var(--richard)}
+
+/* Próximas cuotas */
+.proximas-section{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-bottom:24px}
+.proximas-card{background:#fff;border-radius:14px;border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-head-title{font-size:13px;font-weight:600;color:var(--text)}
+.cuota-vence-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid #F9FAFB;transition:background .1s;cursor:default}
+.cuota-vence-row:last-child{border-bottom:none}
+.cuota-vence-row:hover{background:#FAFFF8}
+.cv-days{min-width:48px;text-align:center}
+.cv-days-num{font-family:'DM Serif Display',serif;font-size:22px;line-height:1}
+.cv-days-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.cv-days-num.vencida{color:var(--danger)}
+.cv-days-num.hoy{color:var(--warn)}
+.cv-days-num.pronto{color:var(--warn)}
+.cv-days-num.ok{color:var(--accent)}
+.cv-divider{width:1px;height:36px;background:var(--border)}
+.cv-info{flex:1;min-width:0}
+.cv-factura{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv-casa{font-size:11px;color:var(--muted)}
+.cv-right{text-align:right}
+.cv-monto{font-size:13px;font-weight:600}
+.cv-persona{font-size:10px;color:var(--muted)}
+.cv-badge{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;margin-left:6px}
+
+/* Resumen personas */
+.persona-split{display:flex;flex-direction:column;gap:10px;padding:14px}
+.persona-block{border-radius:10px;padding:14px}
+.persona-mc{background:#F5F3FF;border:1.5px solid #DDD6FE}
+.persona-ri{background:#E0F2FE;border:1.5px solid #BAE6FD}
+.pb-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.persona-mc .pb-name{color:var(--mc)}
+.persona-ri .pb-name{color:var(--richard)}
+.pb-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:3px}
+.pb-row strong{color:var(--text)}
+.pb-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700;padding-top:6px;border-top:1px solid rgba(0,0,0,.07);margin-top:4px}
+.persona-mc .pb-total{color:var(--mc)}
+.persona-ri .pb-total{color:var(--richard)}
+.progress-bar{height:5px;background:#E5E7EB;border-radius:10px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:10px;transition:width .4s}
+.progress-mc{background:linear-gradient(90deg,var(--mc),#A78BFA)}
+.progress-ri{background:linear-gradient(90deg,var(--richard),#38BDF8)}
+
+/* TABLE */
+.table-card{background:#fff;border-radius:14px;border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden}
+.table-toolbar{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-input{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);width:180px}
 .search-input:focus{outline:none;border-color:var(--accent);background:#fff}
-select.filter-sel,input[type=date].filter-date{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);cursor:pointer}
-select.filter-sel:focus,input[type=date].filter-date:focus{outline:none;border-color:var(--accent)}
+select.filter-sel{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--bg);cursor:pointer}
+select.filter-sel:focus{outline:none;border-color:var(--accent)}
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{padding:11px 14px;text-align:left;background:#F9FAFB;border-bottom:1px solid var(--border);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-td{padding:12px 14px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+th{padding:10px 14px;text-align:left;background:#F9FAFB;border-bottom:1px solid var(--border);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+td{padding:11px 14px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#FAFFF8}
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:#D1FAE5;color:#065F46}.badge-red{background:#FEE2E2;color:#991B1B}
 .badge-amber{background:#FEF3C7;color:#92400E}.badge-blue{background:#DBEAFE;color:#1E40AF}
 .badge-purple{background:#EDE9FE;color:#5B21B6}.badge-richard{background:#E0F2FE;color:#0369A1}
+
+/* BUTTONS */
 .btn{padding:8px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#1B4332}
 .btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--border)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 .btn-danger{background:#FEF2F2;color:var(--danger);border:1.5px solid #FECACA}.btn-danger:hover{background:#FEE2E2}
 .btn-success{background:#D1FAE5;color:#065F46;border:1.5px solid #6EE7B7}.btn-success:hover{background:#A7F3D0}
 .btn-sm{padding:5px 10px;font-size:11px}
-.btn-pdf{background:linear-gradient(135deg,#BE185D,#9D174D);color:#fff}
+.btn-icon{padding:5px 8px;font-size:13px}
+
+/* MODALS */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:#fff;border-radius:16px;padding:32px;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -103,6 +170,8 @@ label.lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:upper
 input.inp,select.sel,textarea.txa{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:#fff;transition:border-color .15s}
 input.inp:focus,select.sel:focus,textarea.txa:focus{outline:none;border-color:var(--accent)}
 textarea.txa{resize:vertical;min-height:70px}
+
+/* ITEMS */
 .items-section{grid-column:1/-1;margin-top:8px}
 .items-section-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
 .items-list{border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
@@ -131,26 +200,47 @@ textarea.txa{resize:vertical;min-height:70px}
 .totals-grand{background:#F0FBF5;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;border:1.5px solid var(--accent3)}
 .totals-grand .g-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
 .totals-grand .g-value{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent)}
-.month-block{background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
+
+/* CRONOGRAMA */
+.month-block{background:#fff;border-radius:14px;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
 .month-header{padding:12px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;justify-content:space-between;align-items:center}
 .month-name{font-family:'DM Serif Display',serif;font-size:17px}
-.btn-pagar-cuota{padding:4px 10px;font-size:11px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:opacity .15s}
-.btn-pagar-cuota:hover{opacity:.85}
+.btn-pagar-cuota{padding:4px 10px;font-size:11px;border-radius:6px;background:rgba(255,255,255,.25);color:#fff;border:1px solid rgba(255,255,255,.4);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+.btn-pagar-cuota:hover{background:rgba(255,255,255,.4)}
 .btn-desmarcar{padding:4px 10px;font-size:11px;border-radius:6px;background:#F3F4F6;color:var(--muted);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+
+/* CUOTA CHIPS */
 .cuota-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .cuota-chip{padding:8px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;border:1.5px solid;text-align:center;line-height:1.4;transition:all .15s}
 .chip-pendiente{background:#F0FBF5;border-color:var(--accent3);color:var(--accent)}
 .chip-vencida{background:#FEF2F2;border-color:#FECACA;color:var(--danger)}
 .chip-pagada{background:#F3F4F6;border-color:var(--border);color:var(--muted);cursor:not-allowed;opacity:.6}
 .chip-sel{border-color:var(--accent);background:var(--accent);color:#fff;transform:scale(1.05)}
+
+/* FOTO UPLOAD */
 .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;margin-top:6px}
 .upload-zone:hover{border-color:var(--accent);background:#F0FBF5}
 .upload-preview{width:100%;max-height:160px;object-fit:contain;border-radius:8px;margin-top:8px;display:none;border:1px solid var(--border)}
+
+/* PAGOS — fila clickeable */
+.pago-row{cursor:pointer;transition:background .1s}
+.pago-row:hover td{background:#F0FBF5 !important}
+
+/* STAT (para stats de tabla) */
+.stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.stat-value{font-family:'DM Serif Display',serif;font-size:24px}
+.stat-value.green{color:var(--accent)}.stat-value.red{color:var(--danger)}.stat-value.amber{color:var(--warn)}.stat-value.purple{color:var(--mc)}.stat-value.blue{color:var(--richard)}
+
+@media(max-width:900px){
+  .dash-grid{grid-template-columns:repeat(3,1fr)}
+  .proximas-section{grid-template-columns:1fr}
+}
 @media(max-width:700px){
   .main{padding:14px}.form-grid{grid-template-columns:1fr}
   .topbar{padding:0 14px}.topbar-nav .nav-btn span{display:none}
   .item-row,.items-header{grid-template-columns:2fr 48px 80px 56px 110px 28px}
   .totals-split{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -208,12 +298,22 @@ textarea.txa{resize:vertical;min-height:70px}
           <option value="Richard">Richard</option>
         </select>
       </div>
-      <div class="stats-row" id="stats-row"></div>
-      <div class="table-card">
-        <div class="table-toolbar"><strong style="font-size:13px;color:var(--muted)">Deudas por factura</strong></div>
-        <div class="tbl-wrap">
-          <table><thead><tr><th>Casa</th><th>Factura</th><th>Responsable</th><th>Total</th><th>Cuotas</th><th>Pagado</th><th>Saldo</th><th>Estado</th></tr></thead>
-          <tbody id="dash-table-body"></tbody></table>
+      <div class="dash-grid" id="dash-kpis"></div>
+      <div class="proximas-section">
+        <div class="proximas-card">
+          <div class="card-head">
+            <span class="card-head-title">📅 Próximas cuotas — ordenadas por vencimiento</span>
+            <select class="filter-sel" id="dash-filter-estado" onchange="renderDashboard()" style="font-size:12px;padding:5px 10px">
+              <option value="">Todas</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="vencida">Vencidas</option>
+            </select>
+          </div>
+          <div id="proximas-list" style="max-height:420px;overflow-y:auto"></div>
+        </div>
+        <div class="proximas-card">
+          <div class="card-head"><span class="card-head-title">👤 Deuda por persona</span></div>
+          <div class="persona-split" id="persona-split"></div>
         </div>
       </div>
     </section>
@@ -249,7 +349,7 @@ textarea.txa{resize:vertical;min-height:70px}
     <!-- PAGOS -->
     <section class="page" id="page-pagos">
       <div class="page-header">
-        <div><h2 class="page-title">Registro de Pagos</h2><p class="page-sub">Abonos por factura o cuota</p></div>
+        <div><h2 class="page-title">Registro de Pagos</h2><p class="page-sub">Clic en una fila para ver o editar</p></div>
         <button class="btn btn-primary admin-only" onclick="openModalPago()">+ Registrar pago</button>
       </div>
       <div class="table-card">
@@ -315,9 +415,13 @@ textarea.txa{resize:vertical;min-height:70px}
       <div class="form-group"><label class="lbl">N° Factura *</label><input class="inp" id="fac-numero" placeholder="FAC-001"></div>
       <div class="form-group"><label class="lbl">Casa comercial *</label><select class="sel" id="fac-casa"></select></div>
       <div class="form-group"><label class="lbl">Fecha de emisión *</label><input class="inp" type="date" id="fac-fecha"></div>
-      <div class="form-group"><label class="lbl">N° cuotas</label><input class="inp" type="number" id="fac-cuotas" value="1" min="1"></div>
-      <div class="form-group"><label class="lbl">Fecha primera cuota</label><input class="inp" type="date" id="fac-primera-cuota"></div>
+      <div class="form-group"><label class="lbl">N° cuotas</label><input class="inp" type="number" id="fac-cuotas" value="1" min="1" oninput="previewCuotas()"></div>
+      <div class="form-group"><label class="lbl">Fecha primera cuota</label><input class="inp" type="date" id="fac-primera-cuota" oninput="previewCuotas()"></div>
       <div class="form-group"><label class="lbl">Notas</label><input class="inp" id="fac-notas" placeholder="Opcional..."></div>
+      <div class="form-group full" id="cuotas-preview-box" style="display:none">
+        <label class="lbl">Vista previa de cuotas</label>
+        <div id="cuotas-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
+      </div>
       <div class="items-section form-group full">
         <div class="items-section-title">Ítems — IVA y responsable por ítem</div>
         <div class="items-list">
@@ -354,11 +458,11 @@ textarea.txa{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- MODAL PAGO -->
+<!-- MODAL PAGO (crear/editar) -->
 <div class="modal-overlay" id="modal-pago">
   <div class="modal" style="max-width:540px">
     <div class="modal-header">
-      <h3 class="modal-title">Registrar Pago</h3>
+      <h3 class="modal-title" id="modal-pago-title">Registrar Pago</h3>
       <button class="modal-close" onclick="closeModal('modal-pago')">✕</button>
     </div>
     <div class="form-grid">
@@ -388,9 +492,13 @@ textarea.txa{resize:vertical;min-height:70px}
       </div>
     </div>
     <input type="hidden" id="pago-cuota-id">
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
-      <button class="btn btn-secondary" onclick="closeModal('modal-pago')">Cancelar</button>
-      <button class="btn btn-primary" onclick="savePago()">Guardar pago</button>
+    <input type="hidden" id="pago-edit-id">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px">
+      <button class="btn btn-danger admin-only" id="btn-eliminar-pago" style="display:none" onclick="eliminarPagoEdicion()">🗑 Eliminar</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button class="btn btn-secondary" onclick="closeModal('modal-pago')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-guardar-pago" onclick="savePago()">Guardar pago</button>
+      </div>
     </div>
   </div>
 </div>
@@ -412,7 +520,7 @@ textarea.txa{resize:vertical;min-height:70px}
   </div>
 </div>
 
-<!-- MODAL DETALLE -->
+<!-- MODAL DETALLE FACTURA -->
 <div class="modal-overlay" id="modal-detalle">
   <div class="modal" style="max-width:700px">
     <div class="modal-header">
@@ -463,11 +571,8 @@ async function doLogin(){
   const badge=document.getElementById('role-badge');
   if(currentRole==='admin'){badge.textContent='Administrador';badge.className='badge-role badge-admin';document.querySelectorAll('.admin-only').forEach(el=>el.style.display='');}
   else{badge.textContent='Solo lectura';badge.className='badge-role badge-viewer';document.querySelectorAll('.admin-only').forEach(el=>el.style.display='none');}
-  try{
-    await loadCasasSelect();
-    await loadFacSelect();
-    await renderDashboard();
-  }catch(e){loaded();showToast('Error al cargar: '+e.message,'err');}
+  try{await loadCasasSelect();await loadFacSelect();await renderDashboard();}
+  catch(e){loaded();showToast('Error al cargar: '+e.message,'err');}
 }
 function doLogout(){document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pin-input').value='';selectRole('viewer')}
 
@@ -484,7 +589,7 @@ async function showPage(p){
   else if(p==='casas')await renderCasas();
 }
 
-/* ── CACHE (queries planas, sin joins) ── */
+/* ── CACHE ── */
 let _casas={},_facturas={},_items={},_pagosMap={},_cuotas=[],_cuotasByFac={};
 async function reloadAll(){
   const[r1,r2,r3,r4,r5]=await Promise.all([
@@ -521,6 +626,11 @@ function calcPersonas(items){
   });
   return{mc,ri};
 }
+function diasParaVencer(fechaStr){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const f=new Date(fechaStr+'T00:00:00');
+  return Math.round((f-hoy)/(1000*60*60*24));
+}
 
 /* ── SELECTS ── */
 async function loadCasasSelect(){
@@ -544,21 +654,83 @@ async function renderDashboard(){
   await reloadAll();
   loaded();
   const pf=document.getElementById('dash-filter-person').value;
+  const ef=document.getElementById('dash-filter-estado').value;
   const facs=Object.values(_facturas).map(enrich).filter(f=>!pf||f.responsable===pf||f.responsable==='Compartida');
   const totalDeuda=facs.reduce((s,f)=>s+parseFloat(f.total||0),0);
   const totalPagado=facs.reduce((s,f)=>s+calcPagado(f),0);
   const totalSaldo=facs.reduce((s,f)=>s+calcSaldo(f),0);
-  let totalMC=0,totalRi=0;
-  facs.forEach(f=>{const t=calcPersonas(f.factura_items);totalMC+=t.mc.s+t.mc.i;totalRi+=t.ri.s+t.ri.i;});
-  document.getElementById('stats-row').innerHTML=`
-    <div class="stat-card"><div class="stat-label">Deuda total</div><div class="stat-value">${fmt(totalDeuda)}</div></div>
-    <div class="stat-card"><div class="stat-label">Total pagado</div><div class="stat-value green">${fmt(totalPagado)}</div></div>
-    <div class="stat-card"><div class="stat-label">Saldo pendiente</div><div class="stat-value red">${fmt(totalSaldo)}</div></div>
-    <div class="stat-card"><div class="stat-label">Deuda M. Carmen</div><div class="stat-value purple">${fmt(totalMC)}</div></div>
-    <div class="stat-card"><div class="stat-label">Deuda Richard</div><div class="stat-value blue">${fmt(totalRi)}</div></div>`;
-  document.getElementById('dash-table-body').innerHTML=facs.length
-    ?facs.map(f=>`<tr><td>${f.casa?.nombre||'—'}</td><td>${f.numero}</td><td>${f.responsable}</td><td>${fmt(f.total)}</td><td>${f.num_cuotas}</td><td>${fmt(calcPagado(f))}</td><td>${fmt(calcSaldo(f))}</td><td>${badgeEstado(getEstado(f))}</td></tr>`).join('')
-    :'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">Sin facturas</td></tr>';
+  let totalMC=0,totalRi=0,saldoMC=0,saldoRi=0;
+  facs.forEach(f=>{
+    const t=calcPersonas(f.factura_items);
+    totalMC+=t.mc.s+t.mc.i;totalRi+=t.ri.s+t.ri.i;
+  });
+
+  // KPIs
+  document.getElementById('dash-kpis').innerHTML=`
+    <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">💰</div><div class="kpi-label">Deuda total</div><div class="kpi-value">${fmt(totalDeuda)}</div></div>
+    <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">✅</div><div class="kpi-label">Total pagado</div><div class="kpi-value green">${fmt(totalPagado)}</div></div>
+    <div class="kpi-card"><div class="kpi-bar red"></div><div class="kpi-icon">⏳</div><div class="kpi-label">Saldo pendiente</div><div class="kpi-value red">${fmt(totalSaldo)}</div></div>
+    <div class="kpi-card"><div class="kpi-bar purple"></div><div class="kpi-icon">💜</div><div class="kpi-label">Deuda M. Carmen</div><div class="kpi-value purple">${fmt(totalMC)}</div></div>
+    <div class="kpi-card"><div class="kpi-bar blue"></div><div class="kpi-icon">💙</div><div class="kpi-label">Deuda Richard</div><div class="kpi-value blue">${fmt(totalRi)}</div></div>`;
+
+  // Próximas cuotas ordenadas
+  const hoyStr=new Date().toISOString().slice(0,10);
+  let cuotasPend=_cuotas.filter(c=>{
+    if(c.pagada)return false;
+    const fac=_facturas[c.factura_id]||{};
+    if(pf&&fac.responsable!==pf&&fac.responsable!=='Compartida')return false;
+    if(ef==='vencida'&&c.fecha_vence>=hoyStr)return false;
+    if(ef==='pendiente'&&c.fecha_vence<hoyStr)return false;
+    return true;
+  }).sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence));
+
+  const proximaHTML=cuotasPend.length?cuotasPend.map(c=>{
+    const fac=_facturas[c.factura_id]||{};
+    const casa=_casas[fac.casa_id]||{};
+    const dias=diasParaVencer(c.fecha_vence);
+    const vencida=dias<0;
+    const hoy2=dias===0;
+    const pronto=dias>0&&dias<=7;
+    const cls=vencida?'vencida':hoy2?'hoy':pronto?'pronto':'ok';
+    const diasLbl=vencida?`${Math.abs(dias)}d`:(hoy2?'HOY':`${dias}d`);
+    const resp=fac.responsable||'';
+    const rBadge=resp==='Maria del Carmen'?'badge-purple':resp==='Richard'?'badge-richard':'badge-green';
+    const rLabel=resp==='Maria del Carmen'?'MC':resp==='Richard'?'Richard':'Comp.';
+    const pagarBtn=currentRole==='admin'?`<button class="btn btn-sm btn-success" style="font-size:11px" onclick="event.stopPropagation();openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`:'';
+    return`<div class="cuota-vence-row">
+      <div class="cv-days"><div class="cv-days-num ${cls}">${diasLbl}</div><div class="cv-days-lbl">${vencida?'vencida':hoy2?'hoy':'días'}</div></div>
+      <div class="cv-divider"></div>
+      <div class="cv-info">
+        <div class="cv-factura">${fac.numero||'—'} <span class="badge ${rBadge}" style="font-size:9px">${rLabel}</span></div>
+        <div class="cv-casa">${casa.nombre||'—'} · C${c.numero}/${fac.num_cuotas||'?'} · Vence ${c.fecha_vence}</div>
+      </div>
+      <div class="cv-right">
+        <div class="cv-monto">${fmt(c.monto)}</div>
+        ${pagarBtn}
+      </div>
+    </div>`;
+  }).join(''):'<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">🎉 No hay cuotas pendientes</div>';
+  document.getElementById('proximas-list').innerHTML=proximaHTML;
+
+  // Persona split
+  const grand=totalMC+totalRi||1;
+  document.getElementById('persona-split').innerHTML=`
+    <div class="persona-block persona-mc">
+      <div class="pb-name">💜 María del Carmen</div>
+      <div class="pb-row"><span>Total deuda:</span><strong>${fmt(totalMC)}</strong></div>
+      <div class="progress-bar"><div class="progress-fill progress-mc" style="width:${(totalMC/grand*100).toFixed(1)}%"></div></div>
+      <div class="pb-total"><span>Participación:</span><span>${(totalMC/grand*100).toFixed(1)}%</span></div>
+    </div>
+    <div class="persona-block persona-ri">
+      <div class="pb-name">💙 Richard</div>
+      <div class="pb-row"><span>Total deuda:</span><strong>${fmt(totalRi)}</strong></div>
+      <div class="progress-bar"><div class="progress-fill progress-ri" style="width:${(totalRi/grand*100).toFixed(1)}%"></div></div>
+      <div class="pb-total"><span>Participación:</span><span>${(totalRi/grand*100).toFixed(1)}%</span></div>
+    </div>
+    <div style="background:#F0FBF5;border-radius:10px;padding:12px 14px;border:1.5px solid var(--accent3);font-size:13px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase">Total general</span>
+      <span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent)">${fmt(totalDeuda)}</span>
+    </div>`;
 }
 
 /* ── CASAS ── */
@@ -627,6 +799,27 @@ function recalcTotals(){
   document.getElementById('ri-iva').textContent=fmt(ri.i);
   document.getElementById('ri-total').textContent=fmt(ri.s+ri.i);
   document.getElementById('g-total').textContent=fmt(mc.s+mc.i+ri.s+ri.i);
+  previewCuotas();
+}
+function previewCuotas(){
+  const n=parseInt(document.getElementById('fac-cuotas').value)||0;
+  const primera=document.getElementById('fac-primera-cuota').value;
+  const box=document.getElementById('cuotas-preview-box');
+  const prev=document.getElementById('cuotas-preview');
+  if(!primera||n<1){box.style.display='none';return;}
+  box.style.display='block';
+  const totalVal=parseFloat(document.getElementById('g-total').textContent.replace(/[$,]/g,''))||0;
+  const cuota=totalVal/n;
+  const base=new Date(primera+'T00:00:00');
+  prev.innerHTML=Array.from({length:n},(_,i)=>{
+    const d=new Date(base);d.setMonth(d.getMonth()+i);
+    const ds=d.toISOString().slice(0,10);
+    return`<div style="background:#F0FBF5;border:1px solid var(--accent3);border-radius:8px;padding:6px 10px;font-size:11px;text-align:center">
+      <div style="font-weight:600;color:var(--accent)">C${i+1}</div>
+      <div style="color:var(--muted)">${ds}</div>
+      <div style="font-weight:700">${fmt(cuota)}</div>
+    </div>`;
+  }).join('');
 }
 async function openNuevaFactura(){
   editingFacturaId=null;
@@ -636,6 +829,7 @@ async function openNuevaFactura(){
   document.getElementById('fac-cuotas').value=1;
   document.getElementById('fac-primera-cuota').value='';
   document.getElementById('items-container').innerHTML='';
+  document.getElementById('cuotas-preview-box').style.display='none';
   await loadCasasSelect();addItemRow();recalcTotals();openModal('modal-factura');
 }
 async function saveFactura(){
@@ -757,7 +951,6 @@ async function verDetalle(id){
   const pagado=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);
   const saldo=Math.max(0,parseFloat(f.total||0)-pagado);
   const t=calcPersonas(items);
-  const hoyStr=new Date().toISOString().slice(0,10);
   document.getElementById('detalle-titulo').textContent=`Factura ${f.numero}`;
   document.getElementById('detalle-content').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:13px">
@@ -801,7 +994,7 @@ async function verDetalle(id){
         <td>${c.pagada?'<span class="badge badge-green">Pagada</span>':'<span class="badge badge-red">Pendiente</span>'}</td>
         ${currentRole==='admin'?`<td>${c.pagada
           ?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,'${id}')">↩ Desmarcar</button>`
-          :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${id}','${c.id}',${c.monto},${c.numero})">Pagar ${c.numero}</button>`
+          :`<button class="btn-pagar-cuota" style="background:var(--accent);padding:4px 10px;font-size:11px;border-radius:6px;color:#fff;border:none;cursor:pointer" onclick="openPagarCuota('${id}','${c.id}',${c.monto},${c.numero})">Pagar ${c.numero}</button>`
         }</td>`:''}
       </tr>`).join('')}</tbody>
     </table>`:''}
@@ -809,8 +1002,8 @@ async function verDetalle(id){
     <table style="font-size:12px">
       <thead><tr><th>Fecha</th><th>Quién</th><th>Monto</th><th>Comprobante</th><th>Nota</th><th>Foto</th></tr></thead>
       <tbody>${pagos.map(p=>`<tr>
-        <td>${p.fecha_pago}</td><td>${p.quien_pago||'—'}</td><td>${fmt(p.monto)}</td>
-        <td>${p.num_comprobante||'—'}</td><td style="font-size:11px">${p.observacion||''}</td>
+        <td>${p.fecha_pago}</td><td>${p.pago_quien||p.quien_pago||'—'}</td><td>${fmt(p.monto)}</td>
+        <td>${p.num_comprobante||'—'}</td><td style="font-size:11px">${p.nota||p.observacion||''}</td>
         <td>${p.foto_url?`<a href="${p.foto_url}" target="_blank" style="color:var(--accent);font-size:11px">📎 Ver</a>`:'—'}</td>
       </tr>`).join('')}</tbody>
     </table>`:''}`;
@@ -829,15 +1022,46 @@ function openPagarCuota(facId,cuotaId,monto,numero){
     document.getElementById('pago-nota').value=`Cuota #${numero}`;
   },300);
 }
-function openModalPago(){
+function openModalPago(pagoData=null){
+  // Reset
+  document.getElementById('modal-pago-title').textContent=pagoData?'Editar Pago':'Registrar Pago';
+  document.getElementById('pago-edit-id').value=pagoData?.id||'';
   document.getElementById('pago-cuota-id').value='';
   document.getElementById('cuotas-box').style.display='none';
   document.getElementById('pago-info-box').style.display='none';
-  document.getElementById('pago-fecha').value=new Date().toISOString().slice(0,10);
-  ['pago-comprobante','pago-nota','pago-monto'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('foto-preview').style.display='none';
+  document.getElementById('btn-guardar-pago').textContent=pagoData?'Actualizar pago':'Guardar pago';
   fotoBase64=null;
+
+  const btnElim=document.getElementById('btn-eliminar-pago');
+  if(pagoData&&currentRole==='admin'){btnElim.style.display='';} else {btnElim.style.display='none';}
+
+  if(pagoData){
+    // Llenar con datos existentes
+    document.getElementById('pago-factura').value=pagoData.factura_id||'';
+    document.getElementById('pago-fecha').value=pagoData.fecha_pago||'';
+    document.getElementById('pago-comprobante').value=pagoData.num_comprobante||'';
+    document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';
+    document.getElementById('pago-monto').value=pagoData.monto||'';
+    document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
+    if(pagoData.foto_url){
+      const prev=document.getElementById('foto-preview');
+      prev.src=pagoData.foto_url;prev.style.display='block';
+    }
+    onFacturaChange();
+  } else {
+    document.getElementById('pago-fecha').value=new Date().toISOString().slice(0,10);
+    ['pago-comprobante','pago-nota','pago-monto'].forEach(id=>document.getElementById(id).value='');
+  }
   openModal('modal-pago');
+}
+async function eliminarPagoEdicion(){
+  const id=document.getElementById('pago-edit-id').value;
+  if(!id||!confirm('¿Eliminar este pago?'))return;
+  loading();
+  const{error}=await sb.from('pagos').delete().eq('id',id);
+  loaded();if(error){showToast(error.message,'err');return;}
+  showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();
 }
 async function onFacturaChange(){
   const facId=document.getElementById('pago-factura').value;
@@ -854,7 +1078,8 @@ async function onFacturaChange(){
   const box=document.getElementById('pago-info-box');
   box.style.display='block';
   box.innerHTML=`<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota aprox.:</strong> ${fmt(cuotaAprox)} &nbsp;|&nbsp; <strong>${f.responsable}</strong>`;
-  document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
+  if(!document.getElementById('pago-monto').value)
+    document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
   const cuotas=r3.data||[];
   if(cuotas.length){
     document.getElementById('cuotas-box').style.display='block';
@@ -877,7 +1102,7 @@ async function toggleCuota(cuotaId,pagada,facId){
   loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);
   loaded();if(error){showToast(error.message,'err');return;}
   showToast(pagada?'Cuota marcada pagada':'Desmarcada','ok');
-  await verDetalle(facId);await renderCronograma();
+  if(facId)await verDetalle(facId);await renderCronograma();
 }
 function onFotoSelected(inp){
   const file=inp.files[0];if(!file)return;
@@ -886,6 +1111,7 @@ function onFotoSelected(inp){
   reader.readAsDataURL(file);
 }
 async function savePago(){
+  const editId=document.getElementById('pago-edit-id').value;
   const facId=document.getElementById('pago-factura').value;
   const fecha=document.getElementById('pago-fecha').value;
   const monto=parseFloat(document.getElementById('pago-monto').value)||0;
@@ -893,10 +1119,9 @@ async function savePago(){
   const cuotaId=document.getElementById('pago-cuota-id').value;
   if(!facId||!fecha||!monto){showToast('Completa campos obligatorios','err');return;}
   const{data:fac}=await sb.from('facturas').select('responsable').eq('id',facId).single();
-  console.log('FAC:', fac, 'responsable:', fac?.responsable);
   loading('Guardando pago...');
   let cuotaNum=null,fotoUrl=null;
-  if(cuotaId){
+  if(cuotaId&&!editId){
     const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
     if(c)cuotaNum=c.numero;
     await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
@@ -910,7 +1135,7 @@ async function savePago(){
       if(!upErr&&upData){const{data:urlData}=sb.storage.from('comprobantes').getPublicUrl(fname);fotoUrl=urlData?.publicUrl||null;}
     }catch(e){console.warn('Foto no subida:',e);}
   }
-  const{error}=await sb.from('pagos').insert({
+  const pagoObj={
     factura_id:facId,
     fecha_pago:fecha,
     num_comprobante:document.getElementById('pago-comprobante').value.trim(),
@@ -920,11 +1145,17 @@ async function savePago(){
     nota:document.getElementById('pago-nota').value.trim(),
     cuota_id:cuotaId||null,
     cuota_numero:cuotaNum,
-    foto_url:fotoUrl
-  });
+    ...(fotoUrl?{foto_url:fotoUrl}:{})
+  };
+  let error;
+  if(editId){
+    ({error}=await sb.from('pagos').update(pagoObj).eq('id',editId));
+  } else {
+    ({error}=await sb.from('pagos').insert(pagoObj));
+  }
   loaded();
   if(error){showToast(error.message,'err');return;}
-  showToast('Pago registrado'+(cuotaId?' y cuota marcada':''),'ok');
+  showToast(editId?'Pago actualizado':`Pago registrado${cuotaId?' y cuota marcada':''}`, 'ok');
   closeModal('modal-pago');fotoBase64=null;
   await loadFacSelect();await renderPagos();await renderDashboard();
 }
@@ -938,28 +1169,39 @@ async function renderPagos(){
   loading();await reloadAll();loaded();
   const quien=document.getElementById('filt-pago-quien').value;
   const allPagos=Object.values(_pagosMap).flat();
-  const pagos=allPagos.filter(p=>!quien||p.quien_pago===quien)
+  const pagos=allPagos.filter(p=>!quien||(p.pago_quien||p.quien_pago)===quien)
     .sort((a,b)=>b.fecha_pago.localeCompare(a.fecha_pago));
   document.getElementById('pago-table-body').innerHTML=pagos.length
     ?pagos.map(p=>{
         const fac=_facturas[p.factura_id]||{};
         const casa=_casas[fac.casa_id]||{};
-        const ab=currentRole==='admin'?`<td><button class="btn btn-danger btn-sm" onclick="deletePago('${p.id}')">🗑</button></td>`:'';
-        return`<tr>
+        const quienPago=p.pago_quien||p.quien_pago||'—';
+        const notaVal=p.nota||p.observacion||'';
+        const clickAttr=`onclick="abrirEditarPago('${p.id}')"`;
+        const ab=currentRole==='admin'?`<td><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletePago('${p.id}')">🗑</button></td>`:'';
+        return`<tr class="pago-row" ${clickAttr}>
           <td>${p.fecha_pago}</td>
           <td>${p.num_comprobante||'—'}</td>
           <td>${fac.numero||'—'}</td>
           <td>${casa.nombre||'—'}</td>
           <td>${p.cuota_numero?`<span class="badge badge-blue">C${p.cuota_numero}</span>`:'<span style="color:var(--muted);font-size:11px">Libre</span>'}</td>
           <td>${p.deuda_de||'—'}</td>
-          <td><span class="badge badge-blue">${p.quien_pago||'—'}</span></td>
+          <td><span class="badge badge-blue">${quienPago}</span></td>
           <td><strong>${fmt(p.monto)}</strong></td>
-          <td style="font-size:11px;color:var(--muted)">${p.observacion||''}</td>
-          <td>${p.foto_url?`<a href="${p.foto_url}" target="_blank" style="color:var(--accent);font-size:12px">📎 Ver</a>`:'—'}</td>
+          <td style="font-size:11px;color:var(--muted)">${notaVal}</td>
+          <td>${p.foto_url?`<a href="${p.foto_url}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);font-size:12px">📎 Ver</a>`:'—'}</td>
           ${ab}
         </tr>`;
     }).join('')
     :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
+}
+async function abrirEditarPago(id){
+  loading('...');
+  const{data,error}=await sb.from('pagos').select('*').eq('id',id).single();
+  loaded();
+  if(error||!data){showToast('No se pudo cargar el pago','err');return;}
+  await loadFacSelect();
+  openModalPago(data);
 }
 
 /* ── CRONOGRAMA ── */
