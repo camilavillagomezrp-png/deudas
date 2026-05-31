@@ -71,7 +71,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .page-title{font-family:'DM Serif Display',serif;font-size:28px}
 .page-sub{font-size:13px;color:var(--muted);margin-top:2px}
 
-/* DASHBOARD — visual cards */
+/* DASHBOARD */
 .dash-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px}
 .kpi-card{background:#fff;border-radius:14px;padding:20px 18px;border:1px solid var(--border);box-shadow:var(--sh);position:relative;overflow:hidden;transition:transform .15s}
 .kpi-card:hover{transform:translateY(-2px)}
@@ -218,15 +218,40 @@ textarea.txa{resize:vertical;min-height:70px}
 .chip-sel{border-color:var(--accent);background:var(--accent);color:#fff;transform:scale(1.05)}
 
 /* FOTO UPLOAD */
-.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;margin-top:6px}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;margin-top:6px;transition:all .2s}
 .upload-zone:hover{border-color:var(--accent);background:#F0FBF5}
-.upload-preview{width:100%;max-height:160px;object-fit:contain;border-radius:8px;margin-top:8px;display:none;border:1px solid var(--border)}
+.upload-preview{width:100%;max-height:160px;object-fit:contain;border-radius:8px;margin-top:8px;display:none;border:1px solid var(--border);cursor:pointer;transition:opacity .2s}
+.upload-preview:hover{opacity:.85}
+
+/* FOTO — zona existente */
+.existing-foto-box{margin-top:8px;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;background:#FAFAFA;display:flex;align-items:center;gap:12px}
+.existing-foto-thumb{width:56px;height:56px;object-fit:cover;border-radius:7px;border:1px solid var(--border);cursor:pointer;transition:transform .15s}
+.existing-foto-thumb:hover{transform:scale(1.05)}
+.existing-foto-info{flex:1;font-size:12px;color:var(--muted)}
+.existing-foto-info strong{display:block;font-size:13px;color:var(--text);margin-bottom:2px}
+.btn-ver-foto{padding:5px 12px;border-radius:7px;background:var(--accent);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-ver-foto:hover{background:#1B4332}
+
+/* FOTO BADGE en tabla */
+.foto-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:background .15s}
+.foto-badge:hover{background:#A7F3D0}
+
+/* LIGHTBOX */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;flex-direction:column;gap:14px}
+#lightbox.open{display:flex}
+#lightbox img{max-width:90vw;max-height:80vh;object-fit:contain;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.lightbox-bar{display:flex;align-items:center;gap:12px}
+.lightbox-close{padding:8px 20px;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;font-weight:500}
+.lightbox-close:hover{background:rgba(255,255,255,.25)}
+.lightbox-open{padding:8px 20px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;font-weight:500}
+.lightbox-open:hover{background:#1B4332}
+.lightbox-label{color:rgba(255,255,255,.6);font-size:12px;text-align:center}
 
 /* PAGOS — fila clickeable */
 .pago-row{cursor:pointer;transition:background .1s}
 .pago-row:hover td{background:#F0FBF5 !important}
 
-/* STAT (para stats de tabla) */
+/* STAT */
 .stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
 .stat-value{font-family:'DM Serif Display',serif;font-size:24px}
 .stat-value.green{color:var(--accent)}.stat-value.red{color:var(--danger)}.stat-value.amber{color:var(--warn)}.stat-value.purple{color:var(--mc)}.stat-value.blue{color:var(--richard)}
@@ -248,6 +273,16 @@ textarea.txa{resize:vertical;min-height:70px}
 
 <div id="loader"><div class="spinner"></div><div class="loader-msg" id="loader-msg">Cargando...</div></div>
 <div id="toast"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <img id="lightbox-img" src="" alt="Comprobante">
+  <div class="lightbox-label" id="lightbox-label">Comprobante de pago</div>
+  <div class="lightbox-bar">
+    <button class="lightbox-open" onclick="window.open(document.getElementById('lightbox-img').src,'_blank')">↗ Abrir original</button>
+    <button class="lightbox-close" onclick="closeLightbox()">✕ Cerrar</button>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -349,7 +384,7 @@ textarea.txa{resize:vertical;min-height:70px}
     <!-- PAGOS -->
     <section class="page" id="page-pagos">
       <div class="page-header">
-        <div><h2 class="page-title">Registro de Pagos</h2><p class="page-sub">Clic en una fila para ver o editar</p></div>
+        <div><h2 class="page-title">Registro de Pagos</h2><p class="page-sub">Clic en una fila para ver o editar · 📎 en foto para visualizar</p></div>
         <button class="btn btn-primary admin-only" onclick="openModalPago()">+ Registrar pago</button>
       </div>
       <div class="table-card">
@@ -482,17 +517,33 @@ textarea.txa{resize:vertical;min-height:70px}
       </div>
       <div class="form-group"><label class="lbl">Monto pagado *</label><input class="inp" type="number" id="pago-monto" step="0.01" placeholder="0.00"></div>
       <div class="form-group full"><label class="lbl">Observación</label><input class="inp" id="pago-nota" placeholder="Ej: Cuota de enero..."></div>
+
+      <!-- FOTO: zona existente (solo en edición) -->
+      <div class="form-group full" id="existing-foto-area" style="display:none">
+        <label class="lbl">Foto actual del comprobante</label>
+        <div class="existing-foto-box">
+          <img id="existing-foto-thumb" src="" alt="Comprobante actual" class="existing-foto-thumb" onclick="verFoto(this.src,'Comprobante guardado')">
+          <div class="existing-foto-info">
+            <strong>Foto guardada en la nube</strong>
+            Haz clic en la imagen para verla en pantalla completa
+          </div>
+          <button class="btn-ver-foto" onclick="verFoto(document.getElementById('existing-foto-thumb').src,'Comprobante guardado')">🔍 Ver</button>
+        </div>
+      </div>
+
       <div class="form-group full">
-        <label class="lbl">Foto del comprobante</label>
-        <div class="upload-zone" onclick="document.getElementById('foto-input').click()">
+        <label class="lbl" id="foto-label">Foto del comprobante</label>
+        <div class="upload-zone" onclick="document.getElementById('foto-input').click()" id="upload-zone-box">
           📷 Toca para subir foto desde galería o cámara
           <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="onFotoSelected(this)">
         </div>
-        <img id="foto-preview" class="upload-preview" alt="comprobante">
+        <img id="foto-preview" class="upload-preview" alt="comprobante" onclick="verFoto(this.src,'Nueva foto')">
+        <div id="foto-nueva-label" style="display:none;font-size:11px;color:var(--accent);margin-top:4px;font-weight:600">✓ Nueva foto lista para subir</div>
       </div>
     </div>
     <input type="hidden" id="pago-cuota-id">
     <input type="hidden" id="pago-edit-id">
+    <input type="hidden" id="pago-foto-url-existing">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px">
       <button class="btn btn-danger admin-only" id="btn-eliminar-pago" style="display:none" onclick="eliminarPagoEdicion()">🗑 Eliminar</button>
       <div style="display:flex;gap:10px;margin-left:auto">
@@ -550,6 +601,19 @@ const fmt=n=>'$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,','
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+/* ── LIGHTBOX ── */
+function verFoto(url, label='Comprobante de pago'){
+  if(!url)return;
+  document.getElementById('lightbox-img').src=url;
+  document.getElementById('lightbox-label').textContent=label;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 
 /* ── AUTH ── */
 let currentRole='viewer';
@@ -659,13 +723,12 @@ async function renderDashboard(){
   const totalDeuda=facs.reduce((s,f)=>s+parseFloat(f.total||0),0);
   const totalPagado=facs.reduce((s,f)=>s+calcPagado(f),0);
   const totalSaldo=facs.reduce((s,f)=>s+calcSaldo(f),0);
-  let totalMC=0,totalRi=0,saldoMC=0,saldoRi=0;
+  let totalMC=0,totalRi=0;
   facs.forEach(f=>{
     const t=calcPersonas(f.factura_items);
     totalMC+=t.mc.s+t.mc.i;totalRi+=t.ri.s+t.ri.i;
   });
 
-  // KPIs
   document.getElementById('dash-kpis').innerHTML=`
     <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">💰</div><div class="kpi-label">Deuda total</div><div class="kpi-value">${fmt(totalDeuda)}</div></div>
     <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">✅</div><div class="kpi-label">Total pagado</div><div class="kpi-value green">${fmt(totalPagado)}</div></div>
@@ -673,7 +736,6 @@ async function renderDashboard(){
     <div class="kpi-card"><div class="kpi-bar purple"></div><div class="kpi-icon">💜</div><div class="kpi-label">Deuda M. Carmen</div><div class="kpi-value purple">${fmt(totalMC)}</div></div>
     <div class="kpi-card"><div class="kpi-bar blue"></div><div class="kpi-icon">💙</div><div class="kpi-label">Deuda Richard</div><div class="kpi-value blue">${fmt(totalRi)}</div></div>`;
 
-  // Próximas cuotas ordenadas
   const hoyStr=new Date().toISOString().slice(0,10);
   let cuotasPend=_cuotas.filter(c=>{
     if(c.pagada)return false;
@@ -712,7 +774,6 @@ async function renderDashboard(){
   }).join(''):'<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">🎉 No hay cuotas pendientes</div>';
   document.getElementById('proximas-list').innerHTML=proximaHTML;
 
-  // Persona split
   const grand=totalMC+totalRi||1;
   document.getElementById('persona-split').innerHTML=`
     <div class="persona-block persona-mc">
@@ -1004,7 +1065,7 @@ async function verDetalle(id){
       <tbody>${pagos.map(p=>`<tr>
         <td>${p.fecha_pago}</td><td>${p.pago_quien||p.quien_pago||'—'}</td><td>${fmt(p.monto)}</td>
         <td>${p.num_comprobante||'—'}</td><td style="font-size:11px">${p.nota||p.observacion||''}</td>
-        <td>${p.foto_url?`<a href="${p.foto_url}" target="_blank" style="color:var(--accent);font-size:11px">📎 Ver</a>`:'—'}</td>
+        <td>${p.foto_url?`<button class="foto-badge" onclick="verFoto('${p.foto_url}','Comprobante ${p.num_comprobante||p.fecha_pago}')">📎 Ver foto</button>`:'—'}</td>
       </tr>`).join('')}</tbody>
     </table>`:''}`;
   openModal('modal-detalle');
@@ -1022,31 +1083,42 @@ function openPagarCuota(facId,cuotaId,monto,numero){
     document.getElementById('pago-nota').value=`Cuota #${numero}`;
   },300);
 }
+
 function openModalPago(pagoData=null){
-  // Reset
+  // Reset estado
   document.getElementById('modal-pago-title').textContent=pagoData?'Editar Pago':'Registrar Pago';
   document.getElementById('pago-edit-id').value=pagoData?.id||'';
+  document.getElementById('pago-foto-url-existing').value='';
   document.getElementById('pago-cuota-id').value='';
   document.getElementById('cuotas-box').style.display='none';
   document.getElementById('pago-info-box').style.display='none';
   document.getElementById('foto-preview').style.display='none';
+  document.getElementById('foto-preview').src='';
+  document.getElementById('foto-nueva-label').style.display='none';
+  document.getElementById('existing-foto-area').style.display='none';
+  document.getElementById('foto-input').value='';
+  document.getElementById('foto-label').textContent=pagoData?'Reemplazar foto (opcional)':'Foto del comprobante';
+  document.getElementById('upload-zone-box').innerHTML='📷 Toca para subir foto desde galería o cámara<input type="file" id="foto-input" accept="image/*" style="display:none" onchange="onFotoSelected(this)">';
   document.getElementById('btn-guardar-pago').textContent=pagoData?'Actualizar pago':'Guardar pago';
   fotoBase64=null;
 
   const btnElim=document.getElementById('btn-eliminar-pago');
-  if(pagoData&&currentRole==='admin'){btnElim.style.display='';} else {btnElim.style.display='none';}
+  if(pagoData&&currentRole==='admin'){btnElim.style.display='';}else{btnElim.style.display='none';}
 
   if(pagoData){
-    // Llenar con datos existentes
     document.getElementById('pago-factura').value=pagoData.factura_id||'';
     document.getElementById('pago-fecha').value=pagoData.fecha_pago||'';
     document.getElementById('pago-comprobante').value=pagoData.num_comprobante||'';
     document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';
     document.getElementById('pago-monto').value=pagoData.monto||'';
     document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
+
+    // ★ FOTO EXISTENTE: mostrar miniatura y guardar URL
     if(pagoData.foto_url){
-      const prev=document.getElementById('foto-preview');
-      prev.src=pagoData.foto_url;prev.style.display='block';
+      document.getElementById('pago-foto-url-existing').value=pagoData.foto_url;
+      document.getElementById('existing-foto-thumb').src=pagoData.foto_url;
+      document.getElementById('existing-foto-area').style.display='block';
+      document.getElementById('foto-label').textContent='Reemplazar foto (opcional — la actual se conserva)';
     }
     onFacturaChange();
   } else {
@@ -1055,6 +1127,7 @@ function openModalPago(pagoData=null){
   }
   openModal('modal-pago');
 }
+
 async function eliminarPagoEdicion(){
   const id=document.getElementById('pago-edit-id').value;
   if(!id||!confirm('¿Eliminar este pago?'))return;
@@ -1063,6 +1136,7 @@ async function eliminarPagoEdicion(){
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();
 }
+
 async function onFacturaChange(){
   const facId=document.getElementById('pago-factura').value;
   if(!facId){document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';return;}
@@ -1091,6 +1165,7 @@ async function onFacturaChange(){
     }).join('');
   }else{document.getElementById('cuotas-box').style.display='none';}
 }
+
 function selectCuotaChip(el){
   if(el.classList.contains('chip-pagada'))return;
   document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
@@ -1098,18 +1173,27 @@ function selectCuotaChip(el){
   document.getElementById('pago-cuota-id').value=el.dataset.id;
   document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
 }
+
 async function toggleCuota(cuotaId,pagada,facId){
   loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);
   loaded();if(error){showToast(error.message,'err');return;}
   showToast(pagada?'Cuota marcada pagada':'Desmarcada','ok');
   if(facId)await verDetalle(facId);await renderCronograma();
 }
+
 function onFotoSelected(inp){
   const file=inp.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=e=>{fotoBase64=e.target.result;const prev=document.getElementById('foto-preview');prev.src=fotoBase64;prev.style.display='block';};
+  reader.onload=e=>{
+    fotoBase64=e.target.result;
+    const prev=document.getElementById('foto-preview');
+    prev.src=fotoBase64;
+    prev.style.display='block';
+    document.getElementById('foto-nueva-label').style.display='block';
+  };
   reader.readAsDataURL(file);
 }
+
 async function savePago(){
   const editId=document.getElementById('pago-edit-id').value;
   const facId=document.getElementById('pago-factura').value;
@@ -1117,24 +1201,39 @@ async function savePago(){
   const monto=parseFloat(document.getElementById('pago-monto').value)||0;
   const quien=document.getElementById('pago-quien').value;
   const cuotaId=document.getElementById('pago-cuota-id').value;
+  const existingFotoUrl=document.getElementById('pago-foto-url-existing').value||null;
+
   if(!facId||!fecha||!monto){showToast('Completa campos obligatorios','err');return;}
   const{data:fac}=await sb.from('facturas').select('responsable').eq('id',facId).single();
   loading('Guardando pago...');
   let cuotaNum=null,fotoUrl=null;
+
   if(cuotaId&&!editId){
     const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
     if(c)cuotaNum=c.numero;
     await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
   }
+
+  // ★ SUBIR FOTO NUEVA si hay una seleccionada
   if(fotoBase64){
     try{
       const blob=await fetch(fotoBase64).then(r=>r.blob());
       const ext=blob.type.split('/')[1]||'jpg';
       const fname=`comp_${Date.now()}.${ext}`;
       const{data:upData,error:upErr}=await sb.storage.from('comprobantes').upload(fname,blob,{contentType:blob.type,upsert:false});
-      if(!upErr&&upData){const{data:urlData}=sb.storage.from('comprobantes').getPublicUrl(fname);fotoUrl=urlData?.publicUrl||null;}
+      if(!upErr&&upData){
+        const{data:urlData}=sb.storage.from('comprobantes').getPublicUrl(fname);
+        fotoUrl=urlData?.publicUrl||null;
+      } else if(upErr){
+        console.warn('Error subiendo foto:',upErr.message);
+        showToast('Pago guardado, pero la foto no se pudo subir: '+upErr.message,'err');
+      }
     }catch(e){console.warn('Foto no subida:',e);}
   }
+
+  // ★ Determinar URL final: nueva foto > foto existente > nada
+  const fotoFinal = fotoUrl || existingFotoUrl || null;
+
   const pagoObj={
     factura_id:facId,
     fecha_pago:fecha,
@@ -1145,8 +1244,9 @@ async function savePago(){
     nota:document.getElementById('pago-nota').value.trim(),
     cuota_id:cuotaId||null,
     cuota_numero:cuotaNum,
-    ...(fotoUrl?{foto_url:fotoUrl}:{})
+    foto_url:fotoFinal,
   };
+
   let error;
   if(editId){
     ({error}=await sb.from('pagos').update(pagoObj).eq('id',editId));
@@ -1159,12 +1259,14 @@ async function savePago(){
   closeModal('modal-pago');fotoBase64=null;
   await loadFacSelect();await renderPagos();await renderDashboard();
 }
+
 async function deletePago(id){
   if(!confirm('¿Eliminar este pago?'))return;loading();
   const{error}=await sb.from('pagos').delete().eq('id',id);
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');await renderPagos();await renderDashboard();
 }
+
 async function renderPagos(){
   loading();await reloadAll();loaded();
   const quien=document.getElementById('filt-pago-quien').value;
@@ -1179,6 +1281,10 @@ async function renderPagos(){
         const notaVal=p.nota||p.observacion||'';
         const clickAttr=`onclick="abrirEditarPago('${p.id}')"`;
         const ab=currentRole==='admin'?`<td><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletePago('${p.id}')">🗑</button></td>`:'';
+        // ★ Foto: botón que abre lightbox, con stop propagation para no abrir el modal de edición
+        const fotoCell=p.foto_url
+          ?`<button class="foto-badge" onclick="event.stopPropagation();verFoto('${p.foto_url}','Comprobante ${p.num_comprobante||p.fecha_pago}')">📎 Ver foto</button>`
+          :'<span style="color:var(--muted);font-size:11px">—</span>';
         return`<tr class="pago-row" ${clickAttr}>
           <td>${p.fecha_pago}</td>
           <td>${p.num_comprobante||'—'}</td>
@@ -1189,12 +1295,13 @@ async function renderPagos(){
           <td><span class="badge badge-blue">${quienPago}</span></td>
           <td><strong>${fmt(p.monto)}</strong></td>
           <td style="font-size:11px;color:var(--muted)">${notaVal}</td>
-          <td>${p.foto_url?`<a href="${p.foto_url}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);font-size:12px">📎 Ver</a>`:'—'}</td>
+          <td>${fotoCell}</td>
           ${ab}
         </tr>`;
     }).join('')
     :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
 }
+
 async function abrirEditarPago(id){
   loading('...');
   const{data,error}=await sb.from('pagos').select('*').eq('id',id).single();
