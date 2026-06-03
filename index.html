@@ -661,7 +661,11 @@ async function reloadAll(){
   _items={};(r3.data||[]).forEach(it=>{if(!_items[it.factura_id])_items[it.factura_id]=[];_items[it.factura_id].push(it)});
   _pagosMap={};(r4.data||[]).forEach(p=>{if(!_pagosMap[p.factura_id])_pagosMap[p.factura_id]=[];_pagosMap[p.factura_id].push(p)});
   _cuotas=r5.data||[];
-  _cuotasByFac={};_cuotas.forEach(c=>{if(!_cuotasByFac[c.factura_id])_cuotasByFac[c.factura_id]=[];_cuotasByFac[c.factura_id].push(c)});
+ _cuotasByFac={};_cuotas.forEach(c=>{if(!_cuotasByFac[c.factura_id])_cuotasByFac[c.factura_id]=[];_cuotasByFac[c.factura_id].push(c)});
+// Reconciliar: marcar como pagada si tiene pago registrado para esa cuota
+const _pagosByCuotaId={};
+Object.values(_pagosMap).flat().forEach(p=>{if(p.cuota_id)_pagosByCuotaId[p.cuota_id]=true});
+_cuotas.forEach(c=>{if(!c.pagada&&_pagosByCuotaId[c.id])c.pagada=true});
 }
 function enrich(f){return{...f,casa:_casas[f.casa_id]||{},factura_items:_items[f.id]||[],pagos:_pagosMap[f.id]||[],cuotas:_cuotasByFac[f.id]||[]}}
 function calcPagado(f){return(f.pagos||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0)}
@@ -1191,9 +1195,12 @@ async function savePago(){
   loading('Guardando pago...');let cuotaNum=null,fotoUrl=null;
   if(cuotaId&&!editId){
     const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
-    if(c)cuotaNum=c.numero;
-    await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
-  }
+    if(cuotaId&&!editId){
+  const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
+  if(c)cuotaNum=c.numero;
+  const{error:eCuota}=await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
+  if(eCuota)showToast('Pago guardado pero cuota no marcada: '+eCuota.message,'err');
+}
   if(fotoBase64){
     try{
       const blob=await fetch(fotoBase64).then(r=>r.blob());
@@ -1369,6 +1376,17 @@ async function renderCronograma(){
       </table>
     </div>`;
   }).join('');
+}
+  async function reconciliarCuotas(){
+  loading('Reconciliando cuotas...');
+  const{data:pagos}=await sb.from('pagos').select('cuota_id').not('cuota_id','is',null);
+  const ids=[...new Set((pagos||[]).map(p=>p.cuota_id).filter(Boolean))];
+  if(!ids.length){loaded();showToast('Sin cuotas que reconciliar','ok');return}
+  const{error}=await sb.from('cuotas').update({pagada:true}).in('id',ids);
+  loaded();
+  if(error){showToast('Error: '+error.message,'err');return}
+  showToast(`${ids.length} cuota(s) sincronizadas ✓`,'ok');
+  await renderDashboard();await renderCronograma();
 }
 </script>
 </body>
