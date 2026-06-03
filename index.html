@@ -435,8 +435,9 @@ textarea.txa{resize:vertical;min-height:70px}
           </select>
         </div>
         <div class="cron-actions">
-          <button class="btn-clear-cron" onclick="limpiarFiltrosCron()">✕ Limpiar</button>
-          <button class="btn-pdf" onclick="exportCronogramaPDF()">🖨️ Exportar PDF</button>
+  <button class="btn-clear-cron" onclick="limpiarFiltrosCron()">✕ Limpiar</button>
+  <button class="btn-clear-cron admin-only" onclick="reconciliarCuotas()">🔄 Sincronizar</button>
+  <button class="btn-pdf" onclick="exportCronogramaPDF()">🖨️ Exportar PDF</button>
         </div>
       </div>
       <div id="cron-resumen-wrap"></div>
@@ -1193,14 +1194,12 @@ async function savePago(){
   if(!facId||!fecha||!monto){showToast('Completa campos obligatorios','err');return}
   const{data:fac}=await sb.from('facturas').select('responsable').eq('id',facId).single();
   loading('Guardando pago...');let cuotaNum=null,fotoUrl=null;
-  if(cuotaId&&!editId){
+if(cuotaId&&!editId){
     const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
-    if(cuotaId&&!editId){
-  const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
-  if(c)cuotaNum=c.numero;
-  const{error:eCuota}=await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
-  if(eCuota)showToast('Pago guardado pero cuota no marcada: '+eCuota.message,'err');
-}
+    if(c)cuotaNum=c.numero;
+    const{error:eCuota}=await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
+    if(eCuota)showToast('Pago guardado pero cuota no marcada: '+eCuota.message,'err');
+  }
   if(fotoBase64){
     try{
       const blob=await fetch(fotoBase64).then(r=>r.blob());
