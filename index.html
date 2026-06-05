@@ -24,10 +24,10 @@
   --danger: #DC2626;
   --warn: #D97706;
   --info: #2563EB;
-  --mc: #C0392B;       /* 🔴 María del Carmen — rojo */
+  --mc: #C0392B;
   --mc2: #FADBD8;
   --mc3: #FBEAE8;
-  --richard: #D35400;  /* 🟠 Richard — naranja */
+  --richard: #D35400;
   --richard2: #FAE5D3;
   --richard3: #FEF0E7;
   --r: 12px;
@@ -247,6 +247,7 @@ tr:hover td { background: #FAFFF8; }
 .badge-mc      { background: var(--mc2); color: var(--mc); }
 .badge-richard { background: var(--richard2); color: var(--richard); }
 .badge-green2  { background: #D1FAE5; color: #065F46; }
+.badge-historica { background: #F3F4F6; color: #9CA3AF; font-size: 10px; }
 
 /* ══ BUTTONS ══ */
 .btn {
@@ -346,7 +347,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .range-group label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; font-family: var(--sf); }
 .range-group input[type=date] { border: none; font-family: var(--sf); font-size: 13px; color: var(--text); background: transparent; padding: 0; cursor: pointer; outline: none; }
 
-/* ══ MONTH BLOCKS (tabla cronograma) ══ */
+/* ══ MONTH BLOCKS ══ */
 .month-block { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); margin-bottom: 16px; overflow: hidden; }
 .month-header {
   padding: 12px 18px; background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -579,7 +580,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
     <!-- CRONOGRAMA -->
     <section class="page" id="page-cronograma">
       <div class="page-header">
-        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Cuotas mes a mes</p></div>
+        <div><h2 class="page-title">Cronograma de Pagos</h2><p class="page-sub">Cuotas activas mes a mes — cuotas históricas excluidas</p></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
         <div class="cron-tabs">
@@ -751,8 +752,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
       <h3 class="modal-title" id="modal-refin-title">🔄 Nuevo Refinanciamiento</h3>
       <button class="modal-close" onclick="closeModal('modal-refin')">✕</button>
     </div>
-
-    <!-- PASO 1 -->
     <div class="refin-step refin-step-1">
       <div class="refin-step-title">Paso 1 — Datos del refinanciamiento</div>
       <div class="form-grid">
@@ -783,8 +782,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
         <div class="form-group full"><label class="lbl">Notas</label><textarea class="txa" id="refin-notas" rows="2"></textarea></div>
       </div>
     </div>
-
-    <!-- PASO 2 -->
     <div class="refin-step refin-step-2">
       <div class="refin-step-title">Paso 2 — Anticipo de refinanciamiento (opcional)</div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -795,13 +792,13 @@ textarea.txa { resize: vertical; min-height: 70px; }
         <div class="form-grid">
           <div class="form-group">
             <label class="lbl">Responsable del anticipo *</label>
-            <select class="sel" id="refin-anticipo-resp">
+            <select class="sel" id="refin-anticipo-resp" onchange="calcNuevasCuotas()">
               <option value="Maria del Carmen">🔴 María del Carmen</option>
               <option value="Richard">🟠 Richard</option>
               <option value="Compartida">⚖️ Compartida</option>
             </select>
           </div>
-          <div class="form-group"><label class="lbl">Monto anticipo *</label><input class="inp" type="number" id="refin-anticipo-monto" step="0.01" placeholder="0.00"></div>
+          <div class="form-group"><label class="lbl">Monto anticipo *</label><input class="inp" type="number" id="refin-anticipo-monto" step="0.01" placeholder="0.00" oninput="calcNuevasCuotas()"></div>
           <div class="form-group"><label class="lbl">¿Quién pagó físicamente?</label>
             <select class="sel" id="refin-anticipo-quien">
               <option value="Maria del Carmen">🔴 María del Carmen</option>
@@ -816,8 +813,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
         </div>
       </div>
     </div>
-
-    <!-- PASO 3 -->
     <div class="refin-step refin-step-3">
       <div class="refin-step-title">Paso 3 — Nuevas condiciones de pago</div>
       <div class="form-grid">
@@ -841,7 +836,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
         </div>
       </div>
     </div>
-
     <input type="hidden" id="refin-edit-id">
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
       <button class="btn btn-secondary" onclick="closeModal('modal-refin')">Cancelar</button>
@@ -990,6 +984,32 @@ function calcPersonas(items){
   });
   return{mc,ri};
 }
+
+/*
+ * ╔══════════════════════════════════════════════════════╗
+ * ║  FIX #1 — calcSaldoPersonas                         ║
+ * ║  Calcula el saldo pendiente REAL por persona,        ║
+ * ║  descontando los pagos ya registrados.               ║
+ * ║  Antes: se usaba el total original de la factura     ║
+ * ║  (inflaba los KPIs aunque hubiera pagos parciales).  ║
+ * ╚══════════════════════════════════════════════════════╝
+ */
+function calcSaldoPersonas(f){
+  const items=f.factura_items||[];
+  const pagos=f.pagos||[];
+  const t=calcPersonas(items);
+  const totalMC=t.mc.s+t.mc.i;
+  const totalRi=t.ri.s+t.ri.i;
+  const totalFac=totalMC+totalRi;
+  const pagadoTotal=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);
+  if(totalFac<=0) return {saldoMC:0,saldoRi:0};
+  // Distribuye el pago proporcional a la participación de cada persona
+  const ratioPagado=Math.min(1,pagadoTotal/totalFac);
+  const saldoMC=Math.max(0,totalMC*(1-ratioPagado));
+  const saldoRi=Math.max(0,totalRi*(1-ratioPagado));
+  return{saldoMC,saldoRi};
+}
+
 function diasParaVencer(fechaStr){
   const hoy=new Date();hoy.setHours(0,0,0,0);
   const f=new Date(fechaStr+'T00:00:00');
@@ -1020,32 +1040,47 @@ async function loadFacSelect(){
 
 /* ══════════════════════════════════════
    DASHBOARD
+   FIX #2 — KPIs usan saldo pendiente real
+   FIX #3 — cuotas en dashboard excluyen históricas
 ══════════════════════════════════════ */
 async function renderDashboard(){
   loading('Cargando resumen...');await reloadAll();loaded();
   const pf=document.getElementById('dash-filter-person').value;
   const ef=document.getElementById('dash-filter-estado').value;
   const facs=Object.values(_facturas).map(enrich).filter(f=>!pf||f.responsable===pf||f.responsable==='Compartida');
+
   const totalDeuda=facs.reduce((s,f)=>s+parseFloat(f.total||0),0);
   const totalPagado=facs.reduce((s,f)=>s+calcPagado(f),0);
   const totalSaldo=facs.reduce((s,f)=>s+calcSaldo(f),0);
-  let totalMC=0,totalRi=0;
-  facs.forEach(f=>{const t=calcPersonas(f.factura_items);totalMC+=t.mc.s+t.mc.i;totalRi+=t.ri.s+t.ri.i;});
+
+  // FIX #2: sumar saldos pendientes reales, no totales originales
+  let saldoPendienteMC=0, saldoPendienteRi=0;
+  facs.forEach(f=>{
+    const{saldoMC,saldoRi}=calcSaldoPersonas(f);
+    saldoPendienteMC+=saldoMC;
+    saldoPendienteRi+=saldoRi;
+  });
+
   document.getElementById('dash-kpis').innerHTML=`
     <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">💰</div><div class="kpi-label">Deuda total</div><div class="kpi-value">${fmt(totalDeuda)}</div></div>
     <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">✅</div><div class="kpi-label">Total pagado</div><div class="kpi-value green">${fmt(totalPagado)}</div></div>
     <div class="kpi-card"><div class="kpi-bar red"></div><div class="kpi-icon">⏳</div><div class="kpi-label">Saldo pendiente</div><div class="kpi-value red">${fmt(totalSaldo)}</div></div>
-    <div class="kpi-card"><div class="kpi-bar mc"></div><div class="kpi-icon">🔴</div><div class="kpi-label">Deuda M. Carmen</div><div class="kpi-value mc">${fmt(totalMC)}</div></div>
-    <div class="kpi-card"><div class="kpi-bar richard"></div><div class="kpi-icon">🟠</div><div class="kpi-label">Deuda Richard</div><div class="kpi-value richard">${fmt(totalRi)}</div></div>`;
+    <div class="kpi-card"><div class="kpi-bar mc"></div><div class="kpi-icon">🔴</div><div class="kpi-label">Saldo MC</div><div class="kpi-value mc">${fmt(saldoPendienteMC)}</div></div>
+    <div class="kpi-card"><div class="kpi-bar richard"></div><div class="kpi-icon">🟠</div><div class="kpi-label">Saldo Richard</div><div class="kpi-value richard">${fmt(saldoPendienteRi)}</div></div>`;
+
   const hoyStr=new Date().toISOString().slice(0,10);
+
+  // FIX #3: excluir cuotas históricas del dashboard
   let cuotasPend=_cuotas.filter(c=>{
-    if(c.pagada)return false;
+    if(c.es_historica) return false;          // ← FIX #3
+    if(c.pagada) return false;
     const fac=_facturas[c.factura_id]||{};
     if(pf&&fac.responsable!==pf&&fac.responsable!=='Compartida')return false;
     if(ef==='vencida'&&c.fecha_vence>=hoyStr)return false;
     if(ef==='pendiente'&&c.fecha_vence<hoyStr)return false;
     return true;
   }).sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence));
+
   const proximaHTML=cuotasPend.length?cuotasPend.map(c=>{
     const fac=_facturas[c.factura_id]||{};
     const casa=_casas[fac.casa_id]||{};
@@ -1066,23 +1101,24 @@ async function renderDashboard(){
     </div>`;
   }).join(''):'<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">🎉 No hay cuotas pendientes</div>';
   document.getElementById('proximas-list').innerHTML=proximaHTML;
-  const grand=totalMC+totalRi||1;
+
+  const grand=saldoPendienteMC+saldoPendienteRi||1;
   document.getElementById('persona-split').innerHTML=`
     <div class="persona-block persona-mc">
       <div class="pb-name">🔴 María del Carmen</div>
-      <div class="pb-row"><span>Total deuda:</span><strong>${fmt(totalMC)}</strong></div>
-      <div class="progress-bar"><div class="progress-fill progress-mc" style="width:${(totalMC/grand*100).toFixed(1)}%"></div></div>
-      <div class="pb-total"><span>Participación:</span><span>${(totalMC/grand*100).toFixed(1)}%</span></div>
+      <div class="pb-row"><span>Saldo pendiente:</span><strong>${fmt(saldoPendienteMC)}</strong></div>
+      <div class="progress-bar"><div class="progress-fill progress-mc" style="width:${(saldoPendienteMC/grand*100).toFixed(1)}%"></div></div>
+      <div class="pb-total"><span>Participación:</span><span>${(saldoPendienteMC/grand*100).toFixed(1)}%</span></div>
     </div>
     <div class="persona-block persona-ri">
       <div class="pb-name">🟠 Richard</div>
-      <div class="pb-row"><span>Total deuda:</span><strong>${fmt(totalRi)}</strong></div>
-      <div class="progress-bar"><div class="progress-fill progress-ri" style="width:${(totalRi/grand*100).toFixed(1)}%"></div></div>
-      <div class="pb-total"><span>Participación:</span><span>${(totalRi/grand*100).toFixed(1)}%</span></div>
+      <div class="pb-row"><span>Saldo pendiente:</span><strong>${fmt(saldoPendienteRi)}</strong></div>
+      <div class="progress-bar"><div class="progress-fill progress-ri" style="width:${(saldoPendienteRi/grand*100).toFixed(1)}%"></div></div>
+      <div class="pb-total"><span>Participación:</span><span>${(saldoPendienteRi/grand*100).toFixed(1)}%</span></div>
     </div>
     <div style="background:#F0FBF5;border-radius:10px;padding:12px 14px;border:1.5px solid var(--accent3);font-size:13px;display:flex;justify-content:space-between;align-items:center">
-      <span style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;font-family:var(--sf)">Total general</span>
-      <span style="font-family:var(--serif);font-size:20px;color:var(--accent)">${fmt(totalDeuda)}</span>
+      <span style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;font-family:var(--sf)">Saldo total pendiente</span>
+      <span style="font-family:var(--serif);font-size:20px;color:var(--accent)">${fmt(totalSaldo)}</span>
     </div>`;
 }
 
@@ -1311,12 +1347,18 @@ async function verDetalle(id){
   const pagado=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);
   const saldo=Math.max(0,parseFloat(f.total||0)-pagado);
   const t=calcPersonas(items);
+
+  // Separar cuotas activas e históricas para el detalle
+  const cuotasActivas=cuotas.filter(c=>!c.es_historica);
+  const cuotasHistoricas=cuotas.filter(c=>c.es_historica);
+
   document.getElementById('detalle-titulo').textContent=`Factura ${f.numero}`;
   document.getElementById('detalle-content').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:13px;font-family:var(--sf)">
       <div><span style="color:var(--muted)">Casa:</span> <strong>${casa.nombre||'—'}</strong></div>
       <div><span style="color:var(--muted)">Fecha:</span> <strong>${f.fecha_emision}</strong></div>
-      <div><span style="color:var(--muted)">Cuotas:</span> <strong>${f.num_cuotas}</strong></div>
+      <div><span style="color:var(--muted)">Cuotas activas:</span> <strong>${cuotasActivas.length}</strong></div>
+      ${cuotasHistoricas.length?`<div><span style="color:var(--muted)">Cuotas históricas:</span> <strong style="color:#9CA3AF">${cuotasHistoricas.length}</strong></div>`:''}
       ${f.notas?`<div><span style="color:var(--muted)">Notas:</span> <strong>${f.notas}</strong></div>`:''}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
@@ -1344,10 +1386,10 @@ async function verDetalle(id){
         return`<tr><td>${it.descripcion}</td><td>${it.cantidad}</td><td>${fmt(it.precio_unit)}</td><td>${it.iva_porcentaje||0}%</td><td>${fmt(s+iv)}</td><td>${personaBadge(it.responsable)}</td></tr>`;
       }).join('')}</tbody>
     </table>
-    ${cuotas.length?`<h4 style="font-size:12px;color:var(--muted);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.4px;font-family:var(--sf)">Cuotas</h4>
+    ${cuotasActivas.length?`<h4 style="font-size:12px;color:var(--muted);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.4px;font-family:var(--sf)">Cuotas activas (${cuotasActivas.length})</h4>
     <table style="font-size:12px;margin-bottom:12px">
       <thead><tr><th>#</th><th>Vence</th><th>Monto</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead>
-      <tbody>${cuotas.map(c=>`<tr>
+      <tbody>${cuotasActivas.map(c=>`<tr>
         <td>${c.numero}</td><td>${c.fecha_vence}</td><td>${fmt(c.monto)}</td>
         <td>${c.pagada?'<span class="badge badge-green">Pagada</span>':'<span class="badge badge-red">Pendiente</span>'}</td>
         ${currentRole==='admin'?`<td>${c.pagada
@@ -1356,6 +1398,19 @@ async function verDetalle(id){
         }</td>`:''}
       </tr>`).join('')}</tbody>
     </table>`:''}
+    ${cuotasHistoricas.length?`
+    <details style="margin-bottom:12px">
+      <summary style="font-size:12px;color:#9CA3AF;cursor:pointer;padding:6px 0;font-family:var(--sf);font-weight:600;text-transform:uppercase;letter-spacing:.4px">
+        📦 Cuotas históricas (previas a refinanciamiento) — ${cuotasHistoricas.length} cuota${cuotasHistoricas.length>1?'s':''}
+      </summary>
+      <table style="font-size:11px;margin-top:8px;opacity:.7">
+        <thead><tr><th>#</th><th>Vence</th><th>Monto</th><th>Estado</th></tr></thead>
+        <tbody>${cuotasHistoricas.map(c=>`<tr style="opacity:.6">
+          <td>${c.numero}</td><td>${c.fecha_vence}</td><td>${fmt(c.monto)}</td>
+          <td><span class="badge badge-historica">Histórica</span></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </details>`:''}
     ${pagos.length?`<h4 style="font-size:12px;color:var(--muted);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.4px;font-family:var(--sf)">Pagos registrados</h4>
     <table style="font-size:12px">
       <thead><tr><th>Fecha</th><th>Quién</th><th>Monto</th><th>Comprobante</th><th>Nota</th><th>Foto</th></tr></thead>
@@ -1415,13 +1470,19 @@ async function eliminarPagoEdicion(){
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();
 }
+
+/*
+ * FIX #4 — onFacturaChange: chips de cuotas excluyen históricas
+ * Antes mostraba todas las cuotas incluyendo las viejas del
+ * refinanciamiento, confundiendo qué cuota pagar.
+ */
 async function onFacturaChange(){
   const facId=document.getElementById('pago-factura').value;
   if(!facId){document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';return;}
   const[r1,r2,r3]=await Promise.all([
     sb.from('facturas').select('*').eq('id',facId).single(),
     sb.from('pagos').select('monto').eq('factura_id',facId),
-    sb.from('cuotas').select('*').eq('factura_id',facId).order('numero')
+    sb.from('cuotas').select('*').eq('factura_id',facId).eq('es_historica',false).order('numero') // FIX #4
   ]);
   const f=r1.data;if(!f)return;
   const pagado=(r2.data||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0);
@@ -1544,7 +1605,9 @@ async function abrirEditarPago(id){
 }
 
 /* ══════════════════════════════════════
-   CRONOGRAMA — tabs + tabla + gantt
+   CRONOGRAMA
+   FIX #1 (principal) — getCronFiltered excluye cuotas históricas
+   Esto soluciona el problema de cuotas duplicadas en tabla y Gantt
 ══════════════════════════════════════ */
 const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const MESES_CORTO=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -1577,6 +1640,7 @@ function getCronFiltered(){
   const hasta=document.getElementById('cron-hasta').value;
   const hoyStr=new Date().toISOString().slice(0,10);
   return _cuotas.filter(c=>{
+    if(c.es_historica) return false;           // ← FIX #1: excluir históricas
     const fac=_facturas[c.factura_id]||{};
     if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
     if(estadoFilt==='pendiente'&&c.pagada)return false;
@@ -1646,7 +1710,10 @@ function renderCronogramaGantt(){
   if(!meses.length){document.getElementById('cronograma-content').innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-family:var(--sf)">Rango inválido.</p>';return;}
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
+
+  // FIX #1 aplicado también al Gantt: excluir históricas
   const allCuotas=_cuotas.filter(c=>{
+    if(c.es_historica) return false;           // ← FIX #1
     const fac=_facturas[c.factura_id]||{};
     if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
     if(estadoFilt==='pendiente'&&c.pagada)return false;
@@ -1654,6 +1721,7 @@ function renderCronogramaGantt(){
     if(estadoFilt==='vencida'&&(c.pagada||c.fecha_vence>=hoyStr))return false;
     return true;
   });
+
   const facIds=[...new Set(allCuotas.map(c=>c.factura_id))];
   if(!facIds.length){document.getElementById('cronograma-content').innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-family:var(--sf)">No hay cuotas para estos filtros.</p>';return;}
   const totalesMes={};
@@ -1734,7 +1802,7 @@ function renderCronogramaGantt(){
     <div class="gl-item"><div class="gl-dot" style="background:var(--richard3);border-left-color:var(--richard)"></div>🟠 Richard pendiente</div>
     <div class="gl-item"><div class="gl-dot" style="background:#FEF3C7;border-left-color:var(--warn)"></div>🟠 Richard vencida</div>
     <div class="gl-item"><div class="gl-dot" style="background:#F3F4F6;border-left-color:#9CA3AF"></div>Pagada</div>
-    <div style="margin-left:auto;font-size:10px;color:var(--muted)">Columna verde = mes actual</div>
+    <div style="margin-left:auto;font-size:10px;color:var(--muted)">Solo cuotas activas — históricas excluidas · Columna verde = mes actual</div>
   </div>`;
   html+='</div></div></div>';
   document.getElementById('cronograma-content').innerHTML=html;
@@ -1794,6 +1862,7 @@ async function onRefinFacturaChange(){
 function toggleAnticipo(){
   const tiene=document.getElementById('refin-tiene-anticipo').checked;
   document.getElementById('refin-anticipo-campos').style.display=tiene?'block':'none';
+  calcNuevasCuotas();
 }
 
 function calcNuevasCuotas(){
@@ -1805,15 +1874,19 @@ function calcNuevasCuotas(){
   const box=document.getElementById('refin-resumen-box');
   if(!primera||n<1){box.style.display='none';return;}
   box.style.display='block';
-  let nuevoTotal=_refinSaldos.total-anticipo;
   let nuevoMC=_refinSaldos.mc;
   let nuevoRi=_refinSaldos.richard;
   if(tieneAnticipo&&anticipo>0){
     if(antiResp==='Maria del Carmen'){nuevoMC=Math.max(0,nuevoMC-anticipo);}
     else if(antiResp==='Richard'){nuevoRi=Math.max(0,nuevoRi-anticipo);}
-    else{nuevoMC=Math.max(0,nuevoMC-anticipo/2);nuevoRi=Math.max(0,nuevoRi-anticipo/2);}
-    nuevoTotal=nuevoMC+nuevoRi;
+    else{
+      // Compartida: resta anticipo/2 a cada uno; si uno queda negativo,
+      // el sobrante se absorbe (no se redistribuye al otro)
+      nuevoMC=Math.max(0,nuevoMC-anticipo/2);
+      nuevoRi=Math.max(0,nuevoRi-anticipo/2);
+    }
   }
+  const nuevoTotal=nuevoMC+nuevoRi;
   const cuotaMC=n>0?nuevoMC/n:0;
   const cuotaRi=n>0?nuevoRi/n:0;
   document.getElementById('refin-nuevo-total').textContent=fmt(nuevoTotal);
@@ -1862,7 +1935,6 @@ async function saveRefinanciamiento(){
   }
   const nuevoTotal=+(nuevoMC+nuevoRi).toFixed(2);
   loading('Guardando refinanciamiento...');
-  // 1. Guardar en refinanciamientos
   const refinObj={
     factura_id:facId,
     fecha_refinanciamiento:fecha,
@@ -1886,7 +1958,6 @@ async function saveRefinanciamiento(){
   const{data:refinData,error:refinErr}=await sb.from('refinanciamientos').insert(refinObj).select().single();
   if(refinErr){loaded();showToast(refinErr.message,'err');return;}
   const refinId=refinData.id;
-  // 2. Guardar historial de pagos anteriores
   const{data:pagosAnt}=await sb.from('pagos').select('*').eq('factura_id',facId);
   if(pagosAnt&&pagosAnt.length){
     await sb.from('refinanciamiento_historial').insert(
@@ -1903,7 +1974,6 @@ async function saveRefinanciamiento(){
       }))
     );
   }
-  // 3. Si hay anticipo, registrar como pago especial
   if(tieneAnticipo&&antiMonto>0){
     await sb.from('pagos').insert({
       factura_id:facId,
@@ -1917,16 +1987,20 @@ async function saveRefinanciamiento(){
       es_anticipo_refinanciamiento:true
     });
   }
-  // 4. Marcar cuotas anteriores como históricas y crear nuevas
-  await sb.from('cuotas').update({es_historica:true,pagada:true,refinanciamiento_id:refinId}).eq('factura_id',facId).eq('pagada',false);
+  // Marcar cuotas pendientes anteriores como históricas (pagada=true para que no aparezcan como deuda activa)
+  await sb.from('cuotas')
+    .update({es_historica:true,pagada:true,refinanciamiento_id:refinId})
+    .eq('factura_id',facId)
+    .eq('pagada',false)
+    .eq('es_historica',false);  // solo las que aún no son históricas
+
   const nuevaCuotaMonto=+(nuevoTotal/nuevasCuotas).toFixed(2);
   const base=new Date(nuevaPrimera+'T00:00:00');
   const nuevasCuotasArr=Array.from({length:nuevasCuotas},(_,i)=>{
     const d=new Date(base);d.setMonth(d.getMonth()+i);
-    return{factura_id:facId,numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:nuevaCuotaMonto,pagada:false,refinanciamiento_id:refinId};
+    return{factura_id:facId,numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:nuevaCuotaMonto,pagada:false,es_historica:false,refinanciamiento_id:refinId};
   });
   await sb.from('cuotas').insert(nuevasCuotasArr);
-  // 5. Actualizar factura con nuevos totales
   await sb.from('facturas').update({
     num_cuotas:nuevasCuotas,
     fecha_primera_cuota:nuevaPrimera,
@@ -1935,7 +2009,7 @@ async function saveRefinanciamiento(){
     total_richard:+nuevoRi.toFixed(2)
   }).eq('id',facId);
   loaded();
-  showToast('Refinanciamiento guardado correctamente','ok');
+  showToast('Refinanciamiento guardado — cuotas anteriores archivadas como históricas','ok');
   closeModal('modal-refin');
   await renderRefinanciamientos();await renderDashboard();
 }
