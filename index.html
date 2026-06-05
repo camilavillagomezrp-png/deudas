@@ -1280,18 +1280,21 @@ function openModalPago(pagoData=null){
   const btnElim=document.getElementById('btn-eliminar-pago');
   if(pagoData&&currentRole==='admin'){btnElim.style.display=''}else{btnElim.style.display='none'}
   if(pagoData){
-    document.getElementById('pago-factura').value=pagoData.factura_id||'';
-    document.getElementById('pago-fecha').value=pagoData.fecha_pago||'';
-    document.getElementById('pago-comprobante').value=pagoData.num_comprobante||'';
-    document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';
-    document.getElementById('pago-monto').value=pagoData.monto||'';
-    document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
-    if(pagoData.foto_url){
-      document.getElementById('pago-foto-url-existing').value=pagoData.foto_url;
-      document.getElementById('existing-foto-thumb').src=pagoData.foto_url;
-      document.getElementById('existing-foto-area').style.display='block';
-      document.getElementById('foto-label').textContent='Reemplazar foto (opcional — la actual se conserva)';
-    }
+  document.getElementById('pago-factura').value=pagoData.factura_id||'';
+  document.getElementById('pago-cuota-id').value=pagoData.cuota_id||'';
+  document.getElementById('pago-fecha').value=pagoData.fecha_pago||'';
+  document.getElementById('pago-comprobante').value=pagoData.num_comprobante||'';
+  document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';
+  document.getElementById('pago-monto').value=pagoData.monto||'';
+  document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
+  if(pagoData.foto_url){
+    document.getElementById('pago-foto-url-existing').value=pagoData.foto_url;
+    document.getElementById('existing-foto-thumb').src=pagoData.foto_url;
+    document.getElementById('existing-foto-area').style.display='block';
+    document.getElementById('foto-label').textContent='Reemplazar foto (opcional — la actual se conserva)';
+  }
+  onFacturaChange();
+}
     onFacturaChange();
   }else{
     document.getElementById('pago-fecha').value=new Date().toISOString().slice(0,10);
@@ -1346,6 +1349,14 @@ document.getElementById('pago-factura').value=pagoData.factura_id||'';
 // Agrégale la línea de cuota_id ANTES de onFacturaChange:
 document.getElementById('pago-factura').value=pagoData.factura_id||'';
 document.getElementById('pago-cuota-id').value=pagoData.cuota_id||'';  // ← agregar
+  function selectCuotaChip(el, bloqueada=false){
+  if(bloqueada)return;
+  document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
+  el.classList.add('chip-sel');
+  document.getElementById('pago-cuota-id').value=el.dataset.id;
+  document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
+}
+
 onFacturaChange();
 
 async function toggleCuota(cuotaId,pagada,facId){
