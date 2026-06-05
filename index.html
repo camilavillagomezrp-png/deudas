@@ -836,10 +836,22 @@ textarea.txa { resize: vertical; min-height: 70px; }
         </div>
       </div>
     </div>
+
+    <!-- ── BLOQUE REGENERAR (solo visible en modo edición) ── -->
+    <div id="refin-regenerar-box" style="display:none;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <input type="checkbox" id="refin-regenerar-cuotas" style="width:16px;height:16px;margin-top:2px;cursor:pointer;accent-color:var(--accent)">
+        <div>
+          <label for="refin-regenerar-cuotas" style="font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sf);color:#1E40AF">Regenerar cuotas</label>
+          <p style="font-size:11px;color:#3B82F6;margin-top:3px;font-family:var(--sf);line-height:1.5">Si marcas esta opción, las cuotas activas de este refinanciamiento se eliminarán y se crearán nuevas según el número y fecha del Paso 3. Los pagos registrados no se ven afectados.</p>
+        </div>
+      </div>
+    </div>
+
     <input type="hidden" id="refin-edit-id">
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
       <button class="btn btn-secondary" onclick="closeModal('modal-refin')">Cancelar</button>
-      <button class="btn btn-refin" onclick="saveRefinanciamiento()">🔄 Guardar refinanciamiento</button>
+      <button class="btn btn-refin" id="btn-guardar-refin" onclick="saveRefinanciamiento()">🔄 Guardar refinanciamiento</button>
     </div>
   </div>
 </div>
@@ -985,15 +997,6 @@ function calcPersonas(items){
   return{mc,ri};
 }
 
-/*
- * ╔══════════════════════════════════════════════════════╗
- * ║  FIX #1 — calcSaldoPersonas                         ║
- * ║  Calcula el saldo pendiente REAL por persona,        ║
- * ║  descontando los pagos ya registrados.               ║
- * ║  Antes: se usaba el total original de la factura     ║
- * ║  (inflaba los KPIs aunque hubiera pagos parciales).  ║
- * ╚══════════════════════════════════════════════════════╝
- */
 function calcSaldoPersonas(f){
   const items=f.factura_items||[];
   const pagos=f.pagos||[];
@@ -1003,7 +1006,6 @@ function calcSaldoPersonas(f){
   const totalFac=totalMC+totalRi;
   const pagadoTotal=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);
   if(totalFac<=0) return {saldoMC:0,saldoRi:0};
-  // Distribuye el pago proporcional a la participación de cada persona
   const ratioPagado=Math.min(1,pagadoTotal/totalFac);
   const saldoMC=Math.max(0,totalMC*(1-ratioPagado));
   const saldoRi=Math.max(0,totalRi*(1-ratioPagado));
@@ -1038,11 +1040,7 @@ async function loadFacSelect(){
   document.getElementById('refin-factura').innerHTML='<option value="">Seleccionar...</option>'+opts;
 }
 
-/* ══════════════════════════════════════
-   DASHBOARD
-   FIX #2 — KPIs usan saldo pendiente real
-   FIX #3 — cuotas en dashboard excluyen históricas
-══════════════════════════════════════ */
+/* ══ DASHBOARD ══ */
 async function renderDashboard(){
   loading('Cargando resumen...');await reloadAll();loaded();
   const pf=document.getElementById('dash-filter-person').value;
@@ -1053,7 +1051,6 @@ async function renderDashboard(){
   const totalPagado=facs.reduce((s,f)=>s+calcPagado(f),0);
   const totalSaldo=facs.reduce((s,f)=>s+calcSaldo(f),0);
 
-  // FIX #2: sumar saldos pendientes reales, no totales originales
   let saldoPendienteMC=0, saldoPendienteRi=0;
   facs.forEach(f=>{
     const{saldoMC,saldoRi}=calcSaldoPersonas(f);
@@ -1070,9 +1067,8 @@ async function renderDashboard(){
 
   const hoyStr=new Date().toISOString().slice(0,10);
 
-  // FIX #3: excluir cuotas históricas del dashboard
   let cuotasPend=_cuotas.filter(c=>{
-    if(c.es_historica) return false;          // ← FIX #3
+    if(c.es_historica) return false;
     if(c.pagada) return false;
     const fac=_facturas[c.factura_id]||{};
     if(pf&&fac.responsable!==pf&&fac.responsable!=='Compartida')return false;
@@ -1122,9 +1118,7 @@ async function renderDashboard(){
     </div>`;
 }
 
-/* ══════════════════════════════════════
-   CASAS
-══════════════════════════════════════ */
+/* ══ CASAS ══ */
 function openNuevaCasa(){document.getElementById('casa-nombre').value='';document.getElementById('casa-desc').value='';document.getElementById('casa-edit-id').value='';document.getElementById('modal-casa-title').textContent='Nueva Casa Comercial';openModal('modal-casa')}
 async function saveCasa(){
   const n=document.getElementById('casa-nombre').value.trim();if(!n){showToast('Ingresa nombre','err');return;}
@@ -1153,9 +1147,7 @@ async function renderCasas(){
     :'<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:24px">Sin casas</td></tr>';
 }
 
-/* ══════════════════════════════════════
-   FACTURAS
-══════════════════════════════════════ */
+/* ══ FACTURAS ══ */
 let editingFacturaId=null;
 function updateRespColor(sel){
   sel.className='';
@@ -1347,11 +1339,8 @@ async function verDetalle(id){
   const pagado=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);
   const saldo=Math.max(0,parseFloat(f.total||0)-pagado);
   const t=calcPersonas(items);
-
-  // Separar cuotas activas e históricas para el detalle
   const cuotasActivas=cuotas.filter(c=>!c.es_historica);
   const cuotasHistoricas=cuotas.filter(c=>c.es_historica);
-
   document.getElementById('detalle-titulo').textContent=`Factura ${f.numero}`;
   document.getElementById('detalle-content').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:13px;font-family:var(--sf)">
@@ -1423,9 +1412,7 @@ async function verDetalle(id){
   openModal('modal-detalle');
 }
 
-/* ══════════════════════════════════════
-   PAGOS
-══════════════════════════════════════ */
+/* ══ PAGOS ══ */
 function openPagarCuota(facId,cuotaId,monto,numero){
   openModalPago();
   setTimeout(()=>{
@@ -1470,19 +1457,13 @@ async function eliminarPagoEdicion(){
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();
 }
-
-/*
- * FIX #4 — onFacturaChange: chips de cuotas excluyen históricas
- * Antes mostraba todas las cuotas incluyendo las viejas del
- * refinanciamiento, confundiendo qué cuota pagar.
- */
 async function onFacturaChange(){
   const facId=document.getElementById('pago-factura').value;
   if(!facId){document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';return;}
   const[r1,r2,r3]=await Promise.all([
     sb.from('facturas').select('*').eq('id',facId).single(),
     sb.from('pagos').select('monto').eq('factura_id',facId),
-    sb.from('cuotas').select('*').eq('factura_id',facId).eq('es_historica',false).order('numero') // FIX #4
+    sb.from('cuotas').select('*').eq('factura_id',facId).eq('es_historica',false).order('numero')
   ]);
   const f=r1.data;if(!f)return;
   const pagado=(r2.data||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0);
@@ -1604,11 +1585,7 @@ async function abrirEditarPago(id){
   await loadFacSelect();openModalPago(data);
 }
 
-/* ══════════════════════════════════════
-   CRONOGRAMA
-   FIX #1 (principal) — getCronFiltered excluye cuotas históricas
-   Esto soluciona el problema de cuotas duplicadas en tabla y Gantt
-══════════════════════════════════════ */
+/* ══ CRONOGRAMA ══ */
 const MESES_FULL=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const MESES_CORTO=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 let cronTab='tabla';
@@ -1640,7 +1617,7 @@ function getCronFiltered(){
   const hasta=document.getElementById('cron-hasta').value;
   const hoyStr=new Date().toISOString().slice(0,10);
   return _cuotas.filter(c=>{
-    if(c.es_historica) return false;           // ← FIX #1: excluir históricas
+    if(c.es_historica) return false;
     const fac=_facturas[c.factura_id]||{};
     if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
     if(estadoFilt==='pendiente'&&c.pagada)return false;
@@ -1711,9 +1688,8 @@ function renderCronogramaGantt(){
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
 
-  // FIX #1 aplicado también al Gantt: excluir históricas
   const allCuotas=_cuotas.filter(c=>{
-    if(c.es_historica) return false;           // ← FIX #1
+    if(c.es_historica) return false;
     const fac=_facturas[c.factura_id]||{};
     if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
     if(estadoFilt==='pendiente'&&c.pagada)return false;
@@ -1808,9 +1784,7 @@ function renderCronogramaGantt(){
   document.getElementById('cronograma-content').innerHTML=html;
 }
 
-/* ══════════════════════════════════════
-   REFINANCIAMIENTOS
-══════════════════════════════════════ */
+/* ══ REFINANCIAMIENTOS ══ */
 let _refinSaldos={total:0,mc:0,richard:0};
 
 async function onRefinFacturaChange(){
@@ -1879,12 +1853,7 @@ function calcNuevasCuotas(){
   if(tieneAnticipo&&anticipo>0){
     if(antiResp==='Maria del Carmen'){nuevoMC=Math.max(0,nuevoMC-anticipo);}
     else if(antiResp==='Richard'){nuevoRi=Math.max(0,nuevoRi-anticipo);}
-    else{
-      // Compartida: resta anticipo/2 a cada uno; si uno queda negativo,
-      // el sobrante se absorbe (no se redistribuye al otro)
-      nuevoMC=Math.max(0,nuevoMC-anticipo/2);
-      nuevoRi=Math.max(0,nuevoRi-anticipo/2);
-    }
+    else{nuevoMC=Math.max(0,nuevoMC-anticipo/2);nuevoRi=Math.max(0,nuevoRi-anticipo/2);}
   }
   const nuevoTotal=nuevoMC+nuevoRi;
   const cuotaMC=n>0?nuevoMC/n:0;
@@ -1897,6 +1866,9 @@ function calcNuevasCuotas(){
 async function openNuevoRefinanciamiento(){
   document.getElementById('modal-refin-title').textContent='🔄 Nuevo Refinanciamiento';
   document.getElementById('refin-edit-id').value='';
+  document.getElementById('refin-regenerar-box').style.display='none';
+  document.getElementById('refin-regenerar-cuotas').checked=false;
+  document.getElementById('btn-guardar-refin').textContent='🔄 Guardar refinanciamiento';
   document.getElementById('refin-factura').value='';
   document.getElementById('refin-fecha').value=new Date().toISOString().slice(0,10);
   document.getElementById('refin-notas').value='';
@@ -1914,12 +1886,84 @@ async function openNuevoRefinanciamiento(){
   openModal('modal-refin');
 }
 
+/* ═══════════════════════════════════════════════════════
+   editRefinanciamiento — Carga los datos en el modal
+   para edición, restaurando saldos originales guardados
+   y mostrando el checkbox de regenerar cuotas.
+═══════════════════════════════════════════════════════ */
+async function editRefinanciamiento(id){
+  loading('Cargando refinanciamiento...');
+  const r=_refinanciamientos.find(x=>x.id===id);
+  if(!r){loaded();showToast('No se encontró el refinanciamiento','err');return;}
+
+  await loadFacSelect();
+
+  // Encabezado del modal
+  document.getElementById('modal-refin-title').textContent='✏️ Editar Refinanciamiento';
+  document.getElementById('refin-edit-id').value=id;
+  document.getElementById('btn-guardar-refin').textContent='💾 Actualizar refinanciamiento';
+
+  // Paso 1
+  document.getElementById('refin-factura').value=r.factura_id||'';
+  document.getElementById('refin-fecha').value=r.fecha_refinanciamiento||'';
+  document.getElementById('refin-notas').value=r.notas||'';
+
+  // Paso 2 — anticipo
+  const tieneAnticipo=!!r.tiene_anticipo;
+  document.getElementById('refin-tiene-anticipo').checked=tieneAnticipo;
+  document.getElementById('refin-anticipo-campos').style.display=tieneAnticipo?'block':'none';
+  document.getElementById('refin-anticipo-resp').value=r.anticipo_responsable||'Maria del Carmen';
+  document.getElementById('refin-anticipo-monto').value=r.anticipo_monto||'';
+  document.getElementById('refin-anticipo-quien').value=r.anticipo_quien_pago||'Maria del Carmen';
+  document.getElementById('refin-anticipo-fecha').value=r.anticipo_fecha||'';
+  document.getElementById('refin-anticipo-comp').value=r.anticipo_comprobante||'';
+
+  // Paso 3 — nuevas condiciones
+  document.getElementById('refin-nuevas-cuotas').value=r.nuevo_num_cuotas||12;
+  document.getElementById('refin-nueva-primera').value=r.nueva_fecha_primera||'';
+
+  // Mostrar checkbox de regenerar cuotas (solo en edición)
+  document.getElementById('refin-regenerar-box').style.display='block';
+  document.getElementById('refin-regenerar-cuotas').checked=false;
+
+  // Cargar historial de pagos de la factura
+  await onRefinFacturaChange();
+
+  // Sobrescribir _refinSaldos con los valores ORIGINALES del refinanciamiento
+  // (no recalcular en base a pagos actuales, que ya incluyen el anticipo registrado)
+  _refinSaldos={
+    total: r.saldo_anterior||0,
+    mc:    r.saldo_mc_anterior||0,
+    richard: r.saldo_richard_anterior||0
+  };
+  document.getElementById('refin-saldo-total').textContent=fmt(_refinSaldos.total);
+  document.getElementById('refin-saldo-mc').textContent=fmt(_refinSaldos.mc);
+  document.getElementById('refin-saldo-richard').textContent=fmt(_refinSaldos.richard);
+  document.getElementById('refin-saldos-box').style.display='block';
+  calcNuevasCuotas();
+
+  loaded();
+  openModal('modal-refin');
+}
+
+/* ═══════════════════════════════════════════════════════
+   saveRefinanciamiento — Ramifica entre crear y editar
+═══════════════════════════════════════════════════════ */
 async function saveRefinanciamiento(){
+  const editId=document.getElementById('refin-edit-id').value;
   const facId=document.getElementById('refin-factura').value;
   const fecha=document.getElementById('refin-fecha').value;
   const nuevasCuotas=parseInt(document.getElementById('refin-nuevas-cuotas').value)||0;
   const nuevaPrimera=document.getElementById('refin-nueva-primera').value;
   if(!facId||!fecha||!nuevasCuotas||!nuevaPrimera){showToast('Completa todos los campos obligatorios','err');return;}
+
+  // ── MODO EDICIÓN ──
+  if(editId){
+    await _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera);
+    return;
+  }
+
+  // ── MODO CREACIÓN (lógica original) ──
   const tieneAnticipo=document.getElementById('refin-tiene-anticipo').checked;
   const antiMonto=tieneAnticipo?parseFloat(document.getElementById('refin-anticipo-monto').value)||0:0;
   const antiResp=document.getElementById('refin-anticipo-resp').value;
@@ -1987,12 +2031,11 @@ async function saveRefinanciamiento(){
       es_anticipo_refinanciamiento:true
     });
   }
-  // Marcar cuotas pendientes anteriores como históricas (pagada=true para que no aparezcan como deuda activa)
   await sb.from('cuotas')
     .update({es_historica:true,pagada:true,refinanciamiento_id:refinId})
     .eq('factura_id',facId)
     .eq('pagada',false)
-    .eq('es_historica',false);  // solo las que aún no son históricas
+    .eq('es_historica',false);
 
   const nuevaCuotaMonto=+(nuevoTotal/nuevasCuotas).toFixed(2);
   const base=new Date(nuevaPrimera+'T00:00:00');
@@ -2014,6 +2057,100 @@ async function saveRefinanciamiento(){
   await renderRefinanciamientos();await renderDashboard();
 }
 
+/* ═══════════════════════════════════════════════════════
+   _saveRefinEdit — Guarda cambios en un refinanciamiento
+   existente. Opcionalmente regenera las cuotas activas.
+═══════════════════════════════════════════════════════ */
+async function _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera){
+  const tieneAnticipo=document.getElementById('refin-tiene-anticipo').checked;
+  const antiMonto=tieneAnticipo?parseFloat(document.getElementById('refin-anticipo-monto').value)||0:0;
+  const antiResp=document.getElementById('refin-anticipo-resp').value;
+  const antiQuien=document.getElementById('refin-anticipo-quien').value;
+  const antiFecha=document.getElementById('refin-anticipo-fecha').value||fecha;
+  const antiComp=document.getElementById('refin-anticipo-comp').value.trim();
+  const regenerar=document.getElementById('refin-regenerar-cuotas').checked;
+
+  let nuevoMC=_refinSaldos.mc;
+  let nuevoRi=_refinSaldos.richard;
+  if(tieneAnticipo&&antiMonto>0){
+    if(antiResp==='Maria del Carmen'){nuevoMC=Math.max(0,nuevoMC-antiMonto);}
+    else if(antiResp==='Richard'){nuevoRi=Math.max(0,nuevoRi-antiMonto);}
+    else{nuevoMC=Math.max(0,nuevoMC-antiMonto/2);nuevoRi=Math.max(0,nuevoRi-antiMonto/2);}
+  }
+  const nuevoTotal=+(nuevoMC+nuevoRi).toFixed(2);
+
+  loading('Actualizando refinanciamiento...');
+
+  // 1. Actualizar el registro principal en refinanciamientos
+  const{error:refinErr}=await sb.from('refinanciamientos').update({
+    factura_id:facId,
+    fecha_refinanciamiento:fecha,
+    tiene_anticipo:tieneAnticipo,
+    anticipo_monto:antiMonto,
+    anticipo_responsable:antiResp,
+    anticipo_quien_pago:antiQuien,
+    anticipo_fecha:antiFecha||null,
+    anticipo_comprobante:antiComp||null,
+    nuevo_num_cuotas:nuevasCuotas,
+    nueva_fecha_primera:nuevaPrimera,
+    nuevo_total:nuevoTotal,
+    nuevo_total_mc:+nuevoMC.toFixed(2),
+    nuevo_total_richard:+nuevoRi.toFixed(2),
+    notas:document.getElementById('refin-notas').value.trim()
+  }).eq('id',editId);
+
+  if(refinErr){loaded();showToast('Error al actualizar: '+refinErr.message,'err');return;}
+
+  // 2. Si se marcó regenerar, reemplazar cuotas activas de este refinanciamiento
+  if(regenerar){
+    // Eliminar solo cuotas activas (no históricas) ligadas a ESTE refinanciamiento
+    const{error:delErr}=await sb.from('cuotas')
+      .delete()
+      .eq('factura_id',facId)
+      .eq('refinanciamiento_id',editId)
+      .eq('es_historica',false);
+
+    if(delErr){loaded();showToast('Error eliminando cuotas: '+delErr.message,'err');return;}
+
+    // Crear nuevas cuotas
+    const nuevaCuotaMonto=+(nuevoTotal/nuevasCuotas).toFixed(2);
+    const base=new Date(nuevaPrimera+'T00:00:00');
+    const arr=Array.from({length:nuevasCuotas},(_,i)=>{
+      const d=new Date(base);d.setMonth(d.getMonth()+i);
+      return{
+        factura_id:facId,
+        numero:i+1,
+        fecha_vence:d.toISOString().slice(0,10),
+        monto:nuevaCuotaMonto,
+        pagada:false,
+        es_historica:false,
+        refinanciamiento_id:editId
+      };
+    });
+    const{error:insErr}=await sb.from('cuotas').insert(arr);
+    if(insErr){loaded();showToast('Registro actualizado pero error en cuotas: '+insErr.message,'err');return;}
+
+    // Actualizar factura con los nuevos totales
+    await sb.from('facturas').update({
+      num_cuotas:nuevasCuotas,
+      fecha_primera_cuota:nuevaPrimera,
+      total:nuevoTotal,
+      total_mc:+nuevoMC.toFixed(2),
+      total_richard:+nuevoRi.toFixed(2)
+    }).eq('id',facId);
+
+    loaded();
+    showToast('Refinanciamiento actualizado y cuotas regeneradas correctamente','ok');
+  } else {
+    loaded();
+    showToast('Refinanciamiento actualizado — cuotas sin cambios','ok');
+  }
+
+  closeModal('modal-refin');
+  await renderRefinanciamientos();
+  await renderDashboard();
+}
+
 async function renderRefinanciamientos(){
   loading();await reloadAll();loaded();
   document.getElementById('refin-table-body').innerHTML=_refinanciamientos.length
@@ -2032,7 +2169,10 @@ async function renderRefinanciamientos(){
           <td>${r.nuevo_num_cuotas}</td>
           <td style="font-weight:600">${fmt(r.nuevo_total)}</td>
           <td><span class="badge ${r.estado==='activo'?'badge-green':'badge-red'}">${r.estado}</span></td>
-          <td>${currentRole==='admin'?`<button class="btn btn-danger btn-sm" onclick="deleteRefinanciamiento('${r.id}')">🗑</button>`:'—'}</td>
+          <td>${currentRole==='admin'?`<div style="display:flex;gap:4px">
+            <button class="btn btn-secondary btn-sm" onclick="editRefinanciamiento('${r.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteRefinanciamiento('${r.id}')">🗑</button>
+          </div>`:'—'}</td>
         </tr>`;
     }).join('')
     :'<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:24px">Sin refinanciamientos</td></tr>';
