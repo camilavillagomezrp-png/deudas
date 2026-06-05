@@ -1328,20 +1328,26 @@ async function onFacturaChange(){
   if(cuotas.length){
     document.getElementById('cuotas-box').style.display='block';
     const hoy=new Date().toISOString().slice(0,10);
-    document.getElementById('cuotas-chips').innerHTML=cuotas.map(c=>{
-      const vencida=!c.pagada&&c.fecha_vence<hoy;
-      const cls=c.pagada?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';
-      return`<button class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${c.monto}" onclick="selectCuotaChip(this)">${c.pagada?'✓':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small>${fmt(c.monto)}</small></button>`;
-    }).join('');
+    const editId=document.getElementById('pago-edit-id').value;
+const cuotaEditId=document.getElementById('pago-cuota-id').value;
+document.getElementById('cuotas-chips').innerHTML=cuotas.map(c=>{
+  // Si estamos editando este pago, la cuota vinculada se trata como seleccionable
+  const esMiCuota=editId&&c.id===cuotaEditId;
+  const vencida=!c.pagada&&c.fecha_vence<hoy;
+  const cls=c.pagada&&!esMiCuota?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';
+  const sel=esMiCuota?'chip-sel':'';
+  return`<button class="cuota-chip ${cls} ${sel}" data-id="${c.id}" data-monto="${c.monto}" onclick="selectCuotaChip(this,${c.pagada&&!esMiCuota})">${c.pagada&&!esMiCuota?'✓':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small>${fmt(c.monto)}</small></button>`;
+}).join('');
   }else{document.getElementById('cuotas-box').style.display='none'}
 }
-function selectCuotaChip(el){
-  if(el.classList.contains('chip-pagada'))return;
-  document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
-  el.classList.add('chip-sel');
-  document.getElementById('pago-cuota-id').value=el.dataset.id;
-  document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
-}
+// Busca esta línea en openModalPago:
+document.getElementById('pago-factura').value=pagoData.factura_id||'';
+
+// Agrégale la línea de cuota_id ANTES de onFacturaChange:
+document.getElementById('pago-factura').value=pagoData.factura_id||'';
+document.getElementById('pago-cuota-id').value=pagoData.cuota_id||'';  // ← agregar
+onFacturaChange();
+
 async function toggleCuota(cuotaId,pagada,facId){
   loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);
   loaded();if(error){showToast(error.message,'err');return}
