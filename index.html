@@ -7,12 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ── San Francisco / Apple system font stack ── */
 :root {
   --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   --sf-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   --serif: 'DM Serif Display', Georgia, serif;
-
   --bg: #F4F3EE;
   --surface: #fff;
   --accent: #2D6A4F;
@@ -33,11 +31,10 @@
   --r: 12px;
   --sh: 0 1px 3px rgba(0,0,0,.06), 0 4px 20px rgba(0,0,0,.05);
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sf); background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-/* ══ LOGIN ══ */
+/* LOGIN */
 #login-screen {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
   background: linear-gradient(135deg, #1B4332, #2D6A4F, #40916C);
@@ -76,7 +73,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 }
 .pin-error { color: var(--danger); font-size: 12px; margin-top: 8px; display: none; }
 
-/* ══ APP ══ */
+/* APP */
 #app { display: none; min-height: 100vh; }
 .topbar {
   background: #fff; border-bottom: 1px solid var(--border);
@@ -112,7 +109,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 }
 .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
 
-/* ══ LOADER ══ */
+/* LOADER */
 #loader {
   position: fixed; inset: 0; background: rgba(255,255,255,.8);
   z-index: 9999; display: none; align-items: center; justify-content: center;
@@ -127,7 +124,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 @keyframes spin { to { transform: rotate(360deg); } }
 .loader-msg { font-size: 13px; color: var(--muted); font-family: var(--sf); }
 
-/* ══ TOAST ══ */
+/* TOAST */
 #toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast-item {
   padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500;
@@ -138,7 +135,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .toast-err { background: #FEE2E2; color: #991B1B; }
 @keyframes slide-in { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-/* ══ LAYOUT ══ */
+/* LAYOUT */
 .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
 .page { display: none; }
 .page.active { display: block; }
@@ -146,7 +143,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .page-title { font-family: var(--serif); font-size: 28px; letter-spacing: -.5px; }
 .page-sub { font-size: 13px; color: var(--muted); margin-top: 2px; font-family: var(--sf); }
 
-/* ══ KPIs ══ */
+/* KPIs */
 .dash-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 28px; }
 .kpi-card {
   background: #fff; border-radius: 14px; padding: 20px 18px;
@@ -168,7 +165,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .kpi-value.mc      { color: var(--mc); }
 .kpi-value.richard { color: var(--richard); }
 
-/* ══ PRÓXIMAS CUOTAS ══ */
+/* PRÓXIMAS CUOTAS */
 .proximas-section { display: grid; grid-template-columns: 1fr 340px; gap: 18px; margin-bottom: 24px; }
 .proximas-card { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
 .card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
@@ -193,7 +190,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .cv-right { text-align: right; }
 .cv-monto { font-size: 13px; font-weight: 600; font-family: var(--sf); }
 
-/* ══ PERSONA SPLIT ══ */
+/* PERSONA SPLIT */
 .persona-split { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
 .persona-block { border-radius: 10px; padding: 14px; }
 .persona-mc  { background: var(--mc3); border: 1.5px solid var(--mc2); }
@@ -211,7 +208,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .progress-mc  { background: linear-gradient(90deg, var(--mc), #E74C3C); }
 .progress-ri  { background: linear-gradient(90deg, var(--richard), #E67E22); }
 
-/* ══ TABLE ══ */
+/* TABLE */
 .table-card { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
 .table-toolbar { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .search-input {
@@ -235,7 +232,7 @@ td { padding: 11px 14px; border-bottom: 1px solid #F3F4F6; vertical-align: middl
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: #FAFFF8; }
 
-/* ══ BADGES ══ */
+/* BADGES */
 .badge {
   display: inline-flex; align-items: center; padding: 3px 9px;
   border-radius: 20px; font-size: 11px; font-weight: 600; font-family: var(--sf);
@@ -249,7 +246,7 @@ tr:hover td { background: #FAFFF8; }
 .badge-green2  { background: #D1FAE5; color: #065F46; }
 .badge-historica { background: #F3F4F6; color: #9CA3AF; font-size: 10px; }
 
-/* ══ BUTTONS ══ */
+/* BUTTONS */
 .btn {
   padding: 8px 16px; border-radius: 8px; font-family: var(--sf); font-size: 13px;
   font-weight: 500; cursor: pointer; border: none; transition: all .15s;
@@ -266,8 +263,10 @@ tr:hover td { background: #FAFFF8; }
 .btn-refin     { background: #FEF3C7; color: #92400E; border: 1.5px solid #FDE68A; }
 .btn-refin:hover { background: #FDE68A; }
 .btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-clear { background: none; border: 1.5px solid var(--border); color: var(--muted); border-radius: 8px; padding: 7px 12px; font-size: 12px; cursor: pointer; font-family: var(--sf); }
+.btn-clear:hover { border-color: var(--danger); color: var(--danger); }
 
-/* ══ MODALS ══ */
+/* MODALS */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 999;
   display: none; align-items: center; justify-content: center; padding: 20px;
@@ -297,7 +296,7 @@ input.inp, select.sel, textarea.txa {
 input.inp:focus, select.sel:focus, textarea.txa:focus { outline: none; border-color: var(--accent); }
 textarea.txa { resize: vertical; min-height: 70px; }
 
-/* ══ ITEMS ══ */
+/* ITEMS */
 .items-section { grid-column: 1 / -1; margin-top: 8px; }
 .items-section-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 8px; font-family: var(--sf); }
 .items-list { border: 1.5px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
@@ -332,7 +331,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .totals-grand .g-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; font-family: var(--sf); }
 .totals-grand .g-value { font-family: var(--serif); font-size: 20px; color: var(--accent); }
 
-/* ══ CRONOGRAMA TABS ══ */
+/* CRONOGRAMA TABS */
 .cron-tabs { display: flex; background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 4px; gap: 2px; width: fit-content; }
 .cron-tab {
   padding: 6px 18px; border-radius: 7px; border: none; background: transparent;
@@ -347,7 +346,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .range-group label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; font-family: var(--sf); }
 .range-group input[type=date] { border: none; font-family: var(--sf); font-size: 13px; color: var(--text); background: transparent; padding: 0; cursor: pointer; outline: none; }
 
-/* ══ MONTH BLOCKS ══ */
+/* MONTH BLOCKS */
 .month-block { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); margin-bottom: 16px; overflow: hidden; }
 .month-header {
   padding: 12px 18px; background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -365,7 +364,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
   color: var(--muted); border: none; cursor: pointer; font-family: var(--sf); font-weight: 600;
 }
 
-/* ══ CUOTA CHIPS ══ */
+/* CUOTA CHIPS */
 .cuota-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .cuota-chip {
   padding: 8px 12px; border-radius: 10px; font-family: var(--sf); font-size: 11px;
@@ -376,7 +375,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .chip-pagada    { background: #F3F4F6; border-color: var(--border); color: var(--muted); cursor: not-allowed; opacity: .6; }
 .chip-sel       { border-color: var(--accent); background: var(--accent); color: #fff; transform: scale(1.05); }
 
-/* ══ FOTO UPLOAD ══ */
+/* FOTO UPLOAD */
 .upload-zone {
   border: 2px dashed var(--border); border-radius: 8px; padding: 20px;
   text-align: center; cursor: pointer; margin-top: 6px; font-family: var(--sf);
@@ -386,7 +385,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .pago-row { cursor: pointer; transition: background .1s; }
 .pago-row:hover td { background: #F0FBF5 !important; }
 
-/* ══ GANTT ══ */
+/* GANTT */
 .gantt-outer { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
 .gantt-scroll { overflow-x: auto; }
 .gantt-grid { min-width: 600px; }
@@ -424,7 +423,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .gl-item { display: flex; align-items: center; gap: 5px; }
 .gl-dot { width: 12px; height: 10px; border-radius: 2px; border-left: 3px solid transparent; }
 
-/* ══ REFINANCIAMIENTO ══ */
+/* REFINANCIAMIENTO */
 .refin-step { border-radius: 12px; padding: 16px; margin-bottom: 12px; }
 .refin-step-1 { background: #F0FBF5; border: 1.5px solid var(--accent3); }
 .refin-step-2 { background: #FEF3C7; border: 1.5px solid #FDE68A; }
@@ -436,7 +435,10 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .historial-pago-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.06); font-size: 12px; font-family: var(--sf); }
 .historial-pago-row:last-child { border-bottom: none; }
 
-/* ══ RESPONSIVE ══ */
+/* FILTER TOOLBAR DIVIDER */
+.filter-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+
+/* RESPONSIVE */
 @media (max-width: 900px) {
   .dash-grid { grid-template-columns: repeat(3, 1fr); }
   .proximas-section { grid-template-columns: 1fr; }
@@ -458,7 +460,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
 <div id="loader"><div class="spinner"></div><div class="loader-msg" id="loader-msg">Cargando...</div></div>
 <div id="toast"></div>
 
-<!-- ══ LOGIN ══ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">💳</div>
@@ -476,7 +478,7 @@ textarea.txa { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- APP -->
 <div id="app">
   <header class="topbar">
     <div class="topbar-brand">
@@ -536,21 +538,39 @@ textarea.txa { resize: vertical; min-height: 70px; }
       </div>
       <div class="table-card">
         <div class="table-toolbar">
-          <input type="text" class="search-input" placeholder="Buscar..." id="fac-search" oninput="renderFacturas()">
+          <input type="text" class="search-input" placeholder="Buscar factura..." id="fac-search" oninput="renderFacturas()">
+          <!-- ── NUEVOS FILTROS FACTURAS ── -->
+          <select class="filter-sel" id="filt-fac-casa" onchange="renderFacturas()">
+            <option value="">🏪 Todas las casas</option>
+          </select>
+          <select class="filter-sel" id="filt-fac-mes" onchange="renderFacturas()">
+            <option value="">📅 Mes</option>
+            <option value="01">Enero</option><option value="02">Febrero</option>
+            <option value="03">Marzo</option><option value="04">Abril</option>
+            <option value="05">Mayo</option><option value="06">Junio</option>
+            <option value="07">Julio</option><option value="08">Agosto</option>
+            <option value="09">Septiembre</option><option value="10">Octubre</option>
+            <option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+          <select class="filter-sel" id="filt-fac-anio" onchange="renderFacturas()">
+            <option value="">📆 Año</option>
+          </select>
+          <div class="filter-divider"></div>
           <select class="filter-sel" id="filt-fac-person" onchange="renderFacturas()">
-            <option value="">Todas</option>
+            <option value="">👤 Todas</option>
             <option value="Maria del Carmen">🔴 M. Carmen</option>
             <option value="Richard">🟠 Richard</option>
           </select>
           <select class="filter-sel" id="filt-fac-estado" onchange="renderFacturas()">
-            <option value="">Todos</option>
+            <option value="">🔘 Estado</option>
             <option value="pendiente">Pendiente</option>
             <option value="parcial">Parcial</option>
             <option value="pagado">Pagado</option>
           </select>
+          <button class="btn-clear" onclick="clearFacFiltros()">↺ Limpiar</button>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>N° Factura</th><th>Casa</th><th>Fecha</th><th>Responsable</th><th>Total 🔴MC</th><th>Total 🟠Richard</th><th>Total</th><th>Cuotas</th><th>Saldo</th><th>Estado</th><th class="admin-only">Acciones</th></tr></thead>
+          <table><thead><tr><th>N° Factura</th><th>Casa</th><th>Fecha emisión</th><th>Responsable</th><th>Total 🔴MC</th><th>Total 🟠Richard</th><th>Total</th><th>Cuotas</th><th>Saldo</th><th>Estado</th><th class="admin-only">Acciones</th></tr></thead>
           <tbody id="fac-table-body"></tbody></table>
         </div>
       </div>
@@ -564,14 +584,32 @@ textarea.txa { resize: vertical; min-height: 70px; }
       </div>
       <div class="table-card">
         <div class="table-toolbar">
+          <!-- ── NUEVOS FILTROS PAGOS ── -->
+          <select class="filter-sel" id="filt-pago-casa" onchange="renderPagos()">
+            <option value="">🏪 Todas las casas</option>
+          </select>
+          <select class="filter-sel" id="filt-pago-mes" onchange="renderPagos()">
+            <option value="">📅 Mes</option>
+            <option value="01">Enero</option><option value="02">Febrero</option>
+            <option value="03">Marzo</option><option value="04">Abril</option>
+            <option value="05">Mayo</option><option value="06">Junio</option>
+            <option value="07">Julio</option><option value="08">Agosto</option>
+            <option value="09">Septiembre</option><option value="10">Octubre</option>
+            <option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+          <select class="filter-sel" id="filt-pago-anio" onchange="renderPagos()">
+            <option value="">📆 Año</option>
+          </select>
+          <div class="filter-divider"></div>
           <select class="filter-sel" id="filt-pago-quien" onchange="renderPagos()">
-            <option value="">¿Quién pagó?</option>
+            <option value="">👤 ¿Quién pagó?</option>
             <option value="Maria del Carmen">🔴 M. Carmen</option>
             <option value="Richard">🟠 Richard</option>
           </select>
+          <button class="btn-clear" onclick="clearPagoFiltros()">↺ Limpiar</button>
         </div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>Fecha</th><th>Comprobante</th><th>Factura</th><th>Casa</th><th>Cuota #</th><th>Deuda de</th><th>Pagó</th><th>Monto</th><th>Nota</th><th>Foto</th><th class="admin-only">Acción</th></tr></thead>
+          <table><thead><tr><th>Fecha pago</th><th>Comprobante</th><th>Factura</th><th>Casa</th><th>Cuota #</th><th>Deuda de</th><th>Pagó</th><th>Monto</th><th>Nota</th><th>Foto</th><th class="admin-only">Acción</th></tr></thead>
           <tbody id="pago-table-body"></tbody></table>
         </div>
       </div>
@@ -710,8 +748,12 @@ textarea.txa { resize: vertical; min-height: 70px; }
     <div class="form-grid">
       <div class="form-group full"><label class="lbl">Factura *</label><select class="sel" id="pago-factura" onchange="onFacturaChange()"></select></div>
       <div class="form-group full" id="cuotas-box" style="display:none">
-        <label class="lbl">Cuota a pagar (opcional)</label>
+        <label class="lbl">Cuota a pagar (click para seleccionar)</label>
         <div class="cuota-chips" id="cuotas-chips"></div>
+        <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+          <button class="btn-clear" onclick="deseleccionarCuota()" style="font-size:11px;padding:4px 10px">✕ Sin cuota específica</button>
+          <span id="cuota-sel-info" style="font-size:11px;color:var(--accent);font-weight:600"></span>
+        </div>
       </div>
       <div class="form-group full" id="pago-info-box" style="background:#F0FBF5;border-radius:8px;padding:12px;font-size:13px;color:var(--accent);display:none"></div>
       <div class="form-group"><label class="lbl">Fecha de pago *</label><input class="inp" type="date" id="pago-fecha"></div>
@@ -836,8 +878,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
         </div>
       </div>
     </div>
-
-    <!-- ── BLOQUE REGENERAR (solo visible en modo edición) ── -->
     <div id="refin-regenerar-box" style="display:none;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:10px;padding:14px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:flex-start;gap:10px">
         <input type="checkbox" id="refin-regenerar-cuotas" style="width:16px;height:16px;margin-top:2px;cursor:pointer;accent-color:var(--accent)">
@@ -847,7 +887,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
         </div>
       </div>
     </div>
-
     <input type="hidden" id="refin-edit-id">
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
       <button class="btn btn-secondary" onclick="closeModal('modal-refin')">Cancelar</button>
@@ -972,6 +1011,31 @@ async function reloadAll(){
   _cuotas=r5.data||[];
   _cuotasByFac={};_cuotas.forEach(c=>{if(!_cuotasByFac[c.factura_id])_cuotasByFac[c.factura_id]=[];_cuotasByFac[c.factura_id].push(c);});
   _refinanciamientos=r6.data||[];
+  // poblar filtros de años dinámicamente
+  _populateAnios();
+  _populateCasasFiltros();
+}
+function _populateAnios(){
+  const anios=new Set();
+  Object.values(_facturas).forEach(f=>{if(f.fecha_emision)anios.add(f.fecha_emision.slice(0,4));});
+  Object.values(_pagosMap).flat().forEach(p=>{if(p.fecha_pago)anios.add(p.fecha_pago.slice(0,4));});
+  const sorted=[...anios].sort((a,b)=>b-a);
+  ['filt-fac-anio','filt-pago-anio'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const cur=sel.value;
+    const label=id.includes('fac')?'📆 Año':'📆 Año';
+    sel.innerHTML=`<option value="">${label}</option>`+sorted.map(a=>`<option value="${a}">${a}</option>`).join('');
+    if(cur)sel.value=cur;
+  });
+}
+function _populateCasasFiltros(){
+  const opts=Object.values(_casas).map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  ['filt-fac-casa','filt-pago-casa'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const cur=sel.value;
+    sel.innerHTML=`<option value="">🏪 Todas las casas</option>`+opts;
+    if(cur)sel.value=cur;
+  });
 }
 function enrich(f){return{...f,casa:_casas[f.casa_id]||{},factura_items:_items[f.id]||[],pagos:_pagosMap[f.id]||[],cuotas:_cuotasByFac[f.id]||[]};}
 
@@ -996,7 +1060,6 @@ function calcPersonas(items){
   });
   return{mc,ri};
 }
-
 function calcSaldoPersonas(f){
   const items=f.factura_items||[];
   const pagos=f.pagos||[];
@@ -1011,7 +1074,6 @@ function calcSaldoPersonas(f){
   const saldoRi=Math.max(0,totalRi*(1-ratioPagado));
   return{saldoMC,saldoRi};
 }
-
 function diasParaVencer(fechaStr){
   const hoy=new Date();hoy.setHours(0,0,0,0);
   const f=new Date(fechaStr+'T00:00:00');
@@ -1040,43 +1102,44 @@ async function loadFacSelect(){
   document.getElementById('refin-factura').innerHTML='<option value="">Seleccionar...</option>'+opts;
 }
 
+/* ── LIMPIAR FILTROS ── */
+function clearFacFiltros(){
+  ['fac-search','filt-fac-casa','filt-fac-mes','filt-fac-anio','filt-fac-person','filt-fac-estado']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderFacturas();
+}
+function clearPagoFiltros(){
+  ['filt-pago-casa','filt-pago-mes','filt-pago-anio','filt-pago-quien']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderPagos();
+}
+
 /* ══ DASHBOARD ══ */
 async function renderDashboard(){
   loading('Cargando resumen...');await reloadAll();loaded();
   const pf=document.getElementById('dash-filter-person').value;
   const ef=document.getElementById('dash-filter-estado').value;
   const facs=Object.values(_facturas).map(enrich).filter(f=>!pf||f.responsable===pf||f.responsable==='Compartida');
-
   const totalDeuda=facs.reduce((s,f)=>s+parseFloat(f.total||0),0);
   const totalPagado=facs.reduce((s,f)=>s+calcPagado(f),0);
   const totalSaldo=facs.reduce((s,f)=>s+calcSaldo(f),0);
-
   let saldoPendienteMC=0, saldoPendienteRi=0;
-  facs.forEach(f=>{
-    const{saldoMC,saldoRi}=calcSaldoPersonas(f);
-    saldoPendienteMC+=saldoMC;
-    saldoPendienteRi+=saldoRi;
-  });
-
+  facs.forEach(f=>{const{saldoMC,saldoRi}=calcSaldoPersonas(f);saldoPendienteMC+=saldoMC;saldoPendienteRi+=saldoRi;});
   document.getElementById('dash-kpis').innerHTML=`
     <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">💰</div><div class="kpi-label">Deuda total</div><div class="kpi-value">${fmt(totalDeuda)}</div></div>
     <div class="kpi-card"><div class="kpi-bar green"></div><div class="kpi-icon">✅</div><div class="kpi-label">Total pagado</div><div class="kpi-value green">${fmt(totalPagado)}</div></div>
     <div class="kpi-card"><div class="kpi-bar red"></div><div class="kpi-icon">⏳</div><div class="kpi-label">Saldo pendiente</div><div class="kpi-value red">${fmt(totalSaldo)}</div></div>
     <div class="kpi-card"><div class="kpi-bar mc"></div><div class="kpi-icon">🔴</div><div class="kpi-label">Saldo MC</div><div class="kpi-value mc">${fmt(saldoPendienteMC)}</div></div>
     <div class="kpi-card"><div class="kpi-bar richard"></div><div class="kpi-icon">🟠</div><div class="kpi-label">Saldo Richard</div><div class="kpi-value richard">${fmt(saldoPendienteRi)}</div></div>`;
-
   const hoyStr=new Date().toISOString().slice(0,10);
-
   let cuotasPend=_cuotas.filter(c=>{
-    if(c.es_historica) return false;
-    if(c.pagada) return false;
+    if(c.es_historica||c.pagada)return false;
     const fac=_facturas[c.factura_id]||{};
     if(pf&&fac.responsable!==pf&&fac.responsable!=='Compartida')return false;
     if(ef==='vencida'&&c.fecha_vence>=hoyStr)return false;
     if(ef==='pendiente'&&c.fecha_vence<hoyStr)return false;
     return true;
   }).sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence));
-
   const proximaHTML=cuotasPend.length?cuotasPend.map(c=>{
     const fac=_facturas[c.factura_id]||{};
     const casa=_casas[fac.casa_id]||{};
@@ -1097,7 +1160,6 @@ async function renderDashboard(){
     </div>`;
   }).join(''):'<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">🎉 No hay cuotas pendientes</div>';
   document.getElementById('proximas-list').innerHTML=proximaHTML;
-
   const grand=saldoPendienteMC+saldoPendienteRi||1;
   document.getElementById('persona-split').innerHTML=`
     <div class="persona-block persona-mc">
@@ -1299,10 +1361,16 @@ async function renderFacturas(){
   const pf=document.getElementById('filt-fac-person').value;
   const ef=document.getElementById('filt-fac-estado').value;
   const sr=document.getElementById('fac-search').value.toLowerCase();
+  const casaF=document.getElementById('filt-fac-casa').value;
+  const mesF=document.getElementById('filt-fac-mes').value;
+  const anioF=document.getElementById('filt-fac-anio').value;
   let list=Object.values(_facturas).map(enrich).filter(f=>{
     if(pf&&f.responsable!==pf&&f.responsable!=='Compartida')return false;
     if(ef&&getEstado(f)!==ef)return false;
     if(sr&&!f.numero.toLowerCase().includes(sr)&&!(f.casa?.nombre||'').toLowerCase().includes(sr))return false;
+    if(casaF&&f.casa_id!==casaF)return false;
+    if(mesF&&(f.fecha_emision||'').slice(5,7)!==mesF)return false;
+    if(anioF&&(f.fecha_emision||'').slice(0,4)!==anioF)return false;
     return true;
   }).sort((a,b)=>b.fecha_emision.localeCompare(a.fecha_emision));
   document.getElementById('fac-table-body').innerHTML=list.length
@@ -1413,24 +1481,30 @@ async function verDetalle(id){
 }
 
 /* ══ PAGOS ══ */
+// ── FIX: abre el modal de pago pre-seleccionando la cuota correctamente ──
 function openPagarCuota(facId,cuotaId,monto,numero){
   openModalPago();
-  setTimeout(()=>{
+  setTimeout(async()=>{
     document.getElementById('pago-factura').value=facId;
-    onFacturaChange().then(()=>{
-      document.querySelectorAll('#cuotas-chips .cuota-chip').forEach(ch=>{if(ch.dataset.id===cuotaId)ch.click();});
-    });
-    document.getElementById('pago-monto').value=monto.toFixed(2);
+    await onFacturaChange();
+    // seleccionar el chip correspondiente a esta cuota
+    const chip=document.querySelector(`#cuotas-chips .cuota-chip[data-id="${cuotaId}"]`);
+    if(chip&&!chip.classList.contains('chip-pagada'))chip.click();
+    document.getElementById('pago-monto').value=parseFloat(monto).toFixed(2);
     document.getElementById('pago-nota').value=`Cuota #${numero}`;
-  },300);
+  },200);
 }
+
 function openModalPago(pagoData=null){
   document.getElementById('modal-pago-title').textContent=pagoData?'Editar Pago':'Registrar Pago';
   document.getElementById('pago-edit-id').value=pagoData?.id||'';
+  // ── FIX: limpiar cuota seleccionada al abrir el modal ──
   document.getElementById('pago-cuota-id').value='';
   document.getElementById('cuotas-box').style.display='none';
   document.getElementById('pago-info-box').style.display='none';
   document.getElementById('foto-preview').style.display='none';
+  const infoSpan=document.getElementById('cuota-sel-info');
+  if(infoSpan)infoSpan.textContent='';
   document.getElementById('btn-guardar-pago').textContent=pagoData?'Actualizar pago':'Guardar pago';
   fotoBase64=null;
   const btnElim=document.getElementById('btn-eliminar-pago');
@@ -1442,14 +1516,27 @@ function openModalPago(pagoData=null){
     document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';
     document.getElementById('pago-monto').value=pagoData.monto||'';
     document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
+    // ── FIX: pre-cargar cuota_id si el pago ya tiene una cuota asignada ──
+    if(pagoData.cuota_id)document.getElementById('pago-cuota-id').value=pagoData.cuota_id;
     if(pagoData.foto_url){const prev=document.getElementById('foto-preview');prev.src=pagoData.foto_url;prev.style.display='block';}
-    onFacturaChange();
+    onFacturaChange().then(()=>{
+      // resaltar la cuota ya vinculada
+      if(pagoData.cuota_id){
+        const chip=document.querySelector(`#cuotas-chips .cuota-chip[data-id="${pagoData.cuota_id}"]`);
+        if(chip){
+          chip.classList.add('chip-sel');
+          const infoSpan=document.getElementById('cuota-sel-info');
+          if(infoSpan)infoSpan.textContent=`Cuota seleccionada: C${chip.dataset.numero||'?'}`;
+        }
+      }
+    });
   } else {
     document.getElementById('pago-fecha').value=new Date().toISOString().slice(0,10);
     ['pago-comprobante','pago-nota','pago-monto'].forEach(id=>document.getElementById(id).value='');
   }
   openModal('modal-pago');
 }
+
 async function eliminarPagoEdicion(){
   const id=document.getElementById('pago-edit-id').value;
   if(!id||!confirm('¿Eliminar este pago?'))return;
@@ -1457,9 +1544,15 @@ async function eliminarPagoEdicion(){
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();
 }
+
+// ── FIX: onFacturaChange retorna Promise y maneja cuota_id correctamente ──
 async function onFacturaChange(){
   const facId=document.getElementById('pago-factura').value;
-  if(!facId){document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';return;}
+  if(!facId){
+    document.getElementById('cuotas-box').style.display='none';
+    document.getElementById('pago-info-box').style.display='none';
+    return;
+  }
   const[r1,r2,r3]=await Promise.all([
     sb.from('facturas').select('*').eq('id',facId).single(),
     sb.from('pagos').select('monto').eq('factura_id',facId),
@@ -1472,7 +1565,9 @@ async function onFacturaChange(){
   const box=document.getElementById('pago-info-box');
   box.style.display='block';
   box.innerHTML=`<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota aprox.:</strong> ${fmt(cuotaAprox)} &nbsp;|&nbsp; ${personaBadge(f.responsable)}`;
-  if(!document.getElementById('pago-monto').value)document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
+  // solo poner monto default si el campo está vacío
+  if(!document.getElementById('pago-monto').value)
+    document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
   const cuotas=r3.data||[];
   if(cuotas.length){
     document.getElementById('cuotas-box').style.display='block';
@@ -1480,17 +1575,41 @@ async function onFacturaChange(){
     document.getElementById('cuotas-chips').innerHTML=cuotas.map(c=>{
       const vencida=!c.pagada&&c.fecha_vence<hoy;
       const cls=c.pagada?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';
-      return`<button class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${c.monto}" onclick="selectCuotaChip(this,${c.pagada})">${c.pagada?'✓':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small>${fmt(c.monto)}</small></button>`;
+      // ── FIX: agregar data-numero para referencia ──
+      return`<button class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${c.monto}" data-numero="${c.numero}" onclick="selectCuotaChip(this,${c.pagada})">${c.pagada?'✓ ':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small>${fmt(c.monto)}</small></button>`;
     }).join('');
-  } else {document.getElementById('cuotas-box').style.display='none';}
+  } else {
+    document.getElementById('cuotas-box').style.display='none';
+  }
 }
+
+// ── FIX: selectCuotaChip actualiza correctamente el hidden input y el info ──
 function selectCuotaChip(el,bloqueada=false){
-  if(bloqueada)return;
+  if(bloqueada){showToast('Esta cuota ya está marcada como pagada','err');return;}
+  // toggle: si ya estaba seleccionada, deseleccionar
+  const yaSeleccionado=el.classList.contains('chip-sel');
   document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
-  el.classList.add('chip-sel');
-  document.getElementById('pago-cuota-id').value=el.dataset.id;
-  document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
+  const infoSpan=document.getElementById('cuota-sel-info');
+  if(yaSeleccionado){
+    // deseleccionar
+    document.getElementById('pago-cuota-id').value='';
+    if(infoSpan)infoSpan.textContent='';
+  } else {
+    el.classList.add('chip-sel');
+    document.getElementById('pago-cuota-id').value=el.dataset.id;
+    document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
+    if(infoSpan)infoSpan.textContent=`✓ Cuota C${el.dataset.numero} seleccionada`;
+  }
 }
+
+// ── FIX: deseleccionar cuota sin borrar el monto ──
+function deseleccionarCuota(){
+  document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
+  document.getElementById('pago-cuota-id').value='';
+  const infoSpan=document.getElementById('cuota-sel-info');
+  if(infoSpan)infoSpan.textContent='Sin cuota específica (pago libre)';
+}
+
 async function toggleCuota(cuotaId,pagada,facId){
   loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);
   loaded();if(error){showToast(error.message,'err');return;}
@@ -1503,22 +1622,35 @@ function onFotoSelected(inp){
   reader.onload=e=>{fotoBase64=e.target.result;const prev=document.getElementById('foto-preview');prev.src=fotoBase64;prev.style.display='block';};
   reader.readAsDataURL(file);
 }
+
+// ── FIX PRINCIPAL: savePago guarda cuota_id y cuota_numero correctamente ──
 async function savePago(){
   const editId=document.getElementById('pago-edit-id').value;
   const facId=document.getElementById('pago-factura').value;
   const fecha=document.getElementById('pago-fecha').value;
   const monto=parseFloat(document.getElementById('pago-monto').value)||0;
   const quien=document.getElementById('pago-quien').value;
-  const cuotaId=document.getElementById('pago-cuota-id').value;
+  // ── FIX: leer cuota_id del hidden input (ya seteado por selectCuotaChip) ──
+  const cuotaId=document.getElementById('pago-cuota-id').value||null;
   if(!facId||!fecha||!monto){showToast('Completa campos obligatorios','err');return;}
   const{data:fac}=await sb.from('facturas').select('responsable').eq('id',facId).single();
   loading('Guardando pago...');
-  let cuotaNum=null,fotoUrl=null;
+  let cuotaNum=null;
+  let fotoUrl=null;
+
+  // ── FIX: obtener cuota_numero y marcar pagada SOLO en creación nueva ──
   if(cuotaId&&!editId){
     const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
     if(c)cuotaNum=c.numero;
-    await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
+    // marcar la cuota como pagada en la BD
+    const{error:cuotaErr}=await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
+    if(cuotaErr)console.warn('No se pudo marcar cuota pagada:',cuotaErr);
+  } else if(cuotaId&&editId){
+    // en edición solo obtenemos el número, sin cambiar el estado de la cuota
+    const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
+    if(c)cuotaNum=c.numero;
   }
+
   if(fotoBase64){
     try{
       const blob=await fetch(fotoBase64).then(r=>r.blob());
@@ -1528,35 +1660,65 @@ async function savePago(){
       if(!upErr&&upData){const{data:urlData}=sb.storage.from('comprobantes').getPublicUrl(fname);fotoUrl=urlData?.publicUrl||null;}
     }catch(e){console.warn('Foto no subida:',e);}
   }
+
+  // ── FIX: construir pagoObj incluyendo siempre cuota_id y cuota_numero ──
   const pagoObj={
-    factura_id:facId,fecha_pago:fecha,
-    num_comprobante:document.getElementById('pago-comprobante').value.trim(),
-    pago_quien:quien,deuda_de:fac?.responsable||'Compartida',
-    monto,nota:document.getElementById('pago-nota').value.trim(),
-    cuota_id:cuotaId||null,cuota_numero:cuotaNum,
+    factura_id:facId,
+    fecha_pago:fecha,
+    num_comprobante:document.getElementById('pago-comprobante').value.trim()||null,
+    pago_quien:quien,
+    deuda_de:fac?.responsable||'Compartida',
+    monto,
+    nota:document.getElementById('pago-nota').value.trim()||null,
+    cuota_id:cuotaId,          // null si no hay cuota seleccionada
+    cuota_numero:cuotaNum,     // null si no hay cuota seleccionada
     ...(fotoUrl?{foto_url:fotoUrl}:{})
   };
+
   let error;
-  if(editId){({error}=await sb.from('pagos').update(pagoObj).eq('id',editId));}
-  else{({error}=await sb.from('pagos').insert(pagoObj));}
+  if(editId){
+    ({error}=await sb.from('pagos').update(pagoObj).eq('id',editId));
+  } else {
+    ({error}=await sb.from('pagos').insert(pagoObj));
+  }
   loaded();
   if(error){showToast(error.message,'err');return;}
-  showToast(editId?'Pago actualizado':`Pago registrado${cuotaId?' y cuota marcada':''}`, 'ok');
-  closeModal('modal-pago');fotoBase64=null;
-  await loadFacSelect();await renderPagos();await renderDashboard();
+
+  const msgExtra=cuotaId&&!editId?' y cuota marcada como pagada':'';
+  showToast(editId?'Pago actualizado':`Pago registrado${msgExtra}`,'ok');
+  closeModal('modal-pago');
+  fotoBase64=null;
+  await loadFacSelect();
+  await renderPagos();
+  await renderDashboard();
 }
+
 async function deletePago(id){
   if(!confirm('¿Eliminar este pago?'))return;loading();
   const{error}=await sb.from('pagos').delete().eq('id',id);
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');await renderPagos();await renderDashboard();
 }
+
+// ── renderPagos con nuevos filtros de casa / mes / año ──
 async function renderPagos(){
   loading();await reloadAll();loaded();
   const quien=document.getElementById('filt-pago-quien').value;
+  const casaF=document.getElementById('filt-pago-casa').value;
+  const mesF=document.getElementById('filt-pago-mes').value;
+  const anioF=document.getElementById('filt-pago-anio').value;
   const allPagos=Object.values(_pagosMap).flat();
-  const pagos=allPagos.filter(p=>!quien||(p.pago_quien||p.quien_pago)===quien)
-    .sort((a,b)=>b.fecha_pago.localeCompare(a.fecha_pago));
+  const pagos=allPagos.filter(p=>{
+    if(quien&&(p.pago_quien||p.quien_pago)!==quien)return false;
+    // filtro por casa (a través de la factura)
+    if(casaF){const fac=_facturas[p.factura_id]||{};if(fac.casa_id!==casaF)return false;}
+    // filtro por mes de fecha_pago
+    if(mesF&&(p.fecha_pago||'').slice(5,7)!==mesF)return false;
+    // filtro por año de fecha_pago
+    if(anioF&&(p.fecha_pago||'').slice(0,4)!==anioF)return false;
+    return true;
+  }).sort((a,b)=>b.fecha_pago.localeCompare(a.fecha_pago));
+
   document.getElementById('pago-table-body').innerHTML=pagos.length
     ?pagos.map(p=>{
         const fac=_facturas[p.factura_id]||{};
@@ -1565,10 +1727,16 @@ async function renderPagos(){
         const notaVal=p.nota||p.observacion||'';
         const clickAttr=`onclick="abrirEditarPago('${p.id}')"`;
         const ab=currentRole==='admin'?`<td><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletePago('${p.id}')">🗑</button></td>`:'';
+        // ── FIX: mostrar correctamente el número de cuota ──
+        const cuotaCell=p.cuota_id||p.cuota_numero
+          ?`<span class="badge badge-blue">C${p.cuota_numero||'?'}</span>`
+          :'<span style="color:var(--muted);font-size:11px">Libre</span>';
         return`<tr class="pago-row" ${clickAttr}>
-          <td>${p.fecha_pago}</td><td>${p.num_comprobante||'—'}</td>
-          <td>${fac.numero||'—'}</td><td>${casa.nombre||'—'}</td>
-          <td>${p.cuota_numero?`<span class="badge badge-blue">C${p.cuota_numero}</span>`:'<span style="color:var(--muted);font-size:11px">Libre</span>'}</td>
+          <td>${p.fecha_pago}</td>
+          <td>${p.num_comprobante||'—'}</td>
+          <td>${fac.numero||'—'}</td>
+          <td>${casa.nombre||'—'}</td>
+          <td>${cuotaCell}</td>
           <td>${personaBadge(p.deuda_de)}</td>
           <td>${personaBadge(quienPago)}</td>
           <td><strong>${fmt(p.monto)}</strong></td>
@@ -1579,10 +1747,14 @@ async function renderPagos(){
     }).join('')
     :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
 }
+
 async function abrirEditarPago(id){
-  loading('...');const{data,error}=await sb.from('pagos').select('*').eq('id',id).single();
-  loaded();if(error||!data){showToast('No se pudo cargar el pago','err');return;}
-  await loadFacSelect();openModalPago(data);
+  loading('...');
+  const{data,error}=await sb.from('pagos').select('*').eq('id',id).single();
+  loaded();
+  if(error||!data){showToast('No se pudo cargar el pago','err');return;}
+  await loadFacSelect();
+  openModalPago(data);
 }
 
 /* ══ CRONOGRAMA ══ */
@@ -1609,7 +1781,6 @@ async function renderCronograma(){
   if(cronTab==='tabla')renderCronogramaTabla();
   else renderCronogramaGantt();
 }
-
 function getCronFiltered(){
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
@@ -1628,7 +1799,6 @@ function getCronFiltered(){
     return true;
   });
 }
-
 function renderCronogramaTabla(){
   const hoyStr=new Date().toISOString().slice(0,10);
   const list=getCronFiltered();
@@ -1670,7 +1840,6 @@ function renderCronogramaTabla(){
     </div>`;
   }).join('');
 }
-
 function renderCronogramaGantt(){
   const hoyStr=new Date().toISOString().slice(0,10);
   const desde=document.getElementById('cron-desde').value;
@@ -1687,7 +1856,6 @@ function renderCronogramaGantt(){
   if(!meses.length){document.getElementById('cronograma-content').innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-family:var(--sf)">Rango inválido.</p>';return;}
   const personFilt=document.getElementById('cron-person').value;
   const estadoFilt=document.getElementById('cron-estado').value;
-
   const allCuotas=_cuotas.filter(c=>{
     if(c.es_historica) return false;
     const fac=_facturas[c.factura_id]||{};
@@ -1697,7 +1865,6 @@ function renderCronogramaGantt(){
     if(estadoFilt==='vencida'&&(c.pagada||c.fecha_vence>=hoyStr))return false;
     return true;
   });
-
   const facIds=[...new Set(allCuotas.map(c=>c.factura_id))];
   if(!facIds.length){document.getElementById('cronograma-content').innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-family:var(--sf)">No hay cuotas para estos filtros.</p>';return;}
   const totalesMes={};
@@ -1746,13 +1913,9 @@ function renderCronogramaGantt(){
       cuotasMes.forEach(c=>{
         const vencida=!c.pagada&&c.fecha_vence<hoyStr;
         let chipCls;
-        if(resp==='Maria del Carmen'){
-          chipCls=c.pagada?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';
-        } else if(resp==='Richard'){
-          chipCls=c.pagada?'g-chip-ri-pag':vencida?'g-chip-ri-venc':'g-chip-ri-pend';
-        } else {
-          chipCls=c.pagada?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';
-        }
+        if(resp==='Maria del Carmen'){chipCls=c.pagada?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';}
+        else if(resp==='Richard'){chipCls=c.pagada?'g-chip-ri-pag':vencida?'g-chip-ri-venc':'g-chip-ri-pend';}
+        else{chipCls=c.pagada?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';}
         html+=`<div class="g-chip ${chipCls}" title="${fac.numero} C${c.numero} — ${fmt(c.monto)} — Vence ${c.fecha_vence}">C${c.numero} ${fmt(c.monto)}</div>`;
       });
       html+='</div>';
@@ -1786,14 +1949,12 @@ function renderCronogramaGantt(){
 
 /* ══ REFINANCIAMIENTOS ══ */
 let _refinSaldos={total:0,mc:0,richard:0};
-
 async function onRefinFacturaChange(){
   const facId=document.getElementById('refin-factura').value;
   if(!facId){
     document.getElementById('refin-saldos-box').style.display='none';
     document.getElementById('refin-historial-box').innerHTML='<p style="color:var(--muted);font-size:12px;text-align:center">Selecciona una factura para ver el historial</p>';
-    _refinSaldos={total:0,mc:0,richard:0};
-    return;
+    _refinSaldos={total:0,mc:0,richard:0};return;
   }
   const[r1,r2,r3,r4]=await Promise.all([
     sb.from('facturas').select('*').eq('id',facId).single(),
@@ -1818,27 +1979,21 @@ async function onRefinFacturaChange(){
   document.getElementById('refin-saldo-mc').textContent=fmt(saldoMC);
   document.getElementById('refin-saldo-richard').textContent=fmt(saldoRi);
   const histBox=document.getElementById('refin-historial-box');
-  if(pagos.length){
-    histBox.innerHTML=pagos.map(p=>`
-      <div class="historial-pago-row">
-        <span>${p.fecha_pago}</span>
-        <span>${personaBadge(p.pago_quien||p.quien_pago)}</span>
-        <span>${p.num_comprobante||'—'}</span>
-        <span style="font-weight:600">${fmt(p.monto)}</span>
-        <span style="color:var(--muted);font-size:11px">${p.nota||p.observacion||''}</span>
-      </div>`).join('');
-  } else {
-    histBox.innerHTML='<p style="color:var(--muted);font-size:12px;text-align:center">Sin pagos previos</p>';
-  }
+  histBox.innerHTML=pagos.length?pagos.map(p=>`
+    <div class="historial-pago-row">
+      <span>${p.fecha_pago}</span>
+      <span>${personaBadge(p.pago_quien||p.quien_pago)}</span>
+      <span>${p.num_comprobante||'—'}</span>
+      <span style="font-weight:600">${fmt(p.monto)}</span>
+      <span style="color:var(--muted);font-size:11px">${p.nota||p.observacion||''}</span>
+    </div>`).join(''):'<p style="color:var(--muted);font-size:12px;text-align:center">Sin pagos previos</p>';
   calcNuevasCuotas();
 }
-
 function toggleAnticipo(){
   const tiene=document.getElementById('refin-tiene-anticipo').checked;
   document.getElementById('refin-anticipo-campos').style.display=tiene?'block':'none';
   calcNuevasCuotas();
 }
-
 function calcNuevasCuotas(){
   const n=parseInt(document.getElementById('refin-nuevas-cuotas').value)||0;
   const primera=document.getElementById('refin-nueva-primera').value;
@@ -1862,7 +2017,6 @@ function calcNuevasCuotas(){
   document.getElementById('refin-cuota-mc').textContent=fmt(cuotaMC);
   document.getElementById('refin-cuota-richard').textContent=fmt(cuotaRi);
 }
-
 async function openNuevoRefinanciamiento(){
   document.getElementById('modal-refin-title').textContent='🔄 Nuevo Refinanciamiento';
   document.getElementById('refin-edit-id').value='';
@@ -1885,30 +2039,17 @@ async function openNuevoRefinanciamiento(){
   await loadFacSelect();
   openModal('modal-refin');
 }
-
-/* ═══════════════════════════════════════════════════════
-   editRefinanciamiento — Carga los datos en el modal
-   para edición, restaurando saldos originales guardados
-   y mostrando el checkbox de regenerar cuotas.
-═══════════════════════════════════════════════════════ */
 async function editRefinanciamiento(id){
   loading('Cargando refinanciamiento...');
   const r=_refinanciamientos.find(x=>x.id===id);
   if(!r){loaded();showToast('No se encontró el refinanciamiento','err');return;}
-
   await loadFacSelect();
-
-  // Encabezado del modal
   document.getElementById('modal-refin-title').textContent='✏️ Editar Refinanciamiento';
   document.getElementById('refin-edit-id').value=id;
   document.getElementById('btn-guardar-refin').textContent='💾 Actualizar refinanciamiento';
-
-  // Paso 1
   document.getElementById('refin-factura').value=r.factura_id||'';
   document.getElementById('refin-fecha').value=r.fecha_refinanciamiento||'';
   document.getElementById('refin-notas').value=r.notas||'';
-
-  // Paso 2 — anticipo
   const tieneAnticipo=!!r.tiene_anticipo;
   document.getElementById('refin-tiene-anticipo').checked=tieneAnticipo;
   document.getElementById('refin-anticipo-campos').style.display=tieneAnticipo?'block':'none';
@@ -1917,38 +2058,20 @@ async function editRefinanciamiento(id){
   document.getElementById('refin-anticipo-quien').value=r.anticipo_quien_pago||'Maria del Carmen';
   document.getElementById('refin-anticipo-fecha').value=r.anticipo_fecha||'';
   document.getElementById('refin-anticipo-comp').value=r.anticipo_comprobante||'';
-
-  // Paso 3 — nuevas condiciones
   document.getElementById('refin-nuevas-cuotas').value=r.nuevo_num_cuotas||12;
   document.getElementById('refin-nueva-primera').value=r.nueva_fecha_primera||'';
-
-  // Mostrar checkbox de regenerar cuotas (solo en edición)
   document.getElementById('refin-regenerar-box').style.display='block';
   document.getElementById('refin-regenerar-cuotas').checked=false;
-
-  // Cargar historial de pagos de la factura
   await onRefinFacturaChange();
-
-  // Sobrescribir _refinSaldos con los valores ORIGINALES del refinanciamiento
-  // (no recalcular en base a pagos actuales, que ya incluyen el anticipo registrado)
-  _refinSaldos={
-    total: r.saldo_anterior||0,
-    mc:    r.saldo_mc_anterior||0,
-    richard: r.saldo_richard_anterior||0
-  };
+  _refinSaldos={total:r.saldo_anterior||0,mc:r.saldo_mc_anterior||0,richard:r.saldo_richard_anterior||0};
   document.getElementById('refin-saldo-total').textContent=fmt(_refinSaldos.total);
   document.getElementById('refin-saldo-mc').textContent=fmt(_refinSaldos.mc);
   document.getElementById('refin-saldo-richard').textContent=fmt(_refinSaldos.richard);
   document.getElementById('refin-saldos-box').style.display='block';
   calcNuevasCuotas();
-
   loaded();
   openModal('modal-refin');
 }
-
-/* ═══════════════════════════════════════════════════════
-   saveRefinanciamiento — Ramifica entre crear y editar
-═══════════════════════════════════════════════════════ */
 async function saveRefinanciamiento(){
   const editId=document.getElementById('refin-edit-id').value;
   const facId=document.getElementById('refin-factura').value;
@@ -1956,14 +2079,7 @@ async function saveRefinanciamiento(){
   const nuevasCuotas=parseInt(document.getElementById('refin-nuevas-cuotas').value)||0;
   const nuevaPrimera=document.getElementById('refin-nueva-primera').value;
   if(!facId||!fecha||!nuevasCuotas||!nuevaPrimera){showToast('Completa todos los campos obligatorios','err');return;}
-
-  // ── MODO EDICIÓN ──
-  if(editId){
-    await _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera);
-    return;
-  }
-
-  // ── MODO CREACIÓN (lógica original) ──
+  if(editId){await _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera);return;}
   const tieneAnticipo=document.getElementById('refin-tiene-anticipo').checked;
   const antiMonto=tieneAnticipo?parseFloat(document.getElementById('refin-anticipo-monto').value)||0:0;
   const antiResp=document.getElementById('refin-anticipo-resp').value;
@@ -1980,24 +2096,13 @@ async function saveRefinanciamiento(){
   const nuevoTotal=+(nuevoMC+nuevoRi).toFixed(2);
   loading('Guardando refinanciamiento...');
   const refinObj={
-    factura_id:facId,
-    fecha_refinanciamiento:fecha,
-    saldo_anterior:_refinSaldos.total,
-    saldo_mc_anterior:_refinSaldos.mc,
-    saldo_richard_anterior:_refinSaldos.richard,
-    tiene_anticipo:tieneAnticipo,
-    anticipo_monto:antiMonto,
-    anticipo_responsable:antiResp,
-    anticipo_quien_pago:antiQuien,
-    anticipo_fecha:antiFecha||null,
-    anticipo_comprobante:antiComp||null,
-    nuevo_num_cuotas:nuevasCuotas,
-    nueva_fecha_primera:nuevaPrimera,
-    nuevo_total:nuevoTotal,
-    nuevo_total_mc:+nuevoMC.toFixed(2),
-    nuevo_total_richard:+nuevoRi.toFixed(2),
-    notas:document.getElementById('refin-notas').value.trim(),
-    estado:'activo'
+    factura_id:facId,fecha_refinanciamiento:fecha,
+    saldo_anterior:_refinSaldos.total,saldo_mc_anterior:_refinSaldos.mc,saldo_richard_anterior:_refinSaldos.richard,
+    tiene_anticipo:tieneAnticipo,anticipo_monto:antiMonto,anticipo_responsable:antiResp,
+    anticipo_quien_pago:antiQuien,anticipo_fecha:antiFecha||null,anticipo_comprobante:antiComp||null,
+    nuevo_num_cuotas:nuevasCuotas,nueva_fecha_primera:nuevaPrimera,nuevo_total:nuevoTotal,
+    nuevo_total_mc:+nuevoMC.toFixed(2),nuevo_total_richard:+nuevoRi.toFixed(2),
+    notas:document.getElementById('refin-notas').value.trim(),estado:'activo'
   };
   const{data:refinData,error:refinErr}=await sb.from('refinanciamientos').insert(refinObj).select().single();
   if(refinErr){loaded();showToast(refinErr.message,'err');return;}
@@ -2005,38 +2110,13 @@ async function saveRefinanciamiento(){
   const{data:pagosAnt}=await sb.from('pagos').select('*').eq('factura_id',facId);
   if(pagosAnt&&pagosAnt.length){
     await sb.from('refinanciamiento_historial').insert(
-      pagosAnt.map(p=>({
-        refinanciamiento_id:refinId,
-        pago_id:p.id,
-        fecha_pago:p.fecha_pago,
-        monto:p.monto,
-        quien_pago:p.pago_quien||p.quien_pago,
-        deuda_de:p.deuda_de,
-        num_comprobante:p.num_comprobante,
-        nota:p.nota||p.observacion,
-        cuota_numero:p.cuota_numero
-      }))
+      pagosAnt.map(p=>({refinanciamiento_id:refinId,pago_id:p.id,fecha_pago:p.fecha_pago,monto:p.monto,quien_pago:p.pago_quien||p.quien_pago,deuda_de:p.deuda_de,num_comprobante:p.num_comprobante,nota:p.nota||p.observacion,cuota_numero:p.cuota_numero}))
     );
   }
   if(tieneAnticipo&&antiMonto>0){
-    await sb.from('pagos').insert({
-      factura_id:facId,
-      fecha_pago:antiFecha||fecha,
-      num_comprobante:antiComp||null,
-      pago_quien:antiQuien,
-      deuda_de:antiResp,
-      monto:antiMonto,
-      nota:`Anticipo de refinanciamiento`,
-      refinanciamiento_id:refinId,
-      es_anticipo_refinanciamiento:true
-    });
+    await sb.from('pagos').insert({factura_id:facId,fecha_pago:antiFecha||fecha,num_comprobante:antiComp||null,pago_quien:antiQuien,deuda_de:antiResp,monto:antiMonto,nota:`Anticipo de refinanciamiento`,refinanciamiento_id:refinId,es_anticipo_refinanciamiento:true});
   }
-  await sb.from('cuotas')
-    .update({es_historica:true,pagada:true,refinanciamiento_id:refinId})
-    .eq('factura_id',facId)
-    .eq('pagada',false)
-    .eq('es_historica',false);
-
+  await sb.from('cuotas').update({es_historica:true,pagada:true,refinanciamiento_id:refinId}).eq('factura_id',facId).eq('pagada',false).eq('es_historica',false);
   const nuevaCuotaMonto=+(nuevoTotal/nuevasCuotas).toFixed(2);
   const base=new Date(nuevaPrimera+'T00:00:00');
   const nuevasCuotasArr=Array.from({length:nuevasCuotas},(_,i)=>{
@@ -2044,23 +2124,12 @@ async function saveRefinanciamiento(){
     return{factura_id:facId,numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:nuevaCuotaMonto,pagada:false,es_historica:false,refinanciamiento_id:refinId};
   });
   await sb.from('cuotas').insert(nuevasCuotasArr);
-  await sb.from('facturas').update({
-    num_cuotas:nuevasCuotas,
-    fecha_primera_cuota:nuevaPrimera,
-    total:nuevoTotal,
-    total_mc:+nuevoMC.toFixed(2),
-    total_richard:+nuevoRi.toFixed(2)
-  }).eq('id',facId);
+  await sb.from('facturas').update({num_cuotas:nuevasCuotas,fecha_primera_cuota:nuevaPrimera,total:nuevoTotal,total_mc:+nuevoMC.toFixed(2),total_richard:+nuevoRi.toFixed(2)}).eq('id',facId);
   loaded();
   showToast('Refinanciamiento guardado — cuotas anteriores archivadas como históricas','ok');
   closeModal('modal-refin');
   await renderRefinanciamientos();await renderDashboard();
 }
-
-/* ═══════════════════════════════════════════════════════
-   _saveRefinEdit — Guarda cambios en un refinanciamiento
-   existente. Opcionalmente regenera las cuotas activas.
-═══════════════════════════════════════════════════════ */
 async function _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera){
   const tieneAnticipo=document.getElementById('refin-tiene-anticipo').checked;
   const antiMonto=tieneAnticipo?parseFloat(document.getElementById('refin-anticipo-monto').value)||0:0;
@@ -2069,7 +2138,6 @@ async function _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera){
   const antiFecha=document.getElementById('refin-anticipo-fecha').value||fecha;
   const antiComp=document.getElementById('refin-anticipo-comp').value.trim();
   const regenerar=document.getElementById('refin-regenerar-cuotas').checked;
-
   let nuevoMC=_refinSaldos.mc;
   let nuevoRi=_refinSaldos.richard;
   if(tieneAnticipo&&antiMonto>0){
@@ -2078,79 +2146,35 @@ async function _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera){
     else{nuevoMC=Math.max(0,nuevoMC-antiMonto/2);nuevoRi=Math.max(0,nuevoRi-antiMonto/2);}
   }
   const nuevoTotal=+(nuevoMC+nuevoRi).toFixed(2);
-
   loading('Actualizando refinanciamiento...');
-
-  // 1. Actualizar el registro principal en refinanciamientos
   const{error:refinErr}=await sb.from('refinanciamientos').update({
-    factura_id:facId,
-    fecha_refinanciamiento:fecha,
-    tiene_anticipo:tieneAnticipo,
-    anticipo_monto:antiMonto,
-    anticipo_responsable:antiResp,
-    anticipo_quien_pago:antiQuien,
-    anticipo_fecha:antiFecha||null,
-    anticipo_comprobante:antiComp||null,
-    nuevo_num_cuotas:nuevasCuotas,
-    nueva_fecha_primera:nuevaPrimera,
-    nuevo_total:nuevoTotal,
-    nuevo_total_mc:+nuevoMC.toFixed(2),
-    nuevo_total_richard:+nuevoRi.toFixed(2),
+    factura_id:facId,fecha_refinanciamiento:fecha,tiene_anticipo:tieneAnticipo,
+    anticipo_monto:antiMonto,anticipo_responsable:antiResp,anticipo_quien_pago:antiQuien,
+    anticipo_fecha:antiFecha||null,anticipo_comprobante:antiComp||null,
+    nuevo_num_cuotas:nuevasCuotas,nueva_fecha_primera:nuevaPrimera,nuevo_total:nuevoTotal,
+    nuevo_total_mc:+nuevoMC.toFixed(2),nuevo_total_richard:+nuevoRi.toFixed(2),
     notas:document.getElementById('refin-notas').value.trim()
   }).eq('id',editId);
-
   if(refinErr){loaded();showToast('Error al actualizar: '+refinErr.message,'err');return;}
-
-  // 2. Si se marcó regenerar, reemplazar cuotas activas de este refinanciamiento
   if(regenerar){
-    // Eliminar solo cuotas activas (no históricas) ligadas a ESTE refinanciamiento
-    const{error:delErr}=await sb.from('cuotas')
-      .delete()
-      .eq('factura_id',facId)
-      .eq('refinanciamiento_id',editId)
-      .eq('es_historica',false);
-
+    const{error:delErr}=await sb.from('cuotas').delete().eq('factura_id',facId).eq('refinanciamiento_id',editId).eq('es_historica',false);
     if(delErr){loaded();showToast('Error eliminando cuotas: '+delErr.message,'err');return;}
-
-    // Crear nuevas cuotas
     const nuevaCuotaMonto=+(nuevoTotal/nuevasCuotas).toFixed(2);
     const base=new Date(nuevaPrimera+'T00:00:00');
     const arr=Array.from({length:nuevasCuotas},(_,i)=>{
       const d=new Date(base);d.setMonth(d.getMonth()+i);
-      return{
-        factura_id:facId,
-        numero:i+1,
-        fecha_vence:d.toISOString().slice(0,10),
-        monto:nuevaCuotaMonto,
-        pagada:false,
-        es_historica:false,
-        refinanciamiento_id:editId
-      };
+      return{factura_id:facId,numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:nuevaCuotaMonto,pagada:false,es_historica:false,refinanciamiento_id:editId};
     });
     const{error:insErr}=await sb.from('cuotas').insert(arr);
     if(insErr){loaded();showToast('Registro actualizado pero error en cuotas: '+insErr.message,'err');return;}
-
-    // Actualizar factura con los nuevos totales
-    await sb.from('facturas').update({
-      num_cuotas:nuevasCuotas,
-      fecha_primera_cuota:nuevaPrimera,
-      total:nuevoTotal,
-      total_mc:+nuevoMC.toFixed(2),
-      total_richard:+nuevoRi.toFixed(2)
-    }).eq('id',facId);
-
-    loaded();
-    showToast('Refinanciamiento actualizado y cuotas regeneradas correctamente','ok');
+    await sb.from('facturas').update({num_cuotas:nuevasCuotas,fecha_primera_cuota:nuevaPrimera,total:nuevoTotal,total_mc:+nuevoMC.toFixed(2),total_richard:+nuevoRi.toFixed(2)}).eq('id',facId);
+    loaded();showToast('Refinanciamiento actualizado y cuotas regeneradas correctamente','ok');
   } else {
-    loaded();
-    showToast('Refinanciamiento actualizado — cuotas sin cambios','ok');
+    loaded();showToast('Refinanciamiento actualizado — cuotas sin cambios','ok');
   }
-
   closeModal('modal-refin');
-  await renderRefinanciamientos();
-  await renderDashboard();
+  await renderRefinanciamientos();await renderDashboard();
 }
-
 async function renderRefinanciamientos(){
   loading();await reloadAll();loaded();
   document.getElementById('refin-table-body').innerHTML=_refinanciamientos.length
@@ -2177,11 +2201,9 @@ async function renderRefinanciamientos(){
     }).join('')
     :'<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:24px">Sin refinanciamientos</td></tr>';
 }
-
 async function deleteRefinanciamiento(id){
   if(!confirm('¿Eliminar este refinanciamiento? Esto no restaura las cuotas anteriores.'))return;
-  loading();
-  const{error}=await sb.from('refinanciamientos').delete().eq('id',id);
+  loading();const{error}=await sb.from('refinanciamientos').delete().eq('id',id);
   loaded();if(error){showToast(error.message,'err');return;}
   showToast('Eliminado','ok');await renderRefinanciamientos();
 }
