@@ -168,6 +168,21 @@ textarea.txa{resize:vertical;min-height:70px}
 .totals-grand{background:#F0FBF5;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;border:1.5px solid var(--accent3)}
 .totals-grand .g-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
 .totals-grand .g-value{font-family:var(--sf-display);font-size:20px;font-weight:700;letter-spacing:-0.03em;color:var(--accent)}
+/* ── ANTICIPO BOX ── */
+.anticipo-box{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:10px;padding:12px 16px;margin-top:8px;display:none;flex-direction:column;gap:8px}
+.anticipo-box.visible{display:flex}
+.anticipo-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.anticipo-label{font-size:11px;color:#1E40AF;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.anticipo-chips{display:flex;gap:10px;flex-wrap:wrap}
+.anticipo-chip{display:flex;flex-direction:column;align-items:center;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:600;border:1.5px solid}
+.anticipo-chip-total{background:#F0FBF5;border-color:var(--accent3);color:var(--accent)}
+.anticipo-chip-desc{background:#FEE2E2;border-color:#FECACA;color:#991B1B}
+.anticipo-chip-saldo{background:#EFF6FF;border-color:#93C5FD;color:#1D4ED8;font-size:12px}
+.anticipo-chip .chip-val{font-family:var(--sf-display);font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-top:2px}
+.anticipo-chip .chip-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.4px;opacity:.8}
+.saldo-cuotas-highlight{background:#1D4ED8;color:#fff;border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.saldo-cuotas-highlight .sc-val{font-family:var(--sf-display);font-size:18px;letter-spacing:-0.03em}
+/* ── FIN ANTICIPO BOX ── */
 .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;margin-top:6px;transition:all .2s}
 .upload-zone:hover{border-color:var(--accent);background:#F0FBF5}
 .upload-preview{width:100%;max-height:160px;object-fit:contain;border-radius:8px;margin-top:8px;display:none;border:1px solid var(--border);cursor:pointer;transition:opacity .2s}
@@ -458,7 +473,9 @@ textarea.txa{resize:vertical;min-height:70px}
   </main>
 </div>
 
-<!-- MODAL FACTURA -->
+<!-- ═══════════════════════════════════════════════
+     MODAL FACTURA
+════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modal-factura">
   <div class="modal" style="max-width:860px">
     <div class="modal-header">
@@ -475,10 +492,21 @@ textarea.txa{resize:vertical;min-height:70px}
         <input class="inp" type="date" id="fac-primera-cuota" oninput="previewCuotas()">
         <span id="fac-dia-pago-hint" style="font-size:11px;color:var(--accent);margin-top:3px;display:none">📅 Calculado automáticamente según día de pago de la casa</span>
       </div>
+      <!-- ── NUEVO: Anticipo ── -->
+      <div class="form-group">
+        <label class="lbl">Anticipo ya pagado ($)</label>
+        <input class="inp" type="number" id="fac-anticipo" value="0" min="0" step="0.01"
+               oninput="recalcTotals()" placeholder="0.00">
+        <span style="font-size:11px;color:var(--muted);margin-top:3px;display:block">
+          Monto entregado a cuenta. Las cuotas se calcularán sobre el saldo restante.
+        </span>
+      </div>
+      <!-- ── FIN NUEVO ── -->
       <div class="form-group"><label class="lbl">Notas</label><input class="inp" id="fac-notas" placeholder="Opcional..."></div>
       <div class="form-group full" id="cuotas-preview-box" style="display:none">
         <label class="lbl">Vista previa de cuotas</label>
         <div id="cuotas-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"></div>
+        <p id="cuotas-preview-label" style="font-size:11px;margin-top:6px;font-weight:600;color:var(--muted)"></p>
       </div>
       <div class="items-section form-group full">
         <div class="items-section-title">Ítems — IVA y responsable por ítem</div>
@@ -503,10 +531,41 @@ textarea.txa{resize:vertical;min-height:70px}
             <div class="p-total"><span>Total Richard:</span><span id="ri-total">$0.00</span></div>
           </div>
         </div>
+        <!-- Total general factura -->
         <div class="totals-grand">
           <span class="g-label">Total general de la factura</span>
           <span class="g-value" id="g-total">$0.00</span>
         </div>
+
+        <!-- ══════════════════════════════════════════
+             WIDGET ANTICIPO / SALDO PARA CUOTAS
+        ═══════════════════════════════════════════ -->
+        <div class="anticipo-box" id="anticipo-box">
+          <div class="anticipo-label">💡 Desglose con anticipo</div>
+          <div class="anticipo-row">
+            <div class="anticipo-chips">
+              <div class="anticipo-chip anticipo-chip-total">
+                <span class="chip-lbl">Total factura</span>
+                <span class="chip-val" id="ac-total">$0.00</span>
+              </div>
+              <div style="display:flex;align-items:center;font-size:18px;color:var(--danger);font-weight:700;padding:0 2px">−</div>
+              <div class="anticipo-chip anticipo-chip-desc">
+                <span class="chip-lbl">Anticipo</span>
+                <span class="chip-val" id="ac-anticipo">$0.00</span>
+              </div>
+              <div style="display:flex;align-items:center;font-size:18px;color:var(--muted);font-weight:700;padding:0 2px">=</div>
+              <div class="saldo-cuotas-highlight">
+                💳 Saldo a financiar en cuotas:
+                <span class="sc-val" id="ac-saldo">$0.00</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#1E40AF;opacity:.8">
+            Las <strong id="ac-ncuotas">—</strong> cuota(s) de <strong id="ac-cuota-val">—</strong> c/u se calculan sobre el saldo, no sobre el total.
+          </div>
+        </div>
+        <!-- ══════════════════════════════════════════ -->
+
       </div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px">
@@ -737,6 +796,103 @@ function onCasaChange(){
   previewCuotas();
 }
 
+/* ════════════════════════════════════════════════
+   recalcTotals — ahora incluye lógica de anticipo
+════════════════════════════════════════════════ */
+function recalcTotals(){
+  let mc={s:0,i:0},ri={s:0,i:0};
+  document.querySelectorAll('#items-container .item-row').forEach(r=>{
+    const inp=r.querySelectorAll('input');const sel=r.querySelector('select');
+    const sub=(parseFloat(inp[1].value)||0)*(parseFloat(inp[2].value)||0);
+    const iva=sub*(parseFloat(inp[3].value)||0)/100;
+    const resp=sel?sel.value:'Maria del Carmen';
+    if(resp==='Maria del Carmen'){mc.s+=sub;mc.i+=iva}
+    else if(resp==='Richard'){ri.s+=sub;ri.i+=iva}
+    else{mc.s+=sub/2;mc.i+=iva/2;ri.s+=sub/2;ri.i+=iva/2}
+  });
+  const total=mc.s+mc.i+ri.s+ri.i;
+  const anticipo=parseFloat(document.getElementById('fac-anticipo')?.value)||0;
+  const saldo=Math.max(0,total-anticipo);
+
+  document.getElementById('mc-subtotal').textContent=fmt(mc.s);
+  document.getElementById('mc-iva').textContent=fmt(mc.i);
+  document.getElementById('mc-total').textContent=fmt(mc.s+mc.i);
+  document.getElementById('ri-subtotal').textContent=fmt(ri.s);
+  document.getElementById('ri-iva').textContent=fmt(ri.i);
+  document.getElementById('ri-total').textContent=fmt(ri.s+ri.i);
+  document.getElementById('g-total').textContent=fmt(total);
+
+  // Actualizar widget anticipo
+  const box=document.getElementById('anticipo-box');
+  if(anticipo>0){
+    box.classList.add('visible');
+    document.getElementById('ac-total').textContent=fmt(total);
+    document.getElementById('ac-anticipo').textContent=fmt(anticipo);
+    document.getElementById('ac-saldo').textContent=fmt(saldo);
+  }else{
+    box.classList.remove('visible');
+  }
+
+  previewCuotas();
+}
+
+/* ════════════════════════════════════════════════
+   previewCuotas — calcula cuotas sobre el SALDO
+════════════════════════════════════════════════ */
+function previewCuotas(){
+  const n=parseInt(document.getElementById('fac-cuotas').value)||0;
+  const primera=document.getElementById('fac-primera-cuota').value;
+  const box=document.getElementById('cuotas-preview-box');
+  const prev=document.getElementById('cuotas-preview');
+  if(!primera||n<1){box.style.display='none';return}
+  box.style.display='block';
+
+  const totalVal=parseFloat(document.getElementById('g-total').textContent.replace(/[$,]/g,''))||0;
+  const anticipo=parseFloat(document.getElementById('fac-anticipo')?.value)||0;
+  const saldo=Math.max(0,totalVal-anticipo);
+  const cuotaVal=n>0?saldo/n:saldo;
+
+  const casaSel=document.getElementById('fac-casa');
+  const opt=casaSel.options[casaSel.selectedIndex];
+  const diaPago=parseInt(opt?.dataset?.dia)||0;
+  const base=new Date(primera+'T00:00:00');
+
+  prev.innerHTML=Array.from({length:n},(_,i)=>{
+    let d;
+    if(diaPago){
+      const yr=base.getFullYear();const mo=base.getMonth()+i;
+      d=new Date(yr,mo,diaPago);if(d.getDate()!==diaPago)d=new Date(yr,mo+1,0);
+    }else{
+      const yr=base.getFullYear();const mo=base.getMonth()+i;const dia=base.getDate();
+      d=new Date(yr,mo,dia);if(d.getDate()!==dia)d=new Date(yr,mo+1,0);
+    }
+    const ds=d.toISOString().slice(0,10);
+    return`<div style="background:#F0FBF5;border:1px solid var(--accent3);border-radius:8px;padding:6px 10px;font-size:11px;text-align:center">
+      <div style="font-weight:600;color:var(--accent)">C${i+1}</div>
+      <div style="color:var(--muted)">${ds}</div>
+      <div style="font-weight:700">${fmt(cuotaVal)}</div>
+    </div>`;
+  }).join('');
+
+  // Label aclaratorio
+  const labelEl=document.getElementById('cuotas-preview-label');
+  if(labelEl){
+    if(anticipo>0){
+      labelEl.textContent=`${n} cuota(s) × ${fmt(cuotaVal)} = ${fmt(saldo)} (saldo tras anticipo de ${fmt(anticipo)})`;
+      labelEl.style.color='#1D4ED8';
+    }else{
+      labelEl.textContent=`${n} cuota(s) × ${fmt(cuotaVal)} = ${fmt(totalVal)}`;
+      labelEl.style.color='var(--muted)';
+    }
+  }
+
+  // Actualizar texto en widget anticipo
+  const acN=document.getElementById('ac-ncuotas');
+  const acV=document.getElementById('ac-cuota-val');
+  if(acN)acN.textContent=n;
+  if(acV)acV.textContent=fmt(cuotaVal);
+}
+
 async function renderDashboard(){
   loading('Cargando resumen...');await reloadAll();loaded();
   const pf=document.getElementById('dash-filter-person').value;
@@ -856,50 +1012,24 @@ function addItemRow(desc='',qty=1,price='',ivaPct=12,resp='Maria del Carmen'){
     <button class="item-del" onclick="this.parentElement.remove();recalcTotals()">✕</button>`;
   document.getElementById('items-container').appendChild(r);updateRespColor(r.querySelector('select'));recalcTotals();
 }
-function recalcTotals(){
-  let mc={s:0,i:0},ri={s:0,i:0};
-  document.querySelectorAll('#items-container .item-row').forEach(r=>{
-    const inp=r.querySelectorAll('input');const sel=r.querySelector('select');
-    const sub=(parseFloat(inp[1].value)||0)*(parseFloat(inp[2].value)||0);
-    const iva=sub*(parseFloat(inp[3].value)||0)/100;
-    const resp=sel?sel.value:'Maria del Carmen';
-    if(resp==='Maria del Carmen'){mc.s+=sub;mc.i+=iva}
-    else if(resp==='Richard'){ri.s+=sub;ri.i+=iva}
-    else{mc.s+=sub/2;mc.i+=iva/2;ri.s+=sub/2;ri.i+=iva/2}
-  });
-  document.getElementById('mc-subtotal').textContent=fmt(mc.s);document.getElementById('mc-iva').textContent=fmt(mc.i);document.getElementById('mc-total').textContent=fmt(mc.s+mc.i);
-  document.getElementById('ri-subtotal').textContent=fmt(ri.s);document.getElementById('ri-iva').textContent=fmt(ri.i);document.getElementById('ri-total').textContent=fmt(ri.s+ri.i);
-  document.getElementById('g-total').textContent=fmt(mc.s+mc.i+ri.s+ri.i);previewCuotas();
-}
-function previewCuotas(){
-  const n=parseInt(document.getElementById('fac-cuotas').value)||0;
-  const primera=document.getElementById('fac-primera-cuota').value;
-  const box=document.getElementById('cuotas-preview-box');const prev=document.getElementById('cuotas-preview');
-  if(!primera||n<1){box.style.display='none';return}
-  box.style.display='block';
-  const totalVal=parseFloat(document.getElementById('g-total').textContent.replace(/[$,]/g,''))||0;
-  const cuota=totalVal/n;
-  const casaSel=document.getElementById('fac-casa');
-  const opt=casaSel.options[casaSel.selectedIndex];
-  const diaPago=parseInt(opt?.dataset?.dia)||0;
-  const base=new Date(primera+'T00:00:00');
-  prev.innerHTML=Array.from({length:n},(_,i)=>{
-    let d;
-    if(diaPago){const yr=base.getFullYear();const mo=base.getMonth()+i;d=new Date(yr,mo,diaPago);if(d.getDate()!==diaPago)d=new Date(yr,mo+1,0);}
-    else{const yr=base.getFullYear();const mo=base.getMonth()+i;const dia=base.getDate();d=new Date(yr,mo,dia);if(d.getDate()!==dia)d=new Date(yr,mo+1,0);}
-    const ds=d.toISOString().slice(0,10);
-    return`<div style="background:#F0FBF5;border:1px solid var(--accent3);border-radius:8px;padding:6px 10px;font-size:11px;text-align:center"><div style="font-weight:600;color:var(--accent)">C${i+1}</div><div style="color:var(--muted)">${ds}</div><div style="font-weight:700">${fmt(cuota)}</div></div>`;
-  }).join('');
-}
+
 async function openNuevaFactura(){
   editingFacturaId=null;document.getElementById('modal-fac-title').textContent='Nueva Factura';
   ['fac-numero','fac-notas'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('fac-fecha').value=new Date().toISOString().slice(0,10);
-  document.getElementById('fac-cuotas').value=1;document.getElementById('fac-primera-cuota').value='';
+  document.getElementById('fac-cuotas').value=1;
+  document.getElementById('fac-primera-cuota').value='';
+  document.getElementById('fac-anticipo').value=0;  // ← reset anticipo
   document.getElementById('fac-dia-pago-hint').style.display='none';
-  document.getElementById('items-container').innerHTML='';document.getElementById('cuotas-preview-box').style.display='none';
+  document.getElementById('anticipo-box').classList.remove('visible');
+  document.getElementById('items-container').innerHTML='';
+  document.getElementById('cuotas-preview-box').style.display='none';
   await loadCasasSelect();addItemRow();recalcTotals();openModal('modal-factura');
 }
+
+/* ════════════════════════════════════════════════
+   saveFactura — cuotas calculadas sobre el SALDO
+════════════════════════════════════════════════ */
 async function saveFactura(){
   const numero=document.getElementById('fac-numero').value.trim();
   const casaId=document.getElementById('fac-casa').value;
@@ -917,6 +1047,11 @@ async function saveFactura(){
     }
   });
   const subtotal=+(mcS+riS).toFixed(2),ivaTotal=+(mcI+riI).toFixed(2),total=+(subtotal+ivaTotal).toFixed(2);
+
+  // ── Anticipo y saldo para cuotas ──
+  const anticipo=parseFloat(document.getElementById('fac-anticipo').value)||0;
+  const saldoParaCuotas=Math.max(0,total-anticipo);
+
   const numCuotas=parseInt(document.getElementById('fac-cuotas').value)||1;
   const primeraCuota=document.getElementById('fac-primera-cuota').value||null;
   const casaSel=document.getElementById('fac-casa');
@@ -925,18 +1060,30 @@ async function saveFactura(){
   let respFac='Compartida';
   if(mcS+mcI>0&&riS+riI===0)respFac='Maria del Carmen';
   else if(riS+riI>0&&mcS+mcI===0)respFac='Richard';
+
+  // Monto de cuota calculado sobre el SALDO (no el total)
   const cuotasArr=[];
   if(primeraCuota){
-    const mc=+(total/numCuotas).toFixed(2);
+    const montoCuota=+(saldoParaCuotas/numCuotas).toFixed(2);
     const base=new Date(primeraCuota+'T00:00:00');
     for(let i=0;i<numCuotas;i++){
       let d;
       if(diaPago){const yr=base.getFullYear();const mo=base.getMonth()+i;d=new Date(yr,mo,diaPago);if(d.getDate()!==diaPago)d=new Date(yr,mo+1,0);}
       else{const yr=base.getFullYear();const mo=base.getMonth()+i;const dia=base.getDate();d=new Date(yr,mo,dia);if(d.getDate()!==dia)d=new Date(yr,mo+1,0);}
-      cuotasArr.push({numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:mc,pagada:false});
+      cuotasArr.push({numero:i+1,fecha_vence:d.toISOString().slice(0,10),monto:montoCuota,pagada:false});
     }
   }
-  const facObj={numero,casa_id:casaId,fecha_emision:fecha,responsable:respFac,subtotal,iva_porcentaje:0,iva_valor:ivaTotal,total,total_mc:+(mcS+mcI).toFixed(2),total_richard:+(riS+riI).toFixed(2),num_cuotas:numCuotas,fecha_primera_cuota:primeraCuota,notas:document.getElementById('fac-notas').value.trim()};
+
+  const facObj={
+    numero,casa_id:casaId,fecha_emision:fecha,responsable:respFac,
+    subtotal,iva_porcentaje:0,iva_valor:ivaTotal,total,
+    total_mc:+(mcS+mcI).toFixed(2),total_richard:+(riS+riI).toFixed(2),
+    num_cuotas:numCuotas,fecha_primera_cuota:primeraCuota,
+    anticipo:+anticipo.toFixed(2),           // ← guardamos el anticipo
+    saldo_cuotas:+saldoParaCuotas.toFixed(2), // ← guardamos el saldo
+    notas:document.getElementById('fac-notas').value.trim()
+  };
+
   loading('Guardando...');let facId=editingFacturaId;
   if(editingFacturaId){
     const{error}=await sb.from('facturas').update(facObj).eq('id',editingFacturaId);
@@ -956,9 +1103,12 @@ async function saveFactura(){
     const{error:eCuotas}=await sb.from('cuotas').insert(cuotasArr.map(c=>({...c,factura_id:facId})));
     if(eCuotas){loaded();showToast('Error al guardar cuotas: '+eCuotas.message,'err');return;}
   }
-  loaded();showToast(editingFacturaId?'Actualizada':'Guardada','ok');
+  loaded();showToast(anticipo>0
+    ?`Guardada · Anticipo ${fmt(anticipo)} · ${numCuotas} cuota(s) de ${fmt(saldoParaCuotas/numCuotas)}`
+    :(editingFacturaId?'Actualizada':'Guardada'),'ok');
   closeModal('modal-factura');await loadFacSelect();await renderFacturas();await renderDashboard();
 }
+
 async function deleteFactura(id){
   if(!confirm('¿Eliminar factura y pagos?'))return;loading('...');
   await sb.from('pagos').delete().eq('factura_id',id);
@@ -968,6 +1118,10 @@ async function deleteFactura(id){
   loaded();if(error){showToast(error.message,'err');return}
   showToast('Eliminada','ok');await loadFacSelect();await renderFacturas();await renderDashboard();
 }
+
+/* ════════════════════════════════════════════════
+   editFactura — carga anticipo desde BD
+════════════════════════════════════════════════ */
 async function editFactura(id){
   loading('...');
   const[r1,r2]=await Promise.all([
@@ -981,12 +1135,24 @@ async function editFactura(id){
   document.getElementById('modal-fac-title').textContent='Editar Factura';
   document.getElementById('fac-numero').value=f.numero;
   setTimeout(()=>{document.getElementById('fac-casa').value=f.casa_id;onCasaChange();},50);
-  document.getElementById('fac-fecha').value=f.fecha_emision;document.getElementById('fac-cuotas').value=f.num_cuotas;
-  document.getElementById('fac-primera-cuota').value=f.fecha_primera_cuota||'';document.getElementById('fac-notas').value=f.notas||'';
+  document.getElementById('fac-fecha').value=f.fecha_emision;
+  document.getElementById('fac-cuotas').value=f.num_cuotas;
+  document.getElementById('fac-primera-cuota').value=f.fecha_primera_cuota||'';
+  document.getElementById('fac-notas').value=f.notas||'';
+  // ── Cargar anticipo: primero desde columna, si no existe calcular desde pagos libres ──
+  if(f.anticipo!=null&&f.anticipo>0){
+    document.getElementById('fac-anticipo').value=parseFloat(f.anticipo).toFixed(2);
+  }else{
+    // Retrocompatibilidad: calcular desde pagos sin cuota asignada
+    const{data:pagosAnt}=await sb.from('pagos').select('monto').eq('factura_id',id).is('cuota_id',null);
+    const totalAnticipo=(pagosAnt||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0);
+    document.getElementById('fac-anticipo').value=totalAnticipo.toFixed(2);
+  }
   document.getElementById('items-container').innerHTML='';
   (r2.data||[]).forEach(it=>addItemRow(it.descripcion,it.cantidad,it.precio_unit,it.iva_porcentaje??12,it.responsable||'Maria del Carmen'));
   recalcTotals();openModal('modal-factura');
 }
+
 async function renderFacturas(){
   loading();await reloadAll();loaded();
   const pf=document.getElementById('filt-fac-person').value;
@@ -1001,11 +1167,11 @@ async function renderFacturas(){
   document.getElementById('fac-table-body').innerHTML=list.length
     ?list.map(f=>{
         const t=calcPersonas(f.factura_items);
-        // El botón 👁 es visible para todos (viewer y admin)
+        const antiTag=f.anticipo>0?`<span class="badge badge-blue" style="font-size:9px;margin-left:4px" title="Anticipo: ${fmt(f.anticipo)}">💰 Ant.</span>`:'';
         const viewBtn=`<button class="btn btn-secondary btn-sm" onclick="verDetalle('${f.id}')">👁</button>`;
         const editDelBtns=currentRole==='admin'?`<button class="btn btn-secondary btn-sm" onclick="editFactura('${f.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteFactura('${f.id}')">🗑</button>`:'';
         return`<tr>
-          <td><strong>${f.numero}</strong></td><td>${f.casa?.nombre||'—'}</td><td>${f.fecha_emision}</td>
+          <td><strong>${f.numero}</strong>${antiTag}</td><td>${f.casa?.nombre||'—'}</td><td>${f.fecha_emision}</td>
           <td><span class="badge ${f.responsable==='Maria del Carmen'?'badge-purple':f.responsable==='Richard'?'badge-richard':'badge-green'}">${f.responsable}</span></td>
           <td style="color:var(--mc);font-weight:600">${fmt(t.mc.s+t.mc.i)}</td>
           <td style="color:var(--richard);font-weight:600">${fmt(t.ri.s+t.ri.i)}</td>
@@ -1016,6 +1182,7 @@ async function renderFacturas(){
     }).join('')
     :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin resultados</td></tr>';
 }
+
 async function verDetalle(id){
   loading('...');
   const[r1,r2,r3,r4]=await Promise.all([
@@ -1028,6 +1195,12 @@ async function verDetalle(id){
   const casa=_casas[f.casa_id]||{};const items=r2.data||[],pagos=r3.data||[],cuotas=r4.data||[];
   const pagado=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);const saldo=Math.max(0,parseFloat(f.total||0)-pagado);
   const t=calcPersonas(items);
+  const antiBox=f.anticipo>0?`
+    <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:12px;display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <span>💰 <strong>Anticipo registrado:</strong> <span style="color:#1D4ED8;font-weight:700;font-size:14px">${fmt(f.anticipo)}</span></span>
+      <span>💳 <strong>Saldo financiado en cuotas:</strong> <span style="color:var(--accent);font-weight:700;font-size:14px">${fmt(f.saldo_cuotas||Math.max(0,f.total-f.anticipo))}</span></span>
+      <span style="color:var(--muted)">Cuota aprox.: <strong>${fmt(f.saldo_cuotas/f.num_cuotas||0)}</strong></span>
+    </div>`:'';
   document.getElementById('detalle-titulo').textContent=`Factura ${f.numero}`;
   document.getElementById('detalle-content').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;font-size:13px">
@@ -1036,6 +1209,7 @@ async function verDetalle(id){
       <div><span style="color:var(--muted)">Cuotas:</span> <strong>${f.num_cuotas}</strong></div>
       ${f.notas?`<div><span style="color:var(--muted)">Notas:</span> <strong>${f.notas}</strong></div>`:''}
     </div>
+    ${antiBox}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
       <div style="background:#FFF5F5;border:1.5px solid #FECACA;border-radius:8px;padding:10px;font-size:12px">
         <div style="font-weight:700;color:var(--mc);margin-bottom:4px">🔴 María del Carmen</div>
@@ -1143,10 +1317,12 @@ async function onFacturaChange(){
   const f=r1.data;if(!f)return;
   const pagado=(r2.data||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0);
   const saldo=Math.max(0,parseFloat(f.total||0)-pagado);
-  const cuotaAprox=f.num_cuotas>0?f.total/f.num_cuotas:f.total;
+  const anticipo=parseFloat(f.anticipo||0);
+  const saldoCuotas=parseFloat(f.saldo_cuotas||Math.max(0,f.total-anticipo));
+  const cuotaAprox=f.num_cuotas>0?saldoCuotas/f.num_cuotas:saldoCuotas;
   const box=document.getElementById('pago-info-box');
   box.style.display='block';
-  box.innerHTML=`<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota aprox.:</strong> ${fmt(cuotaAprox)} &nbsp;|&nbsp; <strong>${f.responsable}</strong>`;
+  box.innerHTML=`<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota:</strong> ${fmt(cuotaAprox)}${anticipo>0?` &nbsp;|&nbsp; <strong style="color:#1D4ED8">💰 Anticipo: ${fmt(anticipo)}</strong>`:''} &nbsp;|&nbsp; <strong>${f.responsable}</strong>`;
   if(!document.getElementById('pago-monto').value)document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
   const cuotas=r3.data||[];
   if(cuotas.length){
