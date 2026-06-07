@@ -1275,88 +1275,92 @@ function renderCronogramaCasaMes(){
   const list=getCronFiltered();
   if(!list.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">No hay cuotas en el rango seleccionado.</div>';return;}
 
-  // Agrupar: casa → mes → cuotas
-  const porCasa={};
+  // Agrupar: mes → casa → [cuotas]
+  const porMes={};
   list.forEach(c=>{
+    const mesKey=c.fecha_vence.slice(0,7);
     const fac=_facturas[c.factura_id]||{};
     const casaId=fac.casa_id||'sin-casa';
-    const mesKey=c.fecha_vence.slice(0,7); // "2025-06"
-    if(!porCasa[casaId])porCasa[casaId]={cuotas:[],meses:{}};
-    porCasa[casaId].cuotas.push(c);
-    if(!porCasa[casaId].meses[mesKey])porCasa[casaId].meses[mesKey]=[];
-    porCasa[casaId].meses[mesKey].push(c);
+    if(!porMes[mesKey])porMes[mesKey]={};
+    if(!porMes[mesKey][casaId])porMes[mesKey][casaId]=[];
+    porMes[mesKey][casaId].push(c);
   });
 
   let desgloseCounter=0;
   let html='';
 
-  Object.entries(porCasa).sort(([aId],[bId])=>{
-    const aN=(_casas[aId]?.nombre||'').toLowerCase();const bN=(_casas[bId]?.nombre||'').toLowerCase();return aN.localeCompare(bN);
-  }).forEach(([casaId,casaData])=>{
-    const casa=_casas[casaId]||{nombre:'Sin casa'};
-    const totalCasa=casaData.cuotas.reduce((s,c)=>s+parseFloat(c.monto||0),0);
-    const pendCasa=casaData.cuotas.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-    const factCount=[...new Set(casaData.cuotas.map(c=>c.factura_id))].length;
+  Object.keys(porMes).sort().forEach(mesKey=>{
+    const[yr,mo]=mesKey.split('-');
+    const nombreMes=`${MESES_FULL[parseInt(mo)-1]} ${yr}`;
+    const casasDelMes=porMes[mesKey];
+    const hoyYr=new Date().getFullYear(),hoyMo=new Date().getMonth()+1;
+    const esMesActual=(parseInt(yr)===hoyYr&&parseInt(mo)===hoyMo);
 
-    html+=`<div class="cron-casa-block">
-      <div class="cron-casa-header">
+    // Totales del mes
+    let totalMes=0,pendMes=0,mcMes=0,riMes=0;
+    Object.values(casasDelMes).forEach(cuotas=>cuotas.forEach(c=>{
+      const m=parseFloat(c.monto||0);
+      totalMes+=m;if(!c.pagada)pendMes+=m;
+      const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';
+      if(resp==='Maria del Carmen')mcMes+=m;else if(resp==='Richard')riMes+=m;else{mcMes+=m/2;riMes+=m/2;}
+    }));
+
+    html+=`<div class="cron-casa-block" style="margin-bottom:24px">
+      <div class="cron-casa-header" style="cursor:default">
         <div>
-          <div class="cron-casa-nombre">🏪 ${casa.nombre}</div>
-          <div style="font-size:11px;opacity:.7;margin-top:2px;font-weight:600">${factCount} factura${factCount>1?'s':''} activa${factCount>1?'s':''}</div>
+          <div class="cron-casa-nombre" style="${esMesActual?'color:#86efac':''}">${esMesActual?'◀ ':''}📅 ${nombreMes}</div>
+          <div style="font-size:11px;opacity:.7;margin-top:2px;font-weight:600">${Object.keys(casasDelMes).length} casa${Object.keys(casasDelMes).length>1?'s':''} · ${Object.values(casasDelMes).flat().length} cuota${Object.values(casasDelMes).flat().length>1?'s':''}</div>
         </div>
         <div class="cron-casa-totales">
-          <div class="cron-casa-total-item"><div class="cron-casa-total-label">Total cuotas</div><div class="cron-casa-total-valor">${fmt(totalCasa)}</div></div>
-          <div class="cron-casa-total-item"><div class="cron-casa-total-label">Pendiente</div><div class="cron-casa-total-valor" style="color:#86efac">${fmt(pendCasa)}</div></div>
+          ${mcMes>0?`<div class="cron-casa-total-item"><div class="cron-casa-total-label">🔴 MC</div><div class="cron-casa-total-valor" style="font-size:15px;color:#fca5a5">${fmt(mcMes)}</div></div>`:''}
+          ${riMes>0?`<div class="cron-casa-total-item"><div class="cron-casa-total-label">🟠 Richard</div><div class="cron-casa-total-valor" style="font-size:15px;color:#fdba74">${fmt(riMes)}</div></div>`:''}
+          <div class="cron-casa-total-item"><div class="cron-casa-total-label">Pendiente</div><div class="cron-casa-total-valor" style="color:#86efac">${fmt(pendMes)}</div></div>
+          <div class="cron-casa-total-item"><div class="cron-casa-total-label">Total mes</div><div class="cron-casa-total-valor">${fmt(totalMes)}</div></div>
         </div>
       </div>`;
 
-    // Por mes dentro de esta casa
-    Object.entries(casaData.meses).sort(([a],[b])=>a.localeCompare(b)).forEach(([mesKey,cuotasMes])=>{
-      const [yr,mo]=mesKey.split('-');
-      const nombreMes=`${MESES_FULL[parseInt(mo)-1]} ${yr}`;
-      const totalMes=cuotasMes.reduce((s,c)=>s+parseFloat(c.monto||0),0);
-      const pendMes=cuotasMes.filter(c=>!c.pagada).reduce((s,c)=>s+parseFloat(c.monto||0),0);
-
-      // Totales MC y Richard para este mes-casa
-      let mcMes=0,riMes=0;
-      cuotasMes.forEach(c=>{
-        const fac=_facturas[c.factura_id]||{};
-        const resp=fac.responsable||'Compartida';
+    // Una fila por casa dentro del mes
+    Object.entries(casasDelMes).sort(([aId],[bId])=>{
+      return((_casas[aId]?.nombre||'').toLowerCase()).localeCompare((_casas[bId]?.nombre||'').toLowerCase());
+    }).forEach(([casaId,cuotasCasa])=>{
+      const casa=_casas[casaId]||{nombre:'Sin casa'};
+      const totalCasa=cuotasCasa.reduce((s,c)=>s+parseFloat(c.monto||0),0);
+      let mcCasa=0,riCasa=0;
+      cuotasCasa.forEach(c=>{
+        const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';
         const m=parseFloat(c.monto||0);
-        if(resp==='Maria del Carmen')mcMes+=m;
-        else if(resp==='Richard')riMes+=m;
-        else{mcMes+=m/2;riMes+=m/2;}
+        if(resp==='Maria del Carmen')mcCasa+=m;else if(resp==='Richard')riCasa+=m;else{mcCasa+=m/2;riCasa+=m/2;}
       });
-
-      // Cuántas facturas distintas hay en este mes
-      const facsMes=[...new Set(cuotasMes.map(c=>c.factura_id))];
-      const desgloseId=`desglose_${casaId}_${mesKey}_${desgloseCounter++}`;
-      const tieneVencidas=cuotasMes.some(c=>!c.pagada&&c.fecha_vence<hoyStr);
+      const facIds=[...new Set(cuotasCasa.map(c=>c.factura_id))];
+      const tieneVenc=cuotasCasa.some(c=>!c.pagada&&c.fecha_vence<hoyStr);
+      const todasPagadas=cuotasCasa.every(c=>c.pagada);
+      const desgloseId=`dsg_${casaId}_${mesKey}_${desgloseCounter++}`;
+      const subtitulo=facIds.length>1?`${facIds.length} facturas`:(_facturas[facIds[0]]?.numero||'');
 
       html+=`<div class="cron-mes-table">
-        <div class="cron-mes-header-row" onclick="toggleDesglose(this,'${desgloseId}')" style="${tieneVencidas?'border-left:3px solid var(--danger);':''}">
-          <div class="cron-mes-titulo">
-            ${tieneVencidas?'🔴':'📅'} ${nombreMes}
-            <span style="font-size:10px;color:var(--muted);font-weight:600">${facsMes.length} factura${facsMes.length>1?'s':''}</span>
+        <div class="cron-mes-header-row" onclick="toggleDesglose(this,'${desgloseId}')" style="${tieneVenc?'border-left:3px solid var(--danger);':''}${todasPagadas?'opacity:.55':''}">
+          <div class="cron-mes-titulo" style="font-size:14px">
+            🏪 ${casa.nombre}
+            <span style="font-size:10px;color:var(--muted);font-weight:600;margin-left:4px">${subtitulo}</span>
           </div>
           <div class="cron-mes-resumen">
-            ${mcMes>0?`<span class="cron-mes-badge-mc">🔴 ${fmt(mcMes)}</span>`:''}
-            ${riMes>0?`<span class="cron-mes-badge-ri">🟠 ${fmt(riMes)}</span>`:''}
-            <span class="cron-mes-badge-total">${fmt(totalMes)}</span>
+            ${mcCasa>0?`<span class="cron-mes-badge-mc">🔴 ${fmt(mcCasa)}</span>`:''}
+            ${riCasa>0?`<span class="cron-mes-badge-ri">🟠 ${fmt(riCasa)}</span>`:''}
+            <span class="cron-mes-badge-total">${fmt(totalCasa)}</span>
             <span class="cron-mes-chevron">▼</span>
           </div>
         </div>
         <div class="cron-desglose" id="${desgloseId}">
-          <table>
-            <thead><tr><th>Factura</th><th>Responsable</th><th>Cuota</th><th>Vence</th><th>Monto</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead>
-            <tbody>`;
+          <table><thead><tr><th>Factura</th><th>Responsable</th><th>Cuota</th><th>Vence</th><th>Monto</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead>
+          <tbody>`;
 
-      cuotasMes.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)).forEach(c=>{
+      cuotasCasa.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)||
+        (_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')
+      ).forEach(c=>{
         const fac=_facturas[c.factura_id]||{};
         const vencida=!c.pagada&&c.fecha_vence<hoyStr;
         const accion=currentRole==='admin'
-          ?(c.pagada
-            ?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
+          ?(c.pagada?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
             :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
           :'';
         html+=`<tr style="${c.pagada?'opacity:.5':''}${vencida?';background:#FFF5F5':''}">
@@ -1378,7 +1382,6 @@ function renderCronogramaCasaMes(){
 
   document.getElementById('cronograma-content').innerHTML=html;
 }
-
 function renderCronogramaGantt(){
   const hoyStr=new Date().toISOString().slice(0,10);
   const desde=document.getElementById('cron-desde').value,hasta=document.getElementById('cron-hasta').value;
