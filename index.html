@@ -1419,6 +1419,7 @@ function renderCronogramaCasaMes(){
       cuotasCasa.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)||
         (_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')
       ).forEach(c=>{
+        const fac=_facturas[c.factura_id]||{};  // ← LA LÍNEA QUE FALTABA
         const cubierta=isCuotaCubierta(c);
         const vencida=!cubierta&&c.fecha_vence<hoyStr;
         const accion=currentRole==='admin'
