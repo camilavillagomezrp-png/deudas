@@ -1246,58 +1246,6 @@ async function renderCronograma(){loading();await reloadAll();loaded();if(cronTa
 // Devuelve si una cuota está efectivamente cubierta según el saldo real de la factura
 function isCuotaCubierta(cuota) {
   if (!cuota.pagada) return false;
-  // Si la factura tiene saldo pendiente real, la cuota no está realmente cubierta
-  const fac = _facturas[cuota.factura_id];
-  if (!fac) return true;
-  const enrich_fac = enrich(fac);
-  const saldo = calcSaldo(enrich_fac);
-  // Si hay saldo pendiente significativo (más de $0.01), revisamos
-  // para cuotas compartidas: si el saldo es mayor que 0, alguna cuota está mal marcada
-  if (saldo > 0.01) {
-    // calculamos cuánto cubre lo pagado: si pagado cubre al menos el monto de esta cuota, ok
-    const pagado = calcPagado(enrich_fac);
-    const cuotasOrden = (_cuotasByFac[fac.id] || [])
-      .filter(c => !c.es_historica)
-      .sort((a, b) => a.numero - b.numero);
-    // sumamos montos en orden hasta llegar a esta cuota
-    let acum = 0;
-    for (const c of cuotasOrden) {
-      acum += parseFloat(c.monto || 0);
-      if (c.id === cuota.id) return pagado >= acum - 0.01;
-    }
-    return false;
-  }
-  return true;
-}
-function getCronFiltered(){
-  const personFilt=document.getElementById('cron-person').value,estadoFilt=document.getElementById('cron-estado').value;
-  const desde=document.getElementById('cron-desde').value,hasta=document.getElementById('cron-hasta').value;
-  const hoyStr=new Date().toISOString().slice(0,10);
-  return _cuotas.filter(c=>{
-    if(c.es_historica)return false;
-    const fac=_facturas[c.factura_id]||{};
-    if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
-    if(estadoFilt==='pendiente'&&c.pagada)return false;
-    if(estadoFilt==='pagado'&&!c.pagada)return false;
-    if(estadoFilt==='vencida'&&(c.pagada||c.fecha_vence>=hoyStr))return false;
-    if(desde&&c.fecha_vence<desde)return false;
-    if(hasta&&c.fecha_vence>hasta)return false;
-    return true;
-  });
-}
-
-// Toggle desglose al hacer click en una fila de mes
-function toggleDesglose(btnEl,desgloseId){
-  const el=document.getElementById(desgloseId);
-  const chev=btnEl.querySelector('.cron-mes-chevron');
-  if(!el)return;
-  const isOpen=el.classList.contains('open');
-  el.classList.toggle('open',!isOpen);
-  if(chev)chev.classList.toggle('open',!isOpen);
-}
-
-function isCuotaCubierta(cuota) {
-  if (!cuota.pagada) return false;
   const fac = _facturas[cuota.factura_id];
   if (!fac) return true;
   const enrich_fac = enrich(fac);
@@ -1334,6 +1282,14 @@ function getCronFiltered(){
   });
 }
 
+function toggleDesglose(btnEl,desgloseId){
+  const el=document.getElementById(desgloseId);
+  const chev=btnEl.querySelector('.cron-mes-chevron');
+  if(!el)return;
+  const isOpen=el.classList.contains('open');
+  el.classList.toggle('open',!isOpen);
+  if(chev)chev.classList.toggle('open',!isOpen);
+}
 function renderCronogramaCasaMes(){
   const hoyStr=new Date().toISOString().slice(0,10);
   const list=getCronFiltered();
