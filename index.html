@@ -1243,6 +1243,32 @@ function resetCronRange(){initCronRange();renderCronograma();}
 function switchCronTab(t){cronTab=t;document.getElementById('tab-tabla').classList.toggle('active',t==='tabla');document.getElementById('tab-gantt').classList.toggle('active',t==='gantt');renderCronograma();}
 async function renderCronograma(){loading();await reloadAll();loaded();if(cronTab==='tabla')renderCronogramaCasaMes();else renderCronogramaGantt();}
 
+// Devuelve si una cuota está efectivamente cubierta según el saldo real de la factura
+function isCuotaCubierta(cuota) {
+  if (!cuota.pagada) return false;
+  // Si la factura tiene saldo pendiente real, la cuota no está realmente cubierta
+  const fac = _facturas[cuota.factura_id];
+  if (!fac) return true;
+  const enrich_fac = enrich(fac);
+  const saldo = calcSaldo(enrich_fac);
+  // Si hay saldo pendiente significativo (más de $0.01), revisamos
+  // para cuotas compartidas: si el saldo es mayor que 0, alguna cuota está mal marcada
+  if (saldo > 0.01) {
+    // calculamos cuánto cubre lo pagado: si pagado cubre al menos el monto de esta cuota, ok
+    const pagado = calcPagado(enrich_fac);
+    const cuotasOrden = (_cuotasByFac[fac.id] || [])
+      .filter(c => !c.es_historica)
+      .sort((a, b) => a.numero - b.numero);
+    // sumamos montos en orden hasta llegar a esta cuota
+    let acum = 0;
+    for (const c of cuotasOrden) {
+      acum += parseFloat(c.monto || 0);
+      if (c.id === cuota.id) return pagado >= acum - 0.01;
+    }
+    return false;
+  }
+  return true;
+}
 function getCronFiltered(){
   const personFilt=document.getElementById('cron-person').value,estadoFilt=document.getElementById('cron-estado').value;
   const desde=document.getElementById('cron-desde').value,hasta=document.getElementById('cron-hasta').value;
@@ -1270,12 +1296,49 @@ function toggleDesglose(btnEl,desgloseId){
   if(chev)chev.classList.toggle('open',!isOpen);
 }
 
+function isCuotaCubierta(cuota) {
+  if (!cuota.pagada) return false;
+  const fac = _facturas[cuota.factura_id];
+  if (!fac) return true;
+  const enrich_fac = enrich(fac);
+  const saldo = calcSaldo(enrich_fac);
+  if (saldo > 0.01) {
+    const pagado = calcPagado(enrich_fac);
+    const cuotasOrden = (_cuotasByFac[fac.id] || [])
+      .filter(c => !c.es_historica)
+      .sort((a, b) => a.numero - b.numero);
+    let acum = 0;
+    for (const c of cuotasOrden) {
+      acum += parseFloat(c.monto || 0);
+      if (c.id === cuota.id) return pagado >= acum - 0.01;
+    }
+    return false;
+  }
+  return true;
+}
+
+function getCronFiltered(){
+  const personFilt=document.getElementById('cron-person').value,estadoFilt=document.getElementById('cron-estado').value;
+  const desde=document.getElementById('cron-desde').value,hasta=document.getElementById('cron-hasta').value;
+  const hoyStr=new Date().toISOString().slice(0,10);
+  return _cuotas.filter(c=>{
+    if(c.es_historica)return false;
+    const fac=_facturas[c.factura_id]||{};
+    if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
+    if(estadoFilt==='pendiente'&&isCuotaCubierta(c))return false;
+    if(estadoFilt==='pagado'&&!isCuotaCubierta(c))return false;
+    if(estadoFilt==='vencida'&&(isCuotaCubierta(c)||c.fecha_vence>=hoyStr))return false;
+    if(desde&&c.fecha_vence<desde)return false;
+    if(hasta&&c.fecha_vence>hasta)return false;
+    return true;
+  });
+}
+
 function renderCronogramaCasaMes(){
   const hoyStr=new Date().toISOString().slice(0,10);
   const list=getCronFiltered();
   if(!list.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">No hay cuotas en el rango seleccionado.</div>';return;}
 
-  // Agrupar: mes → casa → [cuotas]
   const porMes={};
   list.forEach(c=>{
     const mesKey=c.fecha_vence.slice(0,7);
@@ -1296,11 +1359,11 @@ function renderCronogramaCasaMes(){
     const hoyYr=new Date().getFullYear(),hoyMo=new Date().getMonth()+1;
     const esMesActual=(parseInt(yr)===hoyYr&&parseInt(mo)===hoyMo);
 
-    // Totales del mes
     let totalMes=0,pendMes=0,mcMes=0,riMes=0;
     Object.values(casasDelMes).forEach(cuotas=>cuotas.forEach(c=>{
       const m=parseFloat(c.monto||0);
-      totalMes+=m;if(!c.pagada)pendMes+=m;
+      totalMes+=m;
+      if(!isCuotaCubierta(c))pendMes+=m;
       const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';
       if(resp==='Maria del Carmen')mcMes+=m;else if(resp==='Richard')riMes+=m;else{mcMes+=m/2;riMes+=m/2;}
     }));
@@ -1319,7 +1382,6 @@ function renderCronogramaCasaMes(){
         </div>
       </div>`;
 
-    // Una fila por casa dentro del mes
     Object.entries(casasDelMes).sort(([aId],[bId])=>{
       return((_casas[aId]?.nombre||'').toLowerCase()).localeCompare((_casas[bId]?.nombre||'').toLowerCase());
     }).forEach(([casaId,cuotasCasa])=>{
@@ -1332,8 +1394,8 @@ function renderCronogramaCasaMes(){
         if(resp==='Maria del Carmen')mcCasa+=m;else if(resp==='Richard')riCasa+=m;else{mcCasa+=m/2;riCasa+=m/2;}
       });
       const facIds=[...new Set(cuotasCasa.map(c=>c.factura_id))];
-      const tieneVenc=cuotasCasa.some(c=>!c.pagada&&c.fecha_vence<hoyStr);
-      const todasPagadas=cuotasCasa.every(c=>c.pagada);
+      const tieneVenc=cuotasCasa.some(c=>!isCuotaCubierta(c)&&c.fecha_vence<hoyStr);
+      const todasPagadas=cuotasCasa.every(c=>isCuotaCubierta(c));
       const desgloseId=`dsg_${casaId}_${mesKey}_${desgloseCounter++}`;
       const subtitulo=facIds.length>1?`${facIds.length} facturas`:(_facturas[facIds[0]]?.numero||'');
 
@@ -1357,19 +1419,19 @@ function renderCronogramaCasaMes(){
       cuotasCasa.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)||
         (_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')
       ).forEach(c=>{
-        const fac=_facturas[c.factura_id]||{};
-        const vencida=!c.pagada&&c.fecha_vence<hoyStr;
+        const cubierta=isCuotaCubierta(c);
+        const vencida=!cubierta&&c.fecha_vence<hoyStr;
         const accion=currentRole==='admin'
-          ?(c.pagada?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
+          ?(cubierta?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
             :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
           :'';
-        html+=`<tr style="${c.pagada?'opacity:.5':''}${vencida?';background:#FFF5F5':''}">
+        html+=`<tr style="${cubierta?'opacity:.5':''}${vencida?';background:#FFF5F5':''}">
           <td><strong>${fac.numero||'—'}</strong></td>
           <td>${personaBadge(fac.responsable)}</td>
           <td style="font-weight:700">C${c.numero}/${fac.num_cuotas||'?'}</td>
           <td>${c.fecha_vence}${vencida?'<span style="color:var(--danger);font-size:10px;font-weight:700;margin-left:4px">VENC</span>':''}</td>
           <td><strong>${fmt(c.monto)}</strong></td>
-          <td>${c.pagada?'<span class="badge badge-green">Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>'}</td>
+          <td>${cubierta?'<span class="badge badge-green">Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>'}</td>
           ${currentRole==='admin'?`<td>${accion}</td>`:''}
         </tr>`;
       });
@@ -1391,15 +1453,25 @@ function renderCronogramaGantt(){
   if(!meses.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">Rango inválido.</div>';return;}
   const personFilt=document.getElementById('cron-person').value,estadoFilt=document.getElementById('cron-estado').value;
   const allCuotas=_cuotas.filter(c=>{
-    if(c.es_historica)return false;const fac=_facturas[c.factura_id]||{};
+    if(c.es_historica)return false;
+    const fac=_facturas[c.factura_id]||{};
     if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
-    if(estadoFilt==='pendiente'&&c.pagada)return false;if(estadoFilt==='pagado'&&!c.pagada)return false;
-    if(estadoFilt==='vencida'&&(c.pagada||c.fecha_vence>=hoyStr))return false;return true;
+    if(estadoFilt==='pendiente'&&isCuotaCubierta(c))return false;
+    if(estadoFilt==='pagado'&&!isCuotaCubierta(c))return false;
+    if(estadoFilt==='vencida'&&(isCuotaCubierta(c)||c.fecha_vence>=hoyStr))return false;
+    return true;
   });
   const facIds=[...new Set(allCuotas.map(c=>c.factura_id))];
   if(!facIds.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">No hay cuotas para estos filtros.</div>';return;}
   const totalesMes={};meses.forEach(({yr,mo})=>{totalesMes[`${yr}-${mo}`]={mc:0,ri:0};});
-  allCuotas.forEach(c=>{const d=new Date(c.fecha_vence+'T00:00:00');const k=`${d.getFullYear()}-${d.getMonth()}`;if(!totalesMes[k])return;const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'Compartida';const m=parseFloat(c.monto||0);if(resp==='Maria del Carmen')totalesMes[k].mc+=m;else if(resp==='Richard')totalesMes[k].ri+=m;else{totalesMes[k].mc+=m/2;totalesMes[k].ri+=m/2;}});
+  allCuotas.forEach(c=>{
+    const d=new Date(c.fecha_vence+'T00:00:00');const k=`${d.getFullYear()}-${d.getMonth()}`;
+    if(!totalesMes[k])return;
+    const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'Compartida';const m=parseFloat(c.monto||0);
+    if(resp==='Maria del Carmen')totalesMes[k].mc+=m;
+    else if(resp==='Richard')totalesMes[k].ri+=m;
+    else{totalesMes[k].mc+=m/2;totalesMes[k].ri+=m/2;}
+  });
   const hoyDate=new Date();const hoyYr=hoyDate.getFullYear(),hoyMo=hoyDate.getMonth();
   let html='<div class="gantt-outer"><div class="gantt-scroll"><div class="gantt-grid">';
   html+='<div class="gantt-months-row"><div class="gantt-label-col">Factura / Casa</div>';
@@ -1410,10 +1482,36 @@ function renderCronogramaGantt(){
     const cuotasFac=allCuotas.filter(c=>c.factura_id===facId);const cuotasPorMes={};
     cuotasFac.forEach(c=>{const d=new Date(c.fecha_vence+'T00:00:00');const k=`${d.getFullYear()}-${d.getMonth()}`;if(!cuotasPorMes[k])cuotasPorMes[k]=[];cuotasPorMes[k].push(c);});
     html+=`<div class="gantt-row"><div class="gantt-info"><div class="gantt-info-name">${fac.numero||'—'}</div><div class="gantt-info-sub">${casa.nombre||'—'}</div></div><div class="gantt-cells">`;
-    meses.forEach(({yr,mo})=>{const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const cuotasMes=cuotasPorMes[k]||[];html+=`<div class="gantt-cell${isHoy?' is-today-col':''}">`;cuotasMes.forEach(c=>{const vencida=!c.pagada&&c.fecha_vence<hoyStr;let chipCls;if(resp==='Maria del Carmen'){chipCls=c.pagada?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';}else if(resp==='Richard'){chipCls=c.pagada?'g-chip-ri-pag':vencida?'g-chip-ri-venc':'g-chip-ri-pend';}else{chipCls=c.pagada?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';}html+=`<div class="g-chip ${chipCls}" title="${fac.numero} C${c.numero} — ${fmt(c.monto)}">C${c.numero} ${fmt(c.monto)}</div>`;});html+='</div>';});html+='</div></div>';
+    meses.forEach(({yr,mo})=>{
+      const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const cuotasMes=cuotasPorMes[k]||[];
+      html+=`<div class="gantt-cell${isHoy?' is-today-col':''}">`;
+      cuotasMes.forEach(c=>{
+        const cubierta=isCuotaCubierta(c);
+        const vencida=!cubierta&&c.fecha_vence<hoyStr;
+        let chipCls;
+        if(resp==='Maria del Carmen'){
+          chipCls=cubierta?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';
+        }else if(resp==='Richard'){
+          chipCls=cubierta?'g-chip-ri-pag':vencida?'g-chip-ri-venc':'g-chip-ri-pend';
+        }else{
+          chipCls=cubierta?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';
+        }
+        html+=`<div class="g-chip ${chipCls}" title="${fac.numero} C${c.numero} — ${fmt(c.monto)}">C${c.numero} ${fmt(c.monto)}</div>`;
+      });
+      html+='</div>';
+    });
+    html+='</div></div>';
   });
   html+='<div class="gantt-totals-row"><div class="gantt-totals-label"><div class="gantt-totals-label-title">Totales del mes</div></div>';
-  meses.forEach(({yr,mo})=>{const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const t=totalesMes[k]||{mc:0,ri:0};const total=t.mc+t.ri;html+=`<div class="gantt-total-cell${isHoy?' is-today-col':''}">`;if(t.mc>0)html+=`<div class="gt-mc">${fmt(t.mc)}</div><div style="font-size:8px;color:var(--mc);opacity:.7;margin-top:-1px">MC</div>`;if(t.ri>0)html+=`<div class="gt-ri">${fmt(t.ri)}</div><div style="font-size:8px;color:var(--richard);opacity:.7;margin-top:-1px">Ri</div>`;if(total>0)html+=`<div class="gt-total">= ${fmt(total)}</div>`;html+='</div>';});html+='</div>';
+  meses.forEach(({yr,mo})=>{
+    const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const t=totalesMes[k]||{mc:0,ri:0};const total=t.mc+t.ri;
+    html+=`<div class="gantt-total-cell${isHoy?' is-today-col':''}">`;
+    if(t.mc>0)html+=`<div class="gt-mc">${fmt(t.mc)}</div><div style="font-size:8px;color:var(--mc);opacity:.7;margin-top:-1px">MC</div>`;
+    if(t.ri>0)html+=`<div class="gt-ri">${fmt(t.ri)}</div><div style="font-size:8px;color:var(--richard);opacity:.7;margin-top:-1px">Ri</div>`;
+    if(total>0)html+=`<div class="gt-total">= ${fmt(total)}</div>`;
+    html+='</div>';
+  });
+  html+='</div>';
   html+=`<div class="gantt-legend"><div class="gl-item"><div class="gl-dot" style="background:var(--mc3);border-left-color:var(--mc)"></div>🔴 MC pendiente</div><div class="gl-item"><div class="gl-dot" style="background:#FEE2E2;border-left-color:var(--danger)"></div>🔴 MC vencida</div><div class="gl-item"><div class="gl-dot" style="background:var(--richard3);border-left-color:var(--richard)"></div>🟠 Richard pendiente</div><div class="gl-item"><div class="gl-dot" style="background:#FEF3C7;border-left-color:var(--warn)"></div>🟠 Richard vencida</div><div class="gl-item"><div class="gl-dot" style="background:#F3F4F6;border-left-color:#9CA3AF"></div>Pagada</div><div style="margin-left:auto;font-size:10px;color:var(--muted)">Históricas excluidas · Verde = mes actual</div></div>`;
   html+='</div></div></div>';
   document.getElementById('cronograma-content').innerHTML=html;
