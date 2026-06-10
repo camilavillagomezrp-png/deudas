@@ -1258,18 +1258,8 @@ async function onFacturaChange(){
   const t=calcPersonas(items);
   const totalMC=t.mc.s+t.mc.i;
   const totalRi=t.ri.s+t.ri.i;
-  const totalFacPersonas2=totalMC+totalRi;
-
-  let pagadoMC=0,pagadoRi=0;
-  (r2.data||[]).forEach(p=>{
-    const m=parseFloat(p.monto||0);
-    if(p.cuenta_id==='C1')pagadoMC+=m;
-    else if(p.cuenta_id==='C2')pagadoRi+=m;
-    else{
-      if(totalFacPersonas2>0){pagadoMC+=m*(totalMC/totalFacPersonas2);pagadoRi+=m*(totalRi/totalFacPersonas2);}
-      else{pagadoMC+=m/2;pagadoRi+=m/2;}
-    }
-  });
+  const saldoMCFac=Math.max(0,totalMC-pagadoMC);
+  const saldoRiFac=Math.max(0,totalRi-pagadoRi);
   const saldoTotalReal=saldoMCFac+saldoRiFac;
 
   const cuotas=r3.data||[];
@@ -1527,46 +1517,27 @@ function renderCronogramaCasaMes(){
       ).forEach(c=>{
         const fac=_facturas[c.factura_id]||{};
 
+        // Saldo real de la factura (total - pagado)
+        const facEnrich=enrich(fac);
+        const saldoTotalFac=calcSaldo(facEnrich);
+
+        // Distribución proporcional del saldo por persona según ítems
         const items=_items[fac.id]||[];
         const t=calcPersonas(items);
-        const totalMC=t.mc.s+t.mc.i; // Lo que debe Carmen originalmente
-        const totalRi=t.ri.s+t.ri.i; // Lo que debe Richard originalmente
+        const totalMCFac=t.mc.s+t.mc.i;
+        const totalRiFac=t.ri.s+t.ri.i;
+        const totalFacItems=totalMCFac+totalRiFac;
 
-        // --- LÓGICA DE ANÁLISIS REAL DE PAGOS POR CUENTA BANCARIA ---
-        let pagadoMC=0;
-        let pagadoRi=0;
+        const saldoMCFac=totalFacItems>0?saldoTotalFac*(totalMCFac/totalFacItems):0;
+        const saldoRiFac=totalFacItems>0?saldoTotalFac*(totalRiFac/totalFacItems):0;
 
-        const totalFacPersonas=totalMC+totalRi;
-        (fac.pagos||[]).forEach(p=>{
-          const montoPago=parseFloat(p.monto||0);
-          if(p.cuenta_id==='C1'){
-            pagadoMC+=montoPago;
-          } else if(p.cuenta_id==='C2'){
-            pagadoRi+=montoPago;
-          } else {
-            // Efectivo u otra: amortizar proporcionalmente a lo que debe cada uno
-            if(totalFacPersonas>0){
-              pagadoMC+=montoPago*(totalMC/totalFacPersonas);
-              pagadoRi+=montoPago*(totalRi/totalFacPersonas);
-            } else {
-              pagadoMC+=montoPago/2;
-              pagadoRi+=montoPago/2;
-            }
-          }
-        });
-
-        // Saldo pendiente REAL de la FACTURA por cada persona
-        const saldoMCFac=Math.max(0,totalMC-pagadoMC);
-        const saldoRiFac=Math.max(0,totalRi-pagadoRi);
-
-        // Saldo de esta CUOTA en particular (fraccionamiento proporcional)
-        const cuotasPorFac=(_cuotasByFac[fac.id]||[]).filter(x=>!x.es_historica).sort((a,b)=>a.numero-b.numero);
+        // Fracción de esta cuota sobre el total de cuotas activas
+        const cuotasPorFac=(_cuotasByFac[fac.id]||[]).filter(x=>!x.es_historica);
         const totalCuotas=cuotasPorFac.reduce((s,x)=>s+parseFloat(x.monto||0),0);
-        const fraccion=totalCuotas>0?parseFloat(c.monto||0)/totalCuotas:0;
+        const fraccion=totalCuotas>0?parseFloat(c.monto||0)/totalCuotas:1;
 
         const saldoMCCuota=saldoMCFac*fraccion;
         const saldoRiCuota=saldoRiFac*fraccion;
-        // -------------------------------------------------------------
 
         const cubierta=isCuotaCubierta(c);
         const vencida=!cubierta&&c.fecha_vence<hoyStr;
@@ -1575,16 +1546,15 @@ function renderCronogramaCasaMes(){
             :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
           :'';
 
-        // Celda de saldo con desglose por persona si es compartida
+        // Celda de saldo
         let saldoCell;
         if(cubierta){
           saldoCell='<span class="badge badge-green">Pagada</span>';
         } else if(fac.responsable==='Compartida'){
           const partesMC=saldoMCCuota>0.01?`<div style="color:var(--mc);font-size:10px;font-weight:700">🔴 ${fmt(saldoMCCuota)}</div>`:'';
           const partesRi=saldoRiCuota>0.01?`<div style="color:var(--richard);font-size:10px;font-weight:700">🟠 ${fmt(saldoRiCuota)}</div>`:'';
-          // Si ambos ya saldaron su parte pero la cuota sigue abierta por redondeos
-          if(!partesMC&&!partesRi&&(saldoMCCuota+saldoRiCuota>0)){
-            saldoCell=`<span style="color:var(--muted);font-weight:700">${fmt(saldoMCCuota+saldoRiCuota)}</span>`;
+          if(!partesMC&&!partesRi){
+            saldoCell='<span class="badge badge-green">Saldado</span>';
           } else {
             saldoCell=`<div>${partesMC}${partesRi}</div>`;
           }
