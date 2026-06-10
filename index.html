@@ -1369,26 +1369,72 @@ function renderCronogramaCasaMes(){
           </div>
         </div>
         <div class="cron-desglose" id="${desgloseId}">
-          <table><thead><tr><th>Factura</th><th>Responsable</th><th>Cuota</th><th>Vence</th><th>Monto</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead>
+          <table><thead><tr>
+            <th>Factura</th><th>Responsable</th><th>Cuota</th><th>Vence</th>
+            <th>Monto</th><th>Saldo</th><th>Estado</th>
+            ${currentRole==='admin'?'<th>Acción</th>':''}
+          </tr></thead>
           <tbody>`;
 
       cuotasCasa.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)||
         (_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')
       ).forEach(c=>{
-        const fac=_facturas[c.factura_id]||{};  // ← LA LÍNEA QUE FALTABA
+        const fac=_facturas[c.factura_id]||{};
+        const enrich_fac=enrich(fac);
+        const pagadoFac=calcPagado(enrich_fac);
+        const totalFac=parseFloat(fac.total||0);
+        const items=_items[fac.id]||[];
+        const t=calcPersonas(items);
+        const totalMC=t.mc.s+t.mc.i;
+        const totalRi=t.ri.s+t.ri.i;
+
+        // Saldo proporcional por persona según pagos reales
+        const ratio=totalFac>0?Math.min(1,pagadoFac/totalFac):0;
+        const saldoMCFac=Math.max(0,totalMC*(1-ratio));
+        const saldoRiFac=Math.max(0,totalRi*(1-ratio));
+
+        // Saldo de esta cuota en particular
+        const cuotasPorFac=(_cuotasByFac[fac.id]||[]).filter(x=>!x.es_historica).sort((a,b)=>a.numero-b.numero);
+        const totalCuotas=cuotasPorFac.reduce((s,x)=>s+parseFloat(x.monto||0),0);
+        const fraccion=totalCuotas>0?parseFloat(c.monto||0)/totalCuotas:0;
+        const saldoMCCuota=saldoMCFac*fraccion;
+        const saldoRiCuota=saldoRiFac*fraccion;
+
         const cubierta=isCuotaCubierta(c);
         const vencida=!cubierta&&c.fecha_vence<hoyStr;
         const accion=currentRole==='admin'
           ?(cubierta?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
             :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
           :'';
+
+        // Celda de saldo con desglose por persona si es compartida
+        let saldoCell;
+        if(cubierta){
+          saldoCell='<span class="badge badge-green">Pagada</span>';
+        } else if(fac.responsable==='Compartida'){
+          const partesMC=saldoMCCuota>0.01?`<div style="color:var(--mc);font-size:10px;font-weight:700">🔴 ${fmt(saldoMCCuota)}</div>`:'';
+          const partesRi=saldoRiCuota>0.01?`<div style="color:var(--richard);font-size:10px;font-weight:700">🟠 ${fmt(saldoRiCuota)}</div>`:'';
+          saldoCell=`<div>${partesMC}${partesRi}</div>`;
+        } else {
+          const colorSaldo=fac.responsable==='Maria del Carmen'?'var(--mc)':'var(--richard)';
+          const saldo=fac.responsable==='Maria del Carmen'?saldoMCCuota:saldoRiCuota;
+          saldoCell=`<span style="color:${colorSaldo};font-weight:700">${fmt(saldo)}</span>`;
+        }
+
+        const estadoCell=cubierta
+          ?'<span class="badge badge-green">Pagada</span>'
+          :vencida
+            ?'<span class="badge badge-red">Vencida</span>'
+            :'<span class="badge badge-amber">Pendiente</span>';
+
         html+=`<tr style="${cubierta?'opacity:.5':''}${vencida?';background:#FFF5F5':''}">
           <td><strong>${fac.numero||'—'}</strong></td>
           <td>${personaBadge(fac.responsable)}</td>
           <td style="font-weight:700">C${c.numero}/${fac.num_cuotas||'?'}</td>
           <td>${c.fecha_vence}${vencida?'<span style="color:var(--danger);font-size:10px;font-weight:700;margin-left:4px">VENC</span>':''}</td>
           <td><strong>${fmt(c.monto)}</strong></td>
-          <td>${cubierta?'<span class="badge badge-green">Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>'}</td>
+          <td>${saldoCell}</td>
+          <td>${estadoCell}</td>
           ${currentRole==='admin'?`<td>${accion}</td>`:''}
         </tr>`;
       });
