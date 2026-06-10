@@ -1517,27 +1517,29 @@ function renderCronogramaCasaMes(){
       ).forEach(c=>{
         const fac=_facturas[c.factura_id]||{};
 
-        // Saldo real de la factura (total - pagado)
-        const facEnrich=enrich(fac);
-        const saldoTotalFac=calcSaldo(facEnrich);
+        // --- INICIO REEMPLAZO BLOQUE DE CÁLCULO DE SALDO ---
+        // Saldo real de la factura usando pagos del mapa global
+        const pagadoFac = (_pagosMap[fac.id] || []).reduce((s, p) => s + parseFloat(p.monto || 0), 0);
+        const saldoTotalFac = Math.max(0, parseFloat(fac.total || 0) - pagadoFac);
 
         // Distribución proporcional del saldo por persona según ítems
-        const items=_items[fac.id]||[];
-        const t=calcPersonas(items);
-        const totalMCFac=t.mc.s+t.mc.i;
-        const totalRiFac=t.ri.s+t.ri.i;
-        const totalFacItems=totalMCFac+totalRiFac;
+        const items = _items[fac.id] || [];
+        const t = calcPersonas(items);
+        const totalMCFac = t.mc.s + t.mc.i;
+        const totalRiFac = t.ri.s + t.ri.i;
+        const totalFacItems = totalMCFac + totalRiFac;
 
-        const saldoMCFac=totalFacItems>0?saldoTotalFac*(totalMCFac/totalFacItems):0;
-        const saldoRiFac=totalFacItems>0?saldoTotalFac*(totalRiFac/totalFacItems):0;
+        const saldoMCFac = totalFacItems > 0 ? saldoTotalFac * (totalMCFac / totalFacItems) : 0;
+        const saldoRiFac = totalFacItems > 0 ? saldoTotalFac * (totalRiFac / totalFacItems) : 0;
 
         // Fracción de esta cuota sobre el total de cuotas activas
-        const cuotasPorFac=(_cuotasByFac[fac.id]||[]).filter(x=>!x.es_historica);
-        const totalCuotas=cuotasPorFac.reduce((s,x)=>s+parseFloat(x.monto||0),0);
-        const fraccion=totalCuotas>0?parseFloat(c.monto||0)/totalCuotas:1;
+        const cuotasPorFac = (_cuotasByFac[fac.id] || []).filter(x => !x.es_historica);
+        const totalCuotas = cuotasPorFac.reduce((s, x) => s + parseFloat(x.monto || 0), 0);
+        const fraccion = totalCuotas > 0 ? parseFloat(c.monto || 0) / totalCuotas : 1;
 
-        const saldoMCCuota=saldoMCFac*fraccion;
-        const saldoRiCuota=saldoRiFac*fraccion;
+        const saldoMCCuota = saldoMCFac * fraccion;
+        const saldoRiCuota = saldoRiFac * fraccion;
+        // --- FIN REEMPLAZO ---
 
         const cubierta=isCuotaCubierta(c);
         const vencida=!cubierta&&c.fecha_vence<hoyStr;
