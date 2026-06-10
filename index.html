@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+op<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -1143,15 +1143,90 @@ async function verDetalle(id){
 /* ══════════════════════════════════════════════
    PAGOS
 ══════════════════════════════════════════════ */
-function openPagarCuota(facId,cuotaId,monto,numero){
-  openModalPago();
-  setTimeout(async()=>{
-    document.getElementById('pago-factura').value=facId;await onFacturaChange();
-    const chip=document.querySelector(`#cuotas-chips .cuota-chip[data-id="${cuotaId}"]`);
-    if(chip&&!chip.classList.contains('chip-pagada'))chip.click();
-    document.getElementById('pago-monto').value=parseFloat(monto).toFixed(2);
-    document.getElementById('pago-nota').value=`Cuota #${numero}`;
-  },200);
+function openPagarCuota(facId, cuotaId, montoCuota, numCuota) {
+  currentCuotaPagoId = cuotaId;
+  const fac = _facturas[facId] || {};
+  
+  // 1. Calcular lo que ha pagado cada uno usando las cuentas bancarias
+  let pagadoMC = 0;
+  let pagadoRi = 0;
+  (fac.pagos || []).forEach(p => {
+    const m = parseFloat(p.monto || 0);
+    if (p.cuenta_id === 'C1') pagadoMC += m;       // Pichincha -> Mary
+    else if (p.cuenta_id === 'C2') pagadoRi += m;  // Guayaquil -> Richard
+    else { pagadoMC += m / 2; pagadoRi += m / 2; } // Efectivo u otros -> 50/50
+  });
+
+  // 2. Obtener los totales originales que le correspondían a cada uno
+  const items = _items[fac.id] || [];
+  const t = calcPersonas(items);
+  const totalMC = t.mc.s + t.mc.i;
+  const totalRi = t.ri.s + t.ri.i;
+
+  // 3. Obtener saldos reales de la factura
+  const saldoMCFac = Math.max(0, totalMC - pagadoMC);
+  const saldoRiFac = Math.max(0, totalRi - pagadoRi);
+  const saldoTotalFac = saldoMCFac + saldoRiFac;
+
+  // 4. Fraccionar el saldo para ESTA cuota específica
+  const cuotasPorFac = (_cuotasByFac[fac.id] || []).filter(x => !x.es_historica).sort((a, b) => a.numero - b.numero);
+  const totalCuotas = cuotasPorFac.reduce((s, x) => s + parseFloat(x.monto || 0), 0);
+  const fraccion = totalCuotas > 0 ? montoCuota / totalCuotas : 0;
+
+  const saldoMCCuota = saldoMCFac * fraccion;
+  const saldoRiCuota = saldoRiFac * fraccion;
+  const saldoRealCuotaActual = saldoTotalFac * fraccion;
+
+  // Generar el texto descriptivo según quién deba realmente
+  let desgloseTexto = '';
+  if (fac.responsable === 'Compartida') {
+    let partes = [];
+    if (saldoMCCuota > 0.01) partes.push(`🔴 MC: ${fmt(saldoMCCuota)}`);
+    if (saldoRiCuota > 0.01) partes.push(`🟠 Richard: ${fmt(saldoRiCuota)}`);
+    desgloseTexto = partes.length > 0 ? `(${partes.join(' | ')})` : '(Saldado)';
+  } else {
+    desgloseTexto = fac.responsable === 'Maria del Carmen' 
+      ? `(🔴 MC: ${fmt(saldoMCCuota)})` 
+      : `(🟠 Richard: ${fmt(saldoRiCuota)})`;
+  }
+
+  // Llenar el select de facturas y el modal
+  const select = document.getElementById('pago-factura-id');
+  if (select) select.value = facId;
+  
+  // Renderizar la barra informativa inferior del modal
+  const infoCuota = document.getElementById('pago-info-cuota');
+  if (infoCuota) {
+    infoCuota.innerHTML = `
+      <strong>Saldo Real Cuota:</strong> ${fmt(saldoRealCuotaActual)} 
+      <span style="font-size:12px; margin-left:6px; font-weight:normal; color:var(--muted)">
+        ${desgloseTexto}
+      </span>
+      <span style="margin-left:10px">|</span>
+      <strong style="margin-left:10px">Monto Orig.:</strong> ${fmt(montoCuota)} | 
+      ${personaBadge(fac.responsable)}
+    `;
+  }
+
+  // Pre-llenar el input del monto a pagar con el saldo real que queda de la cuota
+  const inputMonto = document.getElementById('pago-monto');
+  if (inputMonto) {
+    inputMonto.value = saldoRealCuotaActual.toFixed(2);
+  }
+
+  // Mostrar sugerencia de cuenta según quién deba
+  const selectCuenta = document.getElementById('pago-cuenta-id');
+  if (selectCuenta) {
+    if (fac.responsable === 'Compartida') {
+      if (saldoMCCuota > 0.01 && saldoRiCuota <= 0.01) selectCuenta.value = 'C1'; // Sugerir Pichincha si solo debe MC
+      else if (saldoRiCuota > 0.01 && saldoMCCuota <= 0.01) selectCuenta.value = 'C2'; // Sugerir Guayaquil si solo debe Richard
+    } else {
+      selectCuenta.value = fac.responsable === 'Maria del Carmen' ? 'C1' : 'C2';
+    }
+  }
+
+  actualizarCuotasDisponiblesPago(facId, cuotaId);
+  openModal('modal-pago');
 }
 function openModalPago(pagoData=null){
   document.getElementById('modal-pago-title').textContent=pagoData?'Editar Pago':'Registrar Pago';
@@ -1178,24 +1253,115 @@ async function eliminarPagoEdicion(){const id=document.getElementById('pago-edit
 async function onFacturaChange(){
   const facId=document.getElementById('pago-factura').value;
   if(!facId){document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';return;}
-  const[r1,r2,r3]=await Promise.all([sb.from('facturas').select('*').eq('id',facId).single(),sb.from('pagos').select('monto').eq('factura_id',facId),sb.from('cuotas').select('*').eq('factura_id',facId).eq('es_historica',false).order('numero')]);
-  const f=r1.data;if(!f)return;
-  const pagado=(r2.data||[]).reduce((s,p)=>s+parseFloat(p.monto||0),0);const saldo=Math.max(0,parseFloat(f.total||0)-pagado);const cuotaAprox=f.num_cuotas>0?f.total/f.num_cuotas:f.total;
-  const box=document.getElementById('pago-info-box');box.style.display='block';box.innerHTML=`<strong>Saldo:</strong> ${fmt(saldo)} &nbsp;|&nbsp; <strong>Cuota aprox.:</strong> ${fmt(cuotaAprox)} &nbsp;|&nbsp; ${personaBadge(f.responsable)}`;
-  if(!document.getElementById('pago-monto').value)document.getElementById('pago-monto').value=cuotaAprox.toFixed(2);
-  const cuotas=r3.data||[];
+  
+  const[r1,r2,r3]=await Promise.all([
+    sb.from('facturas').select('*').eq('id',facId).single(),
+    sb.from('pagos').select('*').eq('factura_id',facId), // Traemos todo el objeto del pago para ver cuenta_id
+    sb.from('cuotas').select('*').eq('factura_id',facId).eq('es_historica',false).order('numero')
+  ]);
+  
+  const f=r1.data; if(!f)return;
+  
+  // --- ANÁLISIS REAL DE PAGOS POR PERSONA ---
+  let pagadoMC = 0;
+  let pagadoRi = 0;
+  (r2.data || []).forEach(p => {
+    const m = parseFloat(p.monto || 0);
+    if (p.cuenta_id === 'C1') pagadoMC += m;
+    else if (p.cuenta_id === 'C2') pagadoRi += m;
+    else { pagadoMC += m / 2; pagadoRi += m / 2; }
+  });
+
+  const items = _items[f.id] || [];
+  const t = calcPersonas(items);
+  const totalMC = t.mc.s + t.mc.i;
+  const totalRi = t.ri.s + t.ri.i;
+
+  const saldoMCFac = Math.max(0, totalMC - pagadoMC);
+  const saldoRiFac = Math.max(0, totalRi - pagadoRi);
+  const saldoTotalReal = saldoMCFac + saldoRiFac;
+
+  // Fraccionar para calcular el saldo real aproximado por cuota
+  const cuotas = r3.data||[];
+  const totalCuotasOriginales = cuotas.reduce((s,x)=>s+parseFloat(x.monto||0),0);
+  const cuotaAproxOriginal = f.num_cuotas>0?f.total/f.num_cuotas:f.total;
+  const fraccion = totalCuotasOriginales > 0 ? cuotaAproxOriginal / totalCuotasOriginales : 0;
+
+  const saldoMCCuota = saldoMCFac * fraccion;
+  const saldoRiCuota = saldoRiFac * fraccion;
+  const saldoRealCuotaAprox = saldoTotalReal * fraccion;
+
+  // Generar texto descriptivo para la barra informativa
+  let desgloseTexto = '';
+  if (f.responsable === 'Compartida') {
+    let partes = [];
+    if (saldoMCCuota > 0.01) partes.push(`🔴 MC: ${fmt(saldoMCCuota)}`);
+    if (saldoRiCuota > 0.01) partes.push(`🟠 Richard: ${fmt(saldoRiCuota)}`);
+    desgloseTexto = partes.length > 0 ? `(${partes.join(' | ')})` : '(Saldado)';
+  } else {
+    desgloseTexto = f.responsable === 'Maria del Carmen' ? `(🔴 MC: ${fmt(saldoMCCuota)})` : `(🟠 Richard: ${fmt(saldoRiCuota)})`;
+  }
+
+  const box = document.getElementById('pago-info-box');
+  box.style.display = 'block';
+  box.innerHTML = `<strong>Saldo Real Factura:</strong> ${fmt(saldoTotalReal)} <span style="font-size:11px; color:var(--muted)">${desgloseTexto}</span> &nbsp;|&nbsp; <strong>Cuota aprox:</strong> ${fmt(saldoRealCuotaAprox)} &nbsp;|&nbsp; ${personaBadge(f.responsable)}`;
+  
+  if(!document.getElementById('pago-monto').value) {
+    document.getElementById('pago-monto').value = saldoRealCuotaAprox.toFixed(2);
+  }
+  
+  // Autoseleccionar cuenta bancaria sugerida según quién deba
+  const selectCuenta = document.getElementById('pago-cuenta-id');
+  if (selectCuenta) {
+    if (f.responsable === 'Compartida') {
+      if (saldoMCFac > 0.01 && saldoRiFac <= 0.01) selectCuenta.value = 'C1';
+      else if (saldoRiFac > 0.01 && saldoMCFac <= 0.01) selectCuenta.value = 'C2';
+    } else {
+      selectCuenta.value = f.responsable === 'Maria del Carmen' ? 'C1' : 'C2';
+    }
+  }
+
   if(cuotas.length){
-    document.getElementById('cuotas-box').style.display='block';const hoy=new Date().toISOString().slice(0,10);
-    document.getElementById('cuotas-chips').innerHTML=cuotas.map(c=>{const vencida=!c.pagada&&c.fecha_vence<hoy;const cls=c.pagada?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';return`<button class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${c.monto}" data-numero="${c.numero}" onclick="selectCuotaChip(this,${c.pagada})">${c.pagada?'✓ ':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small>${fmt(c.monto)}</small></button>`;}).join('');
+    document.getElementById('cuotas-box').style.display='block'; const hoy=new Date().toISOString().slice(0,10);
+    document.getElementById('cuotas-chips').innerHTML=cuotas.map(c=>{
+      const vencida=!c.pagada&&c.fecha_vence<hoy;
+      const cls=c.pagada?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';
+      
+      // Calcular saldo real específico de este chip
+      const fracChip = totalCuotasOriginales > 0 ? parseFloat(c.monto||0) / totalCuotasOriginales : 0;
+      const saldoChipMC = saldoMCFac * fracChip;
+      const saldoChipRi = saldoRiFac * fracChip;
+      const saldoChipTotal = saldoChipMC + saldoChipRi;
+
+      let descChip = fmt(c.monto);
+      if(!c.pagada && f.responsable === 'Compartida') {
+        let pChip = [];
+        if(saldoChipMC > 0.01) pChip.push(`🔴${fmt(saldoChipMC)}`);
+        if(saldoChipRi > 0.01) pChip.push(`🟠${fmt(saldoChipRi)}`);
+        if(pChip.length > 0) descChip = pChip.join(' ');
+      }
+
+      return`<button type="button" class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${saldoChipTotal}" data-numero="${c.numero}" onclick="selectCuotaChip(this,${c.pagada})">${c.pagada?'✓ ':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small style="font-weight:700">${descChip}</small></button>`;
+    }).join('');
   } else {document.getElementById('cuotas-box').style.display='none';}
 }
+
 function selectCuotaChip(el,bloqueada=false){
   if(bloqueada){showToast('Esta cuota ya está marcada como pagada','err');return;}
   const yaSeleccionado=el.classList.contains('chip-sel');
   document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
   const infoSpan=document.getElementById('cuota-sel-info');
-  if(yaSeleccionado){document.getElementById('pago-cuota-id').value='';if(infoSpan)infoSpan.textContent='';}
-  else{el.classList.add('chip-sel');document.getElementById('pago-cuota-id').value=el.dataset.id;document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);if(infoSpan)infoSpan.textContent=`✓ Cuota C${el.dataset.numero} seleccionada`;}
+  if(yaSeleccionado){
+    document.getElementById('pago-cuota-id').value='';
+    if(infoSpan)infoSpan.textContent='';
+  }
+  else{
+    el.classList.add('chip-sel');
+    document.getElementById('pago-cuota-id').value=el.dataset.id;
+    // Coloca el saldo REAL restante calculada en el chip en el input de monto
+    document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
+    if(infoSpan)infoSpan.textContent=`✓ Cuota C${el.dataset.numero} seleccionada`;
+  }
 }
 function deseleccionarCuota(){document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));document.getElementById('pago-cuota-id').value='';const sp=document.getElementById('cuota-sel-info');if(sp)sp.textContent='Sin cuota específica (pago libre)';}
 async function toggleCuota(cuotaId,pagada,facId){loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);loaded();if(error){showToast(error.message,'err');return;}showToast(pagada?'Cuota marcada pagada':'Desmarcada','ok');if(facId)await verDetalle(facId);await renderCronograma();}
