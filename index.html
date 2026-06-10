@@ -822,12 +822,30 @@ function calcPersonas(items){
   return{mc,ri};
 }
 function calcSaldoPersonas(f){
-  const items=f.factura_items||[];const pagos=f.pagos||[];
-  const t=calcPersonas(items);const totalMC=t.mc.s+t.mc.i;const totalRi=t.ri.s+t.ri.i;const totalFac=totalMC+totalRi;
-  const pagadoTotal=pagos.reduce((s,p)=>s+parseFloat(p.monto||0),0);
-  if(totalFac<=0)return{saldoMC:0,saldoRi:0};
-  const ratioPagado=Math.min(1,pagadoTotal/totalFac);
-  return{saldoMC:Math.max(0,totalMC*(1-ratioPagado)),saldoRi:Math.max(0,totalRi*(1-ratioPagado))};
+  const items = f.factura_items || [];
+  const pagos = f.pagos || [];
+  const t = calcPersonas(items);
+  const totalMC = t.mc.s + t.mc.i;
+  const totalRi = t.ri.s + t.ri.i;
+  const totalFac = totalMC + totalRi;
+
+  // Pagos agrupados por quién pagó
+  let pagadoMC = 0, pagadoRi = 0;
+  pagos.forEach(p => {
+    const m = parseFloat(p.monto || 0);
+    const quien = p.pago_quien || p.quien_pago || '';
+    if (quien === 'Maria del Carmen') pagadoMC += m;
+    else if (quien === 'Richard') pagadoRi += m;
+    else { // pago compartido
+      pagadoMC += totalFac > 0 ? m * (totalMC / totalFac) : m / 2;
+      pagadoRi += totalFac > 0 ? m * (totalRi / totalFac) : m / 2;
+    }
+  });
+
+  return {
+    saldoMC: Math.max(0, totalMC - pagadoMC),
+    saldoRi: Math.max(0, totalRi - pagadoRi)
+  };
 }
 function diasParaVencer(fechaStr){
   const hoy=new Date();hoy.setHours(0,0,0,0);
@@ -1517,20 +1535,28 @@ function renderCronogramaCasaMes(){
       ).forEach(c=>{
         const fac=_facturas[c.factura_id]||{};
 
-        // --- INICIO REEMPLAZO BLOQUE DE CÁLCULO DE SALDO ---
-        // Saldo real de la factura usando pagos del mapa global
-        const pagadoFac = (_pagosMap[fac.id] || []).reduce((s, p) => s + parseFloat(p.monto || 0), 0);
-        const saldoTotalFac = Math.max(0, parseFloat(fac.total || 0) - pagadoFac);
-
-        // Distribución proporcional del saldo por persona según ítems
-        const items = _items[fac.id] || [];
-        const t = calcPersonas(items);
-        const totalMCFac = t.mc.s + t.mc.i;
-        const totalRiFac = t.ri.s + t.ri.i;
+        // Calcular saldo real por persona usando quién pagó
+        const pagadosFac = (_pagosMap[fac.id] || []);
+        const itemsFac = _items[fac.id] || [];
+        const tFac = calcPersonas(itemsFac);
+        const totalMCFac = tFac.mc.s + tFac.mc.i;
+        const totalRiFac = tFac.ri.s + tFac.ri.i;
         const totalFacItems = totalMCFac + totalRiFac;
 
-        const saldoMCFac = totalFacItems > 0 ? saldoTotalFac * (totalMCFac / totalFacItems) : 0;
-        const saldoRiFac = totalFacItems > 0 ? saldoTotalFac * (totalRiFac / totalFacItems) : 0;
+        let pagadoMCFac = 0, pagadoRiFac = 0;
+        pagadosFac.forEach(p => {
+          const m = parseFloat(p.monto || 0);
+          const quien = p.pago_quien || p.quien_pago || '';
+          if (quien === 'Maria del Carmen') pagadoMCFac += m;
+          else if (quien === 'Richard') pagadoRiFac += m;
+          else {
+            pagadoMCFac += totalFacItems > 0 ? m * (totalMCFac / totalFacItems) : m / 2;
+            pagadoRiFac += totalFacItems > 0 ? m * (totalRiFac / totalFacItems) : m / 2;
+          }
+        });
+
+        const saldoMCFac = Math.max(0, totalMCFac - pagadoMCFac);
+        const saldoRiFac = Math.max(0, totalRiFac - pagadoRiFac);
 
         // Fracción de esta cuota sobre el total de cuotas activas
         const cuotasPorFac = (_cuotasByFac[fac.id] || []).filter(x => !x.es_historica);
@@ -1539,7 +1565,6 @@ function renderCronogramaCasaMes(){
 
         const saldoMCCuota = saldoMCFac * fraccion;
         const saldoRiCuota = saldoRiFac * fraccion;
-        // --- FIN REEMPLAZO ---
 
         const cubierta=isCuotaCubierta(c);
         const vencida=!cubierta&&c.fecha_vence<hoyStr;
