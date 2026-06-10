@@ -829,14 +829,13 @@ function calcSaldoPersonas(f){
   const totalRi = t.ri.s + t.ri.i;
   const totalFac = totalMC + totalRi;
 
-  // Pagos agrupados por quién pagó
   let pagadoMC = 0, pagadoRi = 0;
   pagos.forEach(p => {
     const m = parseFloat(p.monto || 0);
     const quien = p.pago_quien || p.quien_pago || '';
     if (quien === 'Maria del Carmen') pagadoMC += m;
     else if (quien === 'Richard') pagadoRi += m;
-    else { // pago compartido
+    else {
       pagadoMC += totalFac > 0 ? m * (totalMC / totalFac) : m / 2;
       pagadoRi += totalFac > 0 ? m * (totalRi / totalFac) : m / 2;
     }
@@ -894,11 +893,15 @@ async function renderDashboard(){
     <div class="kpi-card"><div class="kpi-bar mc"></div><div class="kpi-icon">🔴</div><div class="kpi-label">Saldo MC</div><div class="kpi-value mc">${fmt(saldoMC)}</div></div>
     <div class="kpi-card"><div class="kpi-bar richard"></div><div class="kpi-icon">🟠</div><div class="kpi-label">Saldo Richard</div><div class="kpi-value richard">${fmt(saldoRi)}</div></div>`;
 
-  // ── Cuotas pendientes priorizadas ──
+  // ── Cuotas pendientes: solo las que vencen en los próximos 30 días
+  // o que vencieron hace 30 días o menos (ya no alertar las muy antiguas)
+  const _hace30=new Date();_hace30.setDate(_hace30.getDate()-30);const _hace30Str=_hace30.toISOString().slice(0,10);
   const cuotasPend=_cuotas.filter(c=>{
     if(c.es_historica||c.pagada)return false;
     const fac=_facturas[c.factura_id]||{};
     if(pf&&fac.responsable!==pf&&fac.responsable!=='Compartida')return false;
+    // Excluir cuotas vencidas hace más de 30 días
+    if(c.fecha_vence<_hace30Str)return false;
     return true;
   }).sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence));
 
@@ -928,7 +931,6 @@ async function renderDashboard(){
       </div>
     </div>`;
   }).join('');
-  const urgBadgeColor=urgenciaTotal>0?'background:#FEE2E2;color:#991B1B':'background:#D1FAE5;color:#065F46';
   const alertaHead=urgenciaTotal>0
     ?`${vencidas.length>0?`<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${vencidas.length} vencida${vencidas.length>1?'s':''}</span>`:''} ${proximas7.length>0?`<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${proximas7.length} esta semana</span>`:''}`
     :'<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">Todo al día ✓</span>';
@@ -969,14 +971,10 @@ async function renderDashboard(){
   }).join('');
 
   // ── Bloque 3: Análisis por persona ──
-  // próxima cuota de cada persona
   const proxMC=cuotasPend.find(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Maria del Carmen'||f.responsable==='Compartida';});
   const proxRi=cuotasPend.find(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Richard'||f.responsable==='Compartida';});
   const cuotasPendMC=cuotasPend.filter(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Maria del Carmen'||f.responsable==='Compartida';}).length;
   const cuotasPendRi=cuotasPend.filter(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Richard'||f.responsable==='Compartida';}).length;
-  const progresoPct=(v,t)=>t>0?Math.round(v/t*100):0;
-  const progMC=progresoPct(totalPagado*(saldoMC>0?saldoMC/(saldoMC+saldoRi):0.5),(saldoMC+totalPagado*(saldoMC>0?saldoMC/(saldoMC+saldoRi):0.5)));
-  const progRi=progresoPct(totalPagado*(saldoRi>0?saldoRi/(saldoMC+saldoRi):0.5),(saldoRi+totalPagado*(saldoRi>0?saldoRi/(saldoMC+saldoRi):0.5)));
 
   document.getElementById('analisis-grid').innerHTML=`
     <!-- CARD 1: Urgencias -->
@@ -1006,15 +1004,15 @@ async function renderDashboard(){
         <div class="pa-persona pa-mc">
           <div class="pa-nombre">🔴 María del Carmen</div>
           <div class="pa-stat"><span>Saldo pendiente:</span><strong>${fmt(saldoMC)}</strong></div>
-          <div class="pa-stat"><span>Cuotas pendientes:</span><strong>${cuotasPendMC}</strong></div>
-          ${proxMC?`<div class="pa-prox">Próxima: <em>${fmt(proxMC.monto)}</em> · vence ${proxMC.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas pendientes ✓</div>'}
+          <div class="pa-stat"><span>Cuotas próximas (30d):</span><strong>${cuotasPendMC}</strong></div>
+          ${proxMC?`<div class="pa-prox">Próxima: <em>${fmt(proxMC.monto)}</em> · vence ${proxMC.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas próximas ✓</div>'}
           <div class="pa-saldo-big">${fmt(saldoMC)}</div>
         </div>
         <div class="pa-persona pa-ri">
           <div class="pa-nombre">🟠 Richard</div>
           <div class="pa-stat"><span>Saldo pendiente:</span><strong>${fmt(saldoRi)}</strong></div>
-          <div class="pa-stat"><span>Cuotas pendientes:</span><strong>${cuotasPendRi}</strong></div>
-          ${proxRi?`<div class="pa-prox">Próxima: <em>${fmt(proxRi.monto)}</em> · vence ${proxRi.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas pendientes ✓</div>'}
+          <div class="pa-stat"><span>Cuotas próximas (30d):</span><strong>${cuotasPendRi}</strong></div>
+          ${proxRi?`<div class="pa-prox">Próxima: <em>${fmt(proxRi.monto)}</em> · vence ${proxRi.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas próximas ✓</div>'}
           <div class="pa-saldo-big">${fmt(saldoRi)}</div>
         </div>
         <div style="background:#F0FBF5;border-radius:10px;padding:12px 14px;border:1.5px solid var(--accent3);display:flex;justify-content:space-between;align-items:center">
@@ -1392,7 +1390,13 @@ async function abrirEditarPago(id){loading('...');const{data,error}=await sb.fro
    Click en mes = desglose de facturas individuales
 ══════════════════════════════════════════════ */
 let cronTab='tabla';
-function initCronRange(){const hoy=new Date();const desde=new Date(hoy.getFullYear(),hoy.getMonth()-1,1);const hasta=new Date(hoy.getFullYear(),hoy.getMonth()+6,0);document.getElementById('cron-desde').value=desde.toISOString().slice(0,10);document.getElementById('cron-hasta').value=hasta.toISOString().slice(0,10);}
+
+// ── CAMBIO 1: rango por defecto = todo el año 2026 ──
+function initCronRange(){
+  document.getElementById('cron-desde').value='2026-01-01';
+  document.getElementById('cron-hasta').value='2026-12-31';
+}
+
 function resetCronRange(){initCronRange();renderCronograma();}
 function switchCronTab(t){cronTab=t;document.getElementById('tab-tabla').classList.toggle('active',t==='tabla');document.getElementById('tab-gantt').classList.toggle('active',t==='gantt');renderCronograma();}
 async function renderCronograma(){loading();await reloadAll();loaded();if(cronTab==='tabla')renderCronogramaCasaMes();else renderCronogramaGantt();}
@@ -1535,7 +1539,6 @@ function renderCronogramaCasaMes(){
       ).forEach(c=>{
         const fac=_facturas[c.factura_id]||{};
 
-        // Calcular saldo real por persona usando quién pagó
         const pagadosFac = (_pagosMap[fac.id] || []);
         const itemsFac = _items[fac.id] || [];
         const tFac = calcPersonas(itemsFac);
@@ -1558,7 +1561,6 @@ function renderCronogramaCasaMes(){
         const saldoMCFac = Math.max(0, totalMCFac - pagadoMCFac);
         const saldoRiFac = Math.max(0, totalRiFac - pagadoRiFac);
 
-        // Fracción de esta cuota sobre el total de cuotas activas
         const cuotasPorFac = (_cuotasByFac[fac.id] || []).filter(x => !x.es_historica);
         const totalCuotas = cuotasPorFac.reduce((s, x) => s + parseFloat(x.monto || 0), 0);
         const fraccion = totalCuotas > 0 ? parseFloat(c.monto || 0) / totalCuotas : 1;
@@ -1573,7 +1575,6 @@ function renderCronogramaCasaMes(){
             :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
           :'';
 
-        // Celda de saldo
         let saldoCell;
         if(cubierta){
           saldoCell='<span class="badge badge-green">Pagada</span>';
