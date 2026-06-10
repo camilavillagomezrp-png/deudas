@@ -1380,25 +1380,43 @@ function renderCronogramaCasaMes(){
         (_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')
       ).forEach(c=>{
         const fac=_facturas[c.factura_id]||{};
-        const enrich_fac=enrich(fac);
-        const pagadoFac=calcPagado(enrich_fac);
-        const totalFac=parseFloat(fac.total||0);
+
         const items=_items[fac.id]||[];
         const t=calcPersonas(items);
-        const totalMC=t.mc.s+t.mc.i;
-        const totalRi=t.ri.s+t.ri.i;
+        const totalMC=t.mc.s+t.mc.i; // Lo que debe Carmen originalmente
+        const totalRi=t.ri.s+t.ri.i; // Lo que debe Richard originalmente
 
-        // Saldo proporcional por persona según pagos reales
-        const ratio=totalFac>0?Math.min(1,pagadoFac/totalFac):0;
-        const saldoMCFac=Math.max(0,totalMC*(1-ratio));
-        const saldoRiFac=Math.max(0,totalRi*(1-ratio));
+        // --- LÓGICA DE ANÁLISIS REAL DE PAGOS POR CUENTA BANCARIA ---
+        let pagadoMC=0;
+        let pagadoRi=0;
 
-        // Saldo de esta cuota en particular
+        (fac.pagos||[]).forEach(p=>{
+          const montoPago=parseFloat(p.monto||0);
+          if(p.cuenta_id==='C1'){
+            // Cuenta Pichincha -> Pago exclusivo de Maria del Carmen
+            pagadoMC+=montoPago;
+          } else if(p.cuenta_id==='C2'){
+            // Cuenta Guayaquil -> Pago exclusivo de Richard
+            pagadoRi+=montoPago;
+          } else {
+            // Cuenta C3 (Efectivo) u otra -> Se amortiza 50/50
+            pagadoMC+=montoPago/2;
+            pagadoRi+=montoPago/2;
+          }
+        });
+
+        // Saldo pendiente REAL de la FACTURA por cada persona
+        const saldoMCFac=Math.max(0,totalMC-pagadoMC);
+        const saldoRiFac=Math.max(0,totalRi-pagadoRi);
+
+        // Saldo de esta CUOTA en particular (fraccionamiento proporcional)
         const cuotasPorFac=(_cuotasByFac[fac.id]||[]).filter(x=>!x.es_historica).sort((a,b)=>a.numero-b.numero);
         const totalCuotas=cuotasPorFac.reduce((s,x)=>s+parseFloat(x.monto||0),0);
         const fraccion=totalCuotas>0?parseFloat(c.monto||0)/totalCuotas:0;
+
         const saldoMCCuota=saldoMCFac*fraccion;
         const saldoRiCuota=saldoRiFac*fraccion;
+        // -------------------------------------------------------------
 
         const cubierta=isCuotaCubierta(c);
         const vencida=!cubierta&&c.fecha_vence<hoyStr;
@@ -1414,7 +1432,12 @@ function renderCronogramaCasaMes(){
         } else if(fac.responsable==='Compartida'){
           const partesMC=saldoMCCuota>0.01?`<div style="color:var(--mc);font-size:10px;font-weight:700">🔴 ${fmt(saldoMCCuota)}</div>`:'';
           const partesRi=saldoRiCuota>0.01?`<div style="color:var(--richard);font-size:10px;font-weight:700">🟠 ${fmt(saldoRiCuota)}</div>`:'';
-          saldoCell=`<div>${partesMC}${partesRi}</div>`;
+          // Si ambos ya saldaron su parte pero la cuota sigue abierta por redondeos
+          if(!partesMC&&!partesRi&&(saldoMCCuota+saldoRiCuota>0)){
+            saldoCell=`<span style="color:var(--muted);font-weight:700">${fmt(saldoMCCuota+saldoRiCuota)}</span>`;
+          } else {
+            saldoCell=`<div>${partesMC}${partesRi}</div>`;
+          }
         } else {
           const colorSaldo=fac.responsable==='Maria del Carmen'?'var(--mc)':'var(--richard)';
           const saldo=fac.responsable==='Maria del Carmen'?saldoMCCuota:saldoRiCuota;
