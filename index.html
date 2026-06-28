@@ -72,7 +72,7 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 @keyframes spin { to { transform: rotate(360deg); } }
 .loader-msg { font-size: 13px; color: var(--muted); font-weight: 600; }
 
-#toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+#toast { position: fixed; bottom: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; }
 .toast-item { padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,.15); animation: slide-in .25s ease; max-width: 320px; }
 .toast-ok { background: #D1FAE5; color: #065F46; }
 .toast-err { background: #FEE2E2; color: #991B1B; }
@@ -85,7 +85,6 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .page-title { font-family: var(--serif); font-size: 28px; letter-spacing: -.5px; }
 .page-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
 
-/* ══ KPIs ══ */
 .dash-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 28px; }
 .kpi-card { background: #fff; border-radius: 14px; padding: 20px 18px; border: 1px solid var(--border); box-shadow: var(--sh); position: relative; overflow: hidden; transition: transform .15s; }
 .kpi-card:hover { transform: translateY(-2px); }
@@ -102,14 +101,12 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .kpi-value.mc { color: var(--mc); }
 .kpi-value.richard { color: var(--richard); }
 
-/* ══ NUEVO DASHBOARD ANALÍTICO ══ */
 .analisis-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
 .analisis-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
 .analisis-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .analisis-head-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
 .analisis-head-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 
-/* Alertas por urgencia */
 .urgencia-list { padding: 0; }
 .urgencia-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: background .12s; }
 .urgencia-item:last-child { border-bottom: none; }
@@ -128,7 +125,6 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .dias-alta { background: #FEF3C7; color: #92400E; }
 .dias-normal { background: #D1FAE5; color: #065F46; }
 
-/* Carga mensual */
 .carga-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
 .carga-mes-row { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
 .carga-mes-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -141,7 +137,6 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .carga-bar-mix { background: linear-gradient(90deg, var(--mc), var(--richard)); }
 .carga-sub { display: flex; gap: 10px; font-size: 10px; color: var(--muted); font-weight: 600; }
 
-/* Concentración deuda por persona */
 .persona-analisis { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
 .pa-persona { border-radius: 12px; padding: 14px; }
 .pa-mc { background: var(--mc3); border: 1.5px solid var(--mc2); }
@@ -158,7 +153,6 @@ body { font-family: var(--sf); background: var(--bg); color: var(--text); min-he
 .pa-mc .pa-prox em { color: var(--mc); font-style: normal; }
 .pa-ri .pa-prox em { color: var(--richard); font-style: normal; }
 
-/* ══ TABLA ══ */
 .table-card { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
 .table-toolbar { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .search-input { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--sf); font-size: 13px; background: var(--bg); width: 180px; }
@@ -197,9 +191,10 @@ tr:hover td { background: #FAFFF8; }
 .btn-clear { background: none; border: 1.5px solid var(--border); color: var(--muted); border-radius: 8px; padding: 7px 12px; font-size: 12px; cursor: pointer; font-family: var(--sf); font-weight: 600; }
 .btn-clear:hover { border-color: var(--danger); color: var(--danger); }
 
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 999; display: none; align-items: center; justify-content: center; padding: 20px; }
+/* ── MODAL z-index corregido ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.open { display: flex; }
-.modal { background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 680px; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.modal { background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 680px; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25); position: relative; z-index: 1001; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-title { font-family: var(--serif); font-size: 22px; }
 .modal-close { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border); background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); }
@@ -243,7 +238,78 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .totals-grand .g-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
 .totals-grand .g-value { font-family: var(--serif); font-size: 20px; color: var(--accent); }
 
-/* ══ CRONOGRAMA ══ */
+/* ── BLOQUE DE INTERESES (nuevo) ── */
+.interes-box {
+  background: #FFFBEB;
+  border: 1.5px solid #FDE68A;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 4px;
+}
+.interes-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.interes-box-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #92400E;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.interes-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 28px;
+  gap: 6px;
+  align-items: end;
+  margin-bottom: 6px;
+}
+.interes-row:last-child { margin-bottom: 0; }
+.interes-row input, .interes-row select {
+  padding: 7px 10px;
+  border: 1.5px solid #FDE68A;
+  border-radius: 7px;
+  font-family: var(--sf);
+  font-size: 12px;
+  background: #fff;
+  color: var(--text);
+}
+.interes-row input:focus, .interes-row select:focus {
+  outline: none;
+  border-color: #D97706;
+}
+.btn-del-interes {
+  width: 28px; height: 28px; border: none; background: #FEF2F2;
+  border-radius: 6px; cursor: pointer; color: var(--danger); font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-del-interes:hover { background: #FEE2E2; }
+.interes-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #FDE68A;
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400E;
+}
+.pago-total-final {
+  background: #F0FBF5;
+  border: 1.5px solid var(--accent3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.pago-total-final .ptf-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+.pago-total-final .ptf-value { font-family: var(--serif); font-size: 20px; color: var(--accent); }
+
 .cron-tabs { display: flex; background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 4px; gap: 2px; width: fit-content; }
 .cron-tab { padding: 6px 18px; border-radius: 7px; border: none; background: transparent; font-family: var(--sf); font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all .15s; }
 .cron-tab.active { background: var(--accent); color: #fff; }
@@ -251,7 +317,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .range-group label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; }
 .range-group input[type=date] { border: none; font-family: var(--sf); font-size: 13px; color: var(--text); background: transparent; padding: 0; cursor: pointer; outline: none; }
 
-/* ══ CRONOGRAMA AGRUPADO POR CASA ══ */
 .cron-casa-block { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); margin-bottom: 20px; overflow: hidden; }
 .cron-casa-header { padding: 14px 20px; background: linear-gradient(135deg, #1B4332, var(--accent)); color: #fff; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 .cron-casa-header:hover { background: linear-gradient(135deg, #163829, #245a42); }
@@ -279,7 +344,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .btn-desmarcar { padding: 4px 10px; font-size: 11px; border-radius: 6px; background: #F3F4F6; color: var(--muted); border: none; cursor: pointer; font-family: var(--sf); font-weight: 700; }
 .cron-empty { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; font-weight: 600; }
 
-/* GANTT */
 .gantt-outer { background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--sh); overflow: hidden; }
 .gantt-scroll { overflow-x: auto; }
 .gantt-grid { min-width: 600px; }
@@ -341,7 +405,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
 .pago-row { cursor: pointer; transition: background .1s; }
 .pago-row:hover td { background: #F0FBF5 !important; }
 .filter-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
-
 .persona-split { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
 
 @media (max-width: 1100px) { .analisis-grid { grid-template-columns: 1fr 1fr; } }
@@ -403,7 +466,6 @@ textarea.txa { resize: vertical; min-height: 70px; }
         </select>
       </div>
       <div class="dash-grid" id="dash-kpis"></div>
-      <!-- NUEVO LAYOUT ANALÍTICO -->
       <div class="analisis-grid" id="analisis-grid"></div>
     </section>
 
@@ -584,39 +646,103 @@ textarea.txa { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
-<!-- MODAL PAGO -->
+<!-- ═══════════════════════════════════════════════════════
+     MODAL PAGO — con intereses y sin reset al cambiar factura
+═══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modal-pago">
-  <div class="modal" style="max-width:540px">
-    <div class="modal-header"><h3 class="modal-title" id="modal-pago-title">Registrar Pago</h3><button class="modal-close" onclick="closeModal('modal-pago')">✕</button></div>
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-pago-title">Registrar Pago</h3>
+      <button class="modal-close" onclick="closeModal('modal-pago')">✕</button>
+    </div>
     <div class="form-grid">
-      <div class="form-group full"><label class="lbl">Factura *</label><select class="sel" id="pago-factura" onchange="onFacturaChange()"></select></div>
+
+      <!-- Factura: al cambiar, NO borra los demás campos -->
+      <div class="form-group full">
+        <label class="lbl">Factura *</label>
+        <select class="sel" id="pago-factura" onchange="onFacturaChange()"></select>
+      </div>
+
+      <!-- Info de saldo (solo lectura) -->
+      <div class="form-group full" id="pago-info-box" style="display:none;background:#F0FBF5;border-radius:8px;padding:12px;font-size:13px;color:var(--accent)"></div>
+
+      <!-- Cuotas -->
       <div class="form-group full" id="cuotas-box" style="display:none">
-        <label class="lbl">Cuota a pagar (click para seleccionar)</label>
+        <label class="lbl">Cuota a pagar (clic para seleccionar)</label>
         <div class="cuota-chips" id="cuotas-chips"></div>
         <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
           <button class="btn-clear" onclick="deseleccionarCuota()" style="font-size:11px;padding:4px 10px">✕ Sin cuota específica</button>
           <span id="cuota-sel-info" style="font-size:11px;color:var(--accent);font-weight:700"></span>
         </div>
       </div>
-      <div class="form-group full" id="pago-info-box" style="background:#F0FBF5;border-radius:8px;padding:12px;font-size:13px;color:var(--accent);display:none"></div>
-      <div class="form-group"><label class="lbl">Fecha de pago *</label><input class="inp" type="date" id="pago-fecha"></div>
-      <div class="form-group"><label class="lbl">N° Comprobante</label><input class="inp" id="pago-comprobante" placeholder="COMP-001"></div>
-      <div class="form-group"><label class="lbl">¿Quién pagó? *</label>
+
+      <!-- Fecha y Comprobante -->
+      <div class="form-group">
+        <label class="lbl">Fecha de pago *</label>
+        <input class="inp" type="date" id="pago-fecha">
+      </div>
+      <div class="form-group">
+        <label class="lbl">N° Comprobante</label>
+        <input class="inp" id="pago-comprobante" placeholder="COMP-001">
+      </div>
+
+      <!-- Quién pagó y monto BASE -->
+      <div class="form-group">
+        <label class="lbl">¿Quién pagó? *</label>
         <select class="sel" id="pago-quien">
           <option value="Maria del Carmen">🔴 María del Carmen</option>
           <option value="Richard">🟠 Richard</option>
         </select>
       </div>
-      <div class="form-group"><label class="lbl">Monto pagado *</label><input class="inp" type="number" id="pago-monto" step="0.01" placeholder="0.00"></div>
-      <div class="form-group full"><label class="lbl">Observación</label><input class="inp" id="pago-nota" placeholder="Ej: Cuota de enero..."></div>
+      <div class="form-group">
+        <label class="lbl">Monto cuota (según app)</label>
+        <input class="inp" type="number" id="pago-monto" step="0.01" placeholder="0.00" oninput="recalcPagoTotal()">
+      </div>
+
+      <!-- BLOQUE DE INTERESES -->
+      <div class="form-group full">
+        <div class="interes-box">
+          <div class="interes-box-header">
+            <span class="interes-box-title">💰 Recargos / Intereses</span>
+            <button type="button" class="btn btn-sm btn-secondary" style="font-size:11px;padding:4px 10px;border-color:#FDE68A;color:#92400E;background:#FFFBEB" onclick="addInteresRow()">+ Agregar recargo</button>
+          </div>
+          <div id="intereses-container">
+            <!-- filas de interés se insertan aquí -->
+          </div>
+          <div class="interes-total-row" id="interes-total-row" style="display:none">
+            <span>Total recargos:</span>
+            <span id="interes-total-val">$0.00</span>
+          </div>
+        </div>
+
+        <!-- Total final a pagar -->
+        <div class="pago-total-final">
+          <span class="ptf-label">💳 Total a pagar (cuota + recargos)</span>
+          <span class="ptf-value" id="pago-total-final">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Observación -->
+      <div class="form-group full">
+        <label class="lbl">Observación</label>
+        <input class="inp" id="pago-nota" placeholder="Ej: Cuota de enero...">
+      </div>
+
+      <!-- Foto -->
       <div class="form-group full">
         <label class="lbl">Foto del comprobante</label>
-        <div class="upload-zone" onclick="document.getElementById('foto-input').click()">📷 Toca para subir foto<input type="file" id="foto-input" accept="image/*" style="display:none" onchange="onFotoSelected(this)"></div>
+        <div class="upload-zone" onclick="document.getElementById('foto-input').click()">
+          📷 Toca para subir foto
+          <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="onFotoSelected(this)">
+        </div>
         <img id="foto-preview" class="upload-preview" alt="comprobante">
       </div>
+
     </div>
+
     <input type="hidden" id="pago-cuota-id">
     <input type="hidden" id="pago-edit-id">
+
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px">
       <button class="btn btn-danger admin-only" id="btn-eliminar-pago" style="display:none" onclick="eliminarPagoEdicion()">🗑 Eliminar</button>
       <div style="display:flex;gap:10px;margin-left:auto">
@@ -724,7 +850,19 @@ function showToast(msg,type='ok'){const el=document.createElement('div');el.clas
 window.addEventListener('unhandledrejection',e=>{loaded();showToast('Error: '+(e.reason?.message||e.reason||'desconocido'),'err')});
 const fmt=n=>'$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 const fmtK=n=>{const v=parseFloat(n||0);return v>=1000?'$'+(v/1000).toFixed(1)+'k':fmt(v);};
-function openModal(id){document.getElementById(id).classList.add('open')}
+
+/* ── Modales: abrir/cerrar con z-index correcto ── */
+function openModal(id){
+  // Cerrar otros modales primero para evitar apilamiento
+  document.querySelectorAll('.modal-overlay.open').forEach(m=>{if(m.id!==id)m.classList.remove('open');});
+  const overlay=document.getElementById(id);
+  overlay.classList.add('open');
+  // Forzar que el modal tome el foco para que quede al frente
+  requestAnimationFrame(()=>{
+    const firstInput=overlay.querySelector('input:not([type=hidden]),select,textarea,button.modal-close');
+    if(firstInput)firstInput.focus();
+  });
+}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 
@@ -822,35 +960,16 @@ function calcPersonas(items){
   return{mc,ri};
 }
 function calcSaldoPersonas(f){
-  const items = f.factura_items || [];
-  const pagos = f.pagos || [];
-  const t = calcPersonas(items);
-  const totalMC = t.mc.s + t.mc.i;
-  const totalRi = t.ri.s + t.ri.i;
-  const totalFac = totalMC + totalRi;
-
-  let pagadoMC = 0, pagadoRi = 0;
-  pagos.forEach(p => {
-    const m = parseFloat(p.monto || 0);
-    const quien = p.pago_quien || p.quien_pago || '';
-    if (quien === 'Maria del Carmen') pagadoMC += m;
-    else if (quien === 'Richard') pagadoRi += m;
-    else {
-      pagadoMC += totalFac > 0 ? m * (totalMC / totalFac) : m / 2;
-      pagadoRi += totalFac > 0 ? m * (totalRi / totalFac) : m / 2;
-    }
+  const items=f.factura_items||[];const pagos=f.pagos||[];const t=calcPersonas(items);
+  const totalMC=t.mc.s+t.mc.i;const totalRi=t.ri.s+t.ri.i;const totalFac=totalMC+totalRi;
+  let pagadoMC=0,pagadoRi=0;
+  pagos.forEach(p=>{const m=parseFloat(p.monto||0);const quien=p.pago_quien||p.quien_pago||'';
+    if(quien==='Maria del Carmen')pagadoMC+=m;else if(quien==='Richard')pagadoRi+=m;
+    else{pagadoMC+=totalFac>0?m*(totalMC/totalFac):m/2;pagadoRi+=totalFac>0?m*(totalRi/totalFac):m/2;}
   });
-
-  return {
-    saldoMC: Math.max(0, totalMC - pagadoMC),
-    saldoRi: Math.max(0, totalRi - pagadoRi)
-  };
+  return{saldoMC:Math.max(0,totalMC-pagadoMC),saldoRi:Math.max(0,totalRi-pagadoRi)};
 }
-function diasParaVencer(fechaStr){
-  const hoy=new Date();hoy.setHours(0,0,0,0);
-  const f=new Date(fechaStr+'T00:00:00');
-  return Math.round((f-hoy)/(1000*60*60*24));
-}
+function diasParaVencer(fechaStr){const hoy=new Date();hoy.setHours(0,0,0,0);const f=new Date(fechaStr+'T00:00:00');return Math.round((f-hoy)/(1000*60*60*24));}
 function personaBadge(resp){
   if(resp==='Maria del Carmen')return'<span class="badge badge-mc">🔴 MC</span>';
   if(resp==='Richard')return'<span class="badge badge-richard">🟠 Richard</span>';
@@ -873,7 +992,7 @@ function clearFacFiltros(){['fac-search','filt-fac-casa','filt-fac-mes','filt-fa
 function clearPagoFiltros(){['filt-pago-casa','filt-pago-mes','filt-pago-anio','filt-pago-quien'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderPagos();}
 
 /* ══════════════════════════════════════════════
-   DASHBOARD — ANÁLISIS ESTRATÉGICO
+   DASHBOARD
 ══════════════════════════════════════════════ */
 async function renderDashboard(){
   loading('Cargando panel...');await reloadAll();loaded();
@@ -893,134 +1012,47 @@ async function renderDashboard(){
     <div class="kpi-card"><div class="kpi-bar mc"></div><div class="kpi-icon">🔴</div><div class="kpi-label">Saldo MC</div><div class="kpi-value mc">${fmt(saldoMC)}</div></div>
     <div class="kpi-card"><div class="kpi-bar richard"></div><div class="kpi-icon">🟠</div><div class="kpi-label">Saldo Richard</div><div class="kpi-value richard">${fmt(saldoRi)}</div></div>`;
 
-  // ── Cuotas pendientes: solo las que vencen en los próximos 30 días
-  // o que vencieron hace 30 días o menos (ya no alertar las muy antiguas)
   const _hace30=new Date();_hace30.setDate(_hace30.getDate()-30);const _hace30Str=_hace30.toISOString().slice(0,10);
   const cuotasPend=_cuotas.filter(c=>{
     if(c.es_historica||c.pagada)return false;
     const fac=_facturas[c.factura_id]||{};
     if(pf&&fac.responsable!==pf&&fac.responsable!=='Compartida')return false;
-    // Excluir cuotas vencidas hace más de 30 días
     if(c.fecha_vence<_hace30Str)return false;
     return true;
   }).sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence));
 
-  // ── Bloque 1: Alertas por urgencia ──
   const vencidas=cuotasPend.filter(c=>c.fecha_vence<hoyStr);
   const proximas7=cuotasPend.filter(c=>c.fecha_vence>=hoyStr&&diasParaVencer(c.fecha_vence)<=7);
   const urgenciaTotal=vencidas.length+proximas7.length;
   const urgenciaItems=cuotasPend.slice(0,8).map(c=>{
-    const fac=_facturas[c.factura_id]||{};
-    const casa=_casas[fac.casa_id]||{};
-    const dias=diasParaVencer(c.fecha_vence);
-    const venc=dias<0,pronto=dias>=0&&dias<=7;
+    const fac=_facturas[c.factura_id]||{};const casa=_casas[fac.casa_id]||{};
+    const dias=diasParaVencer(c.fecha_vence);const venc=dias<0,pronto=dias>=0&&dias<=7;
     const cls=venc?'critica':pronto?'alta':'normal';
     const diasText=venc?`Venció hace ${Math.abs(dias)}d`:dias===0?'Vence HOY':`Vence en ${dias}d`;
     const diasCls=venc?'dias-critica':pronto?'dias-alta':'dias-normal';
     const pagarBtn=currentRole==='admin'?`<button class="btn btn-sm btn-success" style="font-size:10px;padding:3px 8px;margin-top:3px" onclick="event.stopPropagation();openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`:'';
-    return`<div class="urgencia-item">
-      <div class="urgencia-dot ${cls}"></div>
-      <div class="urgencia-body">
-        <div class="urgencia-factura">${fac.numero||'—'} · ${casa.nombre||'—'}</div>
-        <div class="urgencia-meta">${personaBadge(fac.responsable)} C${c.numero}/${fac.num_cuotas||'?'}</div>
-      </div>
-      <div class="urgencia-right">
-        <div class="urgencia-monto">${fmt(c.monto)}</div>
-        <div class="urgencia-dias ${diasCls}">${diasText}</div>
-        ${pagarBtn}
-      </div>
-    </div>`;
+    return`<div class="urgencia-item"><div class="urgencia-dot ${cls}"></div><div class="urgencia-body"><div class="urgencia-factura">${fac.numero||'—'} · ${casa.nombre||'—'}</div><div class="urgencia-meta">${personaBadge(fac.responsable)} C${c.numero}/${fac.num_cuotas||'?'}</div></div><div class="urgencia-right"><div class="urgencia-monto">${fmt(c.monto)}</div><div class="urgencia-dias ${diasCls}">${diasText}</div>${pagarBtn}</div></div>`;
   }).join('');
   const alertaHead=urgenciaTotal>0
     ?`${vencidas.length>0?`<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${vencidas.length} vencida${vencidas.length>1?'s':''}</span>`:''} ${proximas7.length>0?`<span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${proximas7.length} esta semana</span>`:''}`
     :'<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">Todo al día ✓</span>';
 
-  // ── Bloque 2: Carga mensual próximos 5 meses ──
-  const maxMeses=5;const hoy=new Date();
-  const mesesCarga=[];
-  for(let i=0;i<maxMeses;i++){
-    const d=new Date(hoy.getFullYear(),hoy.getMonth()+i,1);
-    const yr=d.getFullYear();const mo=d.getMonth();
-    const key=`${yr}-${String(mo+1).padStart(2,'0')}`;
-    let mc=0,ri=0;
-    cuotasPend.forEach(c=>{
-      if(c.fecha_vence.slice(0,7)===key){
-        const fac=_facturas[c.factura_id]||{};
-        const resp=fac.responsable||'Compartida';
-        const m=parseFloat(c.monto||0);
-        if(resp==='Maria del Carmen')mc+=m;
-        else if(resp==='Richard')ri+=m;
-        else{mc+=m/2;ri+=m/2;}
-      }
-    });
-    mesesCarga.push({nombre:`${MESES_CORTO[mo]} ${yr}`,mc,ri,total:mc+ri});
-  }
+  const maxMeses=5;const hoy=new Date();const mesesCarga=[];
+  for(let i=0;i<maxMeses;i++){const d=new Date(hoy.getFullYear(),hoy.getMonth()+i,1);const yr=d.getFullYear();const mo=d.getMonth();const key=`${yr}-${String(mo+1).padStart(2,'0')}`;let mc=0,ri=0;
+    cuotasPend.forEach(c=>{if(c.fecha_vence.slice(0,7)===key){const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'Compartida';const m=parseFloat(c.monto||0);if(resp==='Maria del Carmen')mc+=m;else if(resp==='Richard')ri+=m;else{mc+=m/2;ri+=m/2;}}});
+    mesesCarga.push({nombre:`${MESES_CORTO[mo]} ${yr}`,mc,ri,total:mc+ri});}
   const maxCarga=Math.max(...mesesCarga.map(m=>m.total),1);
-  const cargaHTML=mesesCarga.map((m,i)=>{
-    const pct=Math.round(m.total/maxCarga*100);
-    const barColor=m.mc>0&&m.ri>0?'carga-bar-mix':m.mc>0?'carga-bar-mc':'carga-bar-ri';
-    const esMesActual=i===0;
-    return`<div class="carga-mes-row">
-      <div class="carga-mes-header">
-        <span class="carga-mes-nombre" style="${esMesActual?'color:var(--accent);':'color:var(--text)'}">${m.nombre}${esMesActual?' ◀':''}</span>
-        <span class="carga-mes-total" style="${m.total===0?'color:var(--muted)':''}">${m.total>0?fmt(m.total):'—'}</span>
-      </div>
-      <div class="carga-bar-bg"><div class="carga-bar-fill ${barColor}" style="width:${pct}%"></div></div>
-      ${m.total>0?`<div class="carga-sub">${m.mc>0?`<span style="color:var(--mc)">MC: ${fmt(m.mc)}</span>`:''}${m.ri>0?`<span style="color:var(--richard)">Richard: ${fmt(m.ri)}</span>`:''}</div>`:''}
-    </div>`;
-  }).join('');
+  const cargaHTML=mesesCarga.map((m,i)=>{const pct=Math.round(m.total/maxCarga*100);const barColor=m.mc>0&&m.ri>0?'carga-bar-mix':m.mc>0?'carga-bar-mc':'carga-bar-ri';const esMesActual=i===0;return`<div class="carga-mes-row"><div class="carga-mes-header"><span class="carga-mes-nombre" style="${esMesActual?'color:var(--accent);':'color:var(--text)'}">${m.nombre}${esMesActual?' ◀':''}</span><span class="carga-mes-total" style="${m.total===0?'color:var(--muted)':''}">${m.total>0?fmt(m.total):'—'}</span></div><div class="carga-bar-bg"><div class="carga-bar-fill ${barColor}" style="width:${pct}%"></div></div>${m.total>0?`<div class="carga-sub">${m.mc>0?`<span style="color:var(--mc)">MC: ${fmt(m.mc)}</span>`:''}${m.ri>0?`<span style="color:var(--richard)">Richard: ${fmt(m.ri)}</span>`:''}</div>`:''}</div>`;}).join('');
 
-  // ── Bloque 3: Análisis por persona ──
   const proxMC=cuotasPend.find(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Maria del Carmen'||f.responsable==='Compartida';});
   const proxRi=cuotasPend.find(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Richard'||f.responsable==='Compartida';});
   const cuotasPendMC=cuotasPend.filter(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Maria del Carmen'||f.responsable==='Compartida';}).length;
   const cuotasPendRi=cuotasPend.filter(c=>{const f=_facturas[c.factura_id]||{};return f.responsable==='Richard'||f.responsable==='Compartida';}).length;
 
   document.getElementById('analisis-grid').innerHTML=`
-    <!-- CARD 1: Urgencias -->
-    <div class="analisis-card">
-      <div class="analisis-head">
-        <span class="analisis-head-title">🚨 Cuotas por atender</span>
-        <div style="display:flex;gap:4px;align-items:center">${alertaHead}</div>
-      </div>
-      <div class="urgencia-list">${urgenciaItems||'<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;font-weight:600">🎉 ¡Sin cuotas urgentes!</div>'}</div>
-    </div>
-
-    <!-- CARD 2: Carga mensual -->
-    <div class="analisis-card">
-      <div class="analisis-head">
-        <span class="analisis-head-title">📈 Carga mensual próxima</span>
-        <span style="font-size:11px;color:var(--muted);font-weight:600">${maxMeses} meses</span>
-      </div>
-      <div class="carga-list">${cargaHTML}</div>
-    </div>
-
-    <!-- CARD 3: Análisis por persona -->
-    <div class="analisis-card">
-      <div class="analisis-head">
-        <span class="analisis-head-title">👥 Situación por persona</span>
-      </div>
-      <div class="persona-analisis">
-        <div class="pa-persona pa-mc">
-          <div class="pa-nombre">🔴 María del Carmen</div>
-          <div class="pa-stat"><span>Saldo pendiente:</span><strong>${fmt(saldoMC)}</strong></div>
-          <div class="pa-stat"><span>Cuotas próximas (30d):</span><strong>${cuotasPendMC}</strong></div>
-          ${proxMC?`<div class="pa-prox">Próxima: <em>${fmt(proxMC.monto)}</em> · vence ${proxMC.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas próximas ✓</div>'}
-          <div class="pa-saldo-big">${fmt(saldoMC)}</div>
-        </div>
-        <div class="pa-persona pa-ri">
-          <div class="pa-nombre">🟠 Richard</div>
-          <div class="pa-stat"><span>Saldo pendiente:</span><strong>${fmt(saldoRi)}</strong></div>
-          <div class="pa-stat"><span>Cuotas próximas (30d):</span><strong>${cuotasPendRi}</strong></div>
-          ${proxRi?`<div class="pa-prox">Próxima: <em>${fmt(proxRi.monto)}</em> · vence ${proxRi.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas próximas ✓</div>'}
-          <div class="pa-saldo-big">${fmt(saldoRi)}</div>
-        </div>
-        <div style="background:#F0FBF5;border-radius:10px;padding:12px 14px;border:1.5px solid var(--accent3);display:flex;justify-content:space-between;align-items:center">
-          <span style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase">Saldo total</span>
-          <span style="font-family:var(--serif);font-size:22px;color:var(--accent)">${fmt(totalSaldo)}</span>
-        </div>
-      </div>
-    </div>`;
+    <div class="analisis-card"><div class="analisis-head"><span class="analisis-head-title">🚨 Cuotas por atender</span><div style="display:flex;gap:4px;align-items:center">${alertaHead}</div></div><div class="urgencia-list">${urgenciaItems||'<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;font-weight:600">🎉 ¡Sin cuotas urgentes!</div>'}</div></div>
+    <div class="analisis-card"><div class="analisis-head"><span class="analisis-head-title">📈 Carga mensual próxima</span><span style="font-size:11px;color:var(--muted);font-weight:600">${maxMeses} meses</span></div><div class="carga-list">${cargaHTML}</div></div>
+    <div class="analisis-card"><div class="analisis-head"><span class="analisis-head-title">👥 Situación por persona</span></div><div class="persona-analisis"><div class="pa-persona pa-mc"><div class="pa-nombre">🔴 María del Carmen</div><div class="pa-stat"><span>Saldo pendiente:</span><strong>${fmt(saldoMC)}</strong></div><div class="pa-stat"><span>Cuotas próximas (30d):</span><strong>${cuotasPendMC}</strong></div>${proxMC?`<div class="pa-prox">Próxima: <em>${fmt(proxMC.monto)}</em> · vence ${proxMC.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas próximas ✓</div>'}<div class="pa-saldo-big">${fmt(saldoMC)}</div></div><div class="pa-persona pa-ri"><div class="pa-nombre">🟠 Richard</div><div class="pa-stat"><span>Saldo pendiente:</span><strong>${fmt(saldoRi)}</strong></div><div class="pa-stat"><span>Cuotas próximas (30d):</span><strong>${cuotasPendRi}</strong></div>${proxRi?`<div class="pa-prox">Próxima: <em>${fmt(proxRi.monto)}</em> · vence ${proxRi.fecha_vence}</div>`:'<div class="pa-prox" style="color:#065F46">Sin cuotas próximas ✓</div>'}<div class="pa-saldo-big">${fmt(saldoRi)}</div></div><div style="background:#F0FBF5;border-radius:10px;padding:12px 14px;border:1.5px solid var(--accent3);display:flex;justify-content:space-between;align-items:center"><span style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase">Saldo total</span><span style="font-family:var(--serif);font-size:22px;color:var(--accent)">${fmt(totalSaldo)}</span></div></div></div>`;
 }
 
 /* ══════════════════════════════════════════════
@@ -1157,104 +1189,134 @@ async function verDetalle(id){
 }
 
 /* ══════════════════════════════════════════════
-   PAGOS
+   INTERESES — lógica del bloque de recargos
 ══════════════════════════════════════════════ */
-function openPagarCuota(facId, cuotaId, montoCuota, numCuota) {
-  const fac = _facturas[facId] || {};
+function addInteresRow(){
+  const container=document.getElementById('intereses-container');
+  const row=document.createElement('div');
+  row.className='interes-row';
+  row.innerHTML=`
+    <input type="text" placeholder="Concepto (ej: Interés por mora)" style="border:1.5px solid #FDE68A;border-radius:7px;padding:7px 10px;font-family:var(--sf);font-size:12px;background:#fff;" oninput="recalcPagoTotal()">
+    <input type="number" placeholder="0.00" step="0.01" min="0" style="border:1.5px solid #FDE68A;border-radius:7px;padding:7px 10px;font-family:var(--sf);font-size:12px;background:#fff;" oninput="recalcPagoTotal()">
+    <select style="border:1.5px solid #FDE68A;border-radius:7px;padding:7px 10px;font-family:var(--sf);font-size:12px;background:#fff;" onchange="recalcPagoTotal()">
+      <option value="Maria del Carmen">🔴 MC</option>
+      <option value="Richard">🟠 Richard</option>
+      <option value="Compartida">⚖️ Compartida</option>
+    </select>
+    <button type="button" class="btn-del-interes" onclick="this.parentElement.remove();recalcPagoTotal()">✕</button>`;
+  container.appendChild(row);
+  recalcPagoTotal();
+}
 
-  let pagadoMC = 0, pagadoRi = 0;
-  (fac.pagos || []).forEach(p => {
-    const m = parseFloat(p.monto || 0);
-    if (p.cuenta_id === 'C1') pagadoMC += m;
-    else if (p.cuenta_id === 'C2') pagadoRi += m;
-    else { pagadoMC += m / 2; pagadoRi += m / 2; }
+function getIntereses(){
+  const rows=document.querySelectorAll('#intereses-container .interes-row');
+  let total=0;
+  rows.forEach(r=>{
+    const inputs=r.querySelectorAll('input');
+    const monto=parseFloat(inputs[1]?.value||0)||0;
+    total+=monto;
   });
+  return total;
+}
 
-  const items = _items[fac.id] || [];
-  const t = calcPersonas(items);
-  const totalMC = t.mc.s + t.mc.i;
-  const totalRi = t.ri.s + t.ri.i;
+function recalcPagoTotal(){
+  const montoBase=parseFloat(document.getElementById('pago-monto').value)||0;
+  const totalIntereses=getIntereses();
+  const total=montoBase+totalIntereses;
 
-  const saldoMCFac = Math.max(0, totalMC - pagadoMC);
-  const saldoRiFac = Math.max(0, totalRi - pagadoRi);
-  const saldoTotalFac = saldoMCFac + saldoRiFac;
-
-  const cuotasPorFac = (_cuotasByFac[fac.id] || []).filter(x => !x.es_historica).sort((a, b) => a.numero - b.numero);
-  const totalCuotas = cuotasPorFac.reduce((s, x) => s + parseFloat(x.monto || 0), 0);
-  const fraccion = totalCuotas > 0 ? montoCuota / totalCuotas : 0;
-
-  const saldoMCCuota = saldoMCFac * fraccion;
-  const saldoRiCuota = saldoRiFac * fraccion;
-  const saldoRealCuota = saldoTotalFac * fraccion;
-
-  let desgloseTexto = '';
-  if (fac.responsable === 'Compartida') {
-    let partes = [];
-    if (saldoMCCuota > 0.01) partes.push(`🔴 MC: ${fmt(saldoMCCuota)}`);
-    if (saldoRiCuota > 0.01) partes.push(`🟠 Richard: ${fmt(saldoRiCuota)}`);
-    desgloseTexto = partes.length > 0 ? `(${partes.join(' | ')})` : '(Saldado)';
-  } else {
-    desgloseTexto = fac.responsable === 'Maria del Carmen'
-      ? `(🔴 MC: ${fmt(saldoMCCuota)})`
-      : `(🟠 Richard: ${fmt(saldoRiCuota)})`;
+  const interesTotalRow=document.getElementById('interes-total-row');
+  if(totalIntereses>0){
+    interesTotalRow.style.display='flex';
+    document.getElementById('interes-total-val').textContent=fmt(totalIntereses);
+  }else{
+    interesTotalRow.style.display='none';
   }
+  document.getElementById('pago-total-final').textContent=fmt(total);
+}
+
+/* ══════════════════════════════════════════════
+   PAGOS — modal sin reset al cambiar factura
+══════════════════════════════════════════════ */
+function openPagarCuota(facId, cuotaId, montoCuota, numCuota){
+  // Guardar valores actuales que NO deben borrarse
+  const fechaActual=document.getElementById('pago-fecha').value||new Date().toISOString().slice(0,10);
+  const compActual=document.getElementById('pago-comprobante').value;
+  const notaActual=document.getElementById('pago-nota').value||`Cuota #${numCuota}`;
 
   openModalPago();
-  setTimeout(async () => {
-    document.getElementById('pago-factura').value = facId;
-    await onFacturaChange();
-    const chip = document.querySelector(`#cuotas-chips .cuota-chip[data-id="${cuotaId}"]`);
-    if (chip && !chip.classList.contains('chip-pagada')) chip.click();
 
-    document.getElementById('pago-monto').value = saldoRealCuota.toFixed(2);
-    document.getElementById('pago-nota').value = `Cuota #${numCuota}`;
+  // Esperar a que el DOM esté listo, luego rellenar sin tocar fecha/comp/nota
+  requestAnimationFrame(async()=>{
+    document.getElementById('pago-factura').value=facId;
+    // Preservar campos del usuario
+    document.getElementById('pago-fecha').value=fechaActual;
+    document.getElementById('pago-comprobante').value=compActual;
+    document.getElementById('pago-nota').value=notaActual;
 
-    const infoCuota = document.getElementById('pago-info-cuota');
-    if (infoCuota) {
-      infoCuota.innerHTML = `
-        <strong>Saldo Real Cuota:</strong> ${fmt(saldoRealCuota)}
-        <span style="font-size:12px;margin-left:6px;font-weight:normal;color:var(--muted)">${desgloseTexto}</span>
-        <span style="margin-left:10px">|</span>
-        <strong style="margin-left:10px">Monto Orig.:</strong> ${fmt(montoCuota)} | ${personaBadge(fac.responsable)}
-      `;
-    }
+    await onFacturaChange(true); // true = no sobrescribir monto
 
-    const selectCuenta = document.getElementById('pago-cuenta-id');
-    if (selectCuenta) {
-      if (fac.responsable === 'Compartida') {
-        if (saldoMCCuota > 0.01 && saldoRiCuota <= 0.01) selectCuenta.value = 'C1';
-        else if (saldoRiCuota > 0.01 && saldoMCCuota <= 0.01) selectCuenta.value = 'C2';
-      } else {
-        selectCuenta.value = fac.responsable === 'Maria del Carmen' ? 'C1' : 'C2';
-      }
-    }
-  }, 200);
+    // Seleccionar la cuota específica
+    const chip=document.querySelector(`#cuotas-chips .cuota-chip[data-id="${cuotaId}"]`);
+    if(chip&&!chip.classList.contains('chip-pagada'))chip.click();
+  });
 }
+
 function openModalPago(pagoData=null){
   document.getElementById('modal-pago-title').textContent=pagoData?'Editar Pago':'Registrar Pago';
   document.getElementById('pago-edit-id').value=pagoData?.id||'';
   document.getElementById('pago-cuota-id').value='';
-  document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';document.getElementById('foto-preview').style.display='none';
+  document.getElementById('cuotas-box').style.display='none';
+  document.getElementById('pago-info-box').style.display='none';
+  document.getElementById('foto-preview').style.display='none';
+  // Limpiar intereses
+  document.getElementById('intereses-container').innerHTML='';
+  document.getElementById('interes-total-row').style.display='none';
+  document.getElementById('pago-total-final').textContent='$0.00';
   const infoSpan=document.getElementById('cuota-sel-info');if(infoSpan)infoSpan.textContent='';
   document.getElementById('btn-guardar-pago').textContent=pagoData?'Actualizar pago':'Guardar pago';
   fotoBase64=null;
   const btnElim=document.getElementById('btn-eliminar-pago');
   if(pagoData&&currentRole==='admin'){btnElim.style.display='';}else{btnElim.style.display='none';}
+
   if(pagoData){
-    document.getElementById('pago-factura').value=pagoData.factura_id||'';document.getElementById('pago-fecha').value=pagoData.fecha_pago||'';document.getElementById('pago-comprobante').value=pagoData.num_comprobante||'';document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';document.getElementById('pago-monto').value=pagoData.monto||'';document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
+    document.getElementById('pago-factura').value=pagoData.factura_id||'';
+    document.getElementById('pago-fecha').value=pagoData.fecha_pago||'';
+    document.getElementById('pago-comprobante').value=pagoData.num_comprobante||'';
+    document.getElementById('pago-quien').value=pagoData.pago_quien||pagoData.quien_pago||'Maria del Carmen';
+    document.getElementById('pago-monto').value=pagoData.monto||'';
+    document.getElementById('pago-nota').value=pagoData.nota||pagoData.observacion||'';
     if(pagoData.cuota_id)document.getElementById('pago-cuota-id').value=pagoData.cuota_id;
     if(pagoData.foto_url){const prev=document.getElementById('foto-preview');prev.src=pagoData.foto_url;prev.style.display='block';}
-    onFacturaChange().then(()=>{if(pagoData.cuota_id){const chip=document.querySelector(`#cuotas-chips .cuota-chip[data-id="${pagoData.cuota_id}"]`);if(chip){chip.classList.add('chip-sel');const sp=document.getElementById('cuota-sel-info');if(sp)sp.textContent=`✓ C${chip.dataset.numero} seleccionada`;}}});
-  } else {
+    recalcPagoTotal();
+    onFacturaChange(true).then(()=>{
+      if(pagoData.cuota_id){
+        const chip=document.querySelector(`#cuotas-chips .cuota-chip[data-id="${pagoData.cuota_id}"]`);
+        if(chip){chip.classList.add('chip-sel');const sp=document.getElementById('cuota-sel-info');if(sp)sp.textContent=`✓ C${chip.dataset.numero} seleccionada`;}
+      }
+    });
+  }else{
     document.getElementById('pago-fecha').value=new Date().toISOString().slice(0,10);
     ['pago-comprobante','pago-nota','pago-monto'].forEach(id=>document.getElementById(id).value='');
   }
   openModal('modal-pago');
 }
-async function eliminarPagoEdicion(){const id=document.getElementById('pago-edit-id').value;if(!id||!confirm('¿Eliminar este pago?'))return;loading();const{error}=await sb.from('pagos').delete().eq('id',id);loaded();if(error){showToast(error.message,'err');return;}showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();}
-async function onFacturaChange(){
+
+async function eliminarPagoEdicion(){
+  const id=document.getElementById('pago-edit-id').value;
+  if(!id||!confirm('¿Eliminar este pago?'))return;
+  loading();const{error}=await sb.from('pagos').delete().eq('id',id);loaded();
+  if(error){showToast(error.message,'err');return;}
+  showToast('Eliminado','ok');closeModal('modal-pago');await renderPagos();await renderDashboard();
+}
+
+// preservarMonto=true: no sobreescribe el campo monto (usado cuando venimos de openPagarCuota)
+async function onFacturaChange(preservarMonto=false){
   const facId=document.getElementById('pago-factura').value;
-  if(!facId){document.getElementById('cuotas-box').style.display='none';document.getElementById('pago-info-box').style.display='none';return;}
+  if(!facId){
+    document.getElementById('cuotas-box').style.display='none';
+    document.getElementById('pago-info-box').style.display='none';
+    return;
+  }
   const[r1,r2,r3]=await Promise.all([
     sb.from('facturas').select('*').eq('id',facId).single(),
     sb.from('pagos').select('*').eq('factura_id',facId),
@@ -1272,18 +1334,15 @@ async function onFacturaChange(){
 
   const items=_items[f.id]||[];
   const t=calcPersonas(items);
-  const totalMC=t.mc.s+t.mc.i;
-  const totalRi=t.ri.s+t.ri.i;
-  const saldoMCFac=Math.max(0,totalMC-pagadoMC);
-  const saldoRiFac=Math.max(0,totalRi-pagadoRi);
+  const totalMC=t.mc.s+t.mc.i;const totalRi=t.ri.s+t.ri.i;
+  const saldoMCFac=Math.max(0,totalMC-pagadoMC);const saldoRiFac=Math.max(0,totalRi-pagadoRi);
   const saldoTotalReal=saldoMCFac+saldoRiFac;
 
   const cuotas=r3.data||[];
   const totalCuotasOriginales=cuotas.reduce((s,x)=>s+parseFloat(x.monto||0),0);
   const cuotaAproxOriginal=f.num_cuotas>0?f.total/f.num_cuotas:f.total;
   const fraccion=totalCuotasOriginales>0?cuotaAproxOriginal/totalCuotasOriginales:0;
-  const saldoMCCuota=saldoMCFac*fraccion;
-  const saldoRiCuota=saldoRiFac*fraccion;
+  const saldoMCCuota=saldoMCFac*fraccion;const saldoRiCuota=saldoRiFac*fraccion;
   const saldoRealCuotaAprox=saldoTotalReal*fraccion;
 
   let desgloseTexto='';
@@ -1298,19 +1357,13 @@ async function onFacturaChange(){
 
   const box=document.getElementById('pago-info-box');
   box.style.display='block';
-  box.innerHTML=`<strong>Saldo Real Factura:</strong> ${fmt(saldoTotalReal)} <span style="font-size:11px;color:var(--muted)">${desgloseTexto}</span> &nbsp;|&nbsp; <strong>Cuota aprox:</strong> ${fmt(saldoRealCuotaAprox)} &nbsp;|&nbsp; ${personaBadge(f.responsable)}`;
+  box.innerHTML=`<strong>Saldo factura:</strong> ${fmt(saldoTotalReal)} <span style="font-size:11px;color:var(--muted)">${desgloseTexto}</span> &nbsp;|&nbsp; <strong>Cuota aprox:</strong> ${fmt(saldoRealCuotaAprox)} &nbsp;|&nbsp; ${personaBadge(f.responsable)}`;
 
-  if(!document.getElementById('pago-monto').value)
-    document.getElementById('pago-monto').value=saldoRealCuotaAprox.toFixed(2);
-
-  const selectCuenta=document.getElementById('pago-cuenta-id');
-  if(selectCuenta){
-    if(f.responsable==='Compartida'){
-      if(saldoMCFac>0.01&&saldoRiFac<=0.01)selectCuenta.value='C1';
-      else if(saldoRiFac>0.01&&saldoMCFac<=0.01)selectCuenta.value='C2';
-    }else{
-      selectCuenta.value=f.responsable==='Maria del Carmen'?'C1':'C2';
-    }
+  // Solo poner el monto si no hay valor ya ingresado o si no se debe preservar
+  const campoMonto=document.getElementById('pago-monto');
+  if(!preservarMonto&&!campoMonto.value){
+    campoMonto.value=saldoRealCuotaAprox.toFixed(2);
+    recalcPagoTotal();
   }
 
   if(cuotas.length){
@@ -1320,8 +1373,7 @@ async function onFacturaChange(){
       const vencida=!c.pagada&&c.fecha_vence<hoy;
       const cls=c.pagada?'chip-pagada':vencida?'chip-vencida':'chip-pendiente';
       const fracChip=totalCuotasOriginales>0?parseFloat(c.monto||0)/totalCuotasOriginales:0;
-      const saldoChipMC=saldoMCFac*fracChip;
-      const saldoChipRi=saldoRiFac*fracChip;
+      const saldoChipMC=saldoMCFac*fracChip;const saldoChipRi=saldoRiFac*fracChip;
       const saldoChipTotal=saldoChipMC+saldoChipRi;
       let descChip=fmt(c.monto);
       if(!c.pagada&&f.responsable==='Compartida'){
@@ -1332,8 +1384,11 @@ async function onFacturaChange(){
       }
       return`<button type="button" class="cuota-chip ${cls}" data-id="${c.id}" data-monto="${saldoChipTotal}" data-numero="${c.numero}" onclick="selectCuotaChip(this,${c.pagada})">${c.pagada?'✓ ':''}C${c.numero}<br><small>${c.fecha_vence}</small><br><small style="font-weight:700">${descChip}</small></button>`;
     }).join('');
-  }else{document.getElementById('cuotas-box').style.display='none';}
+  }else{
+    document.getElementById('cuotas-box').style.display='none';
+  }
 }
+
 function selectCuotaChip(el,bloqueada=false){
   if(bloqueada){showToast('Esta cuota ya está marcada como pagada','err');return;}
   const yaSeleccionado=el.classList.contains('chip-sel');
@@ -1346,29 +1401,101 @@ function selectCuotaChip(el,bloqueada=false){
     el.classList.add('chip-sel');
     document.getElementById('pago-cuota-id').value=el.dataset.id;
     document.getElementById('pago-monto').value=parseFloat(el.dataset.monto).toFixed(2);
+    recalcPagoTotal();
     if(infoSpan)infoSpan.textContent=`✓ Cuota C${el.dataset.numero} seleccionada`;
   }
 }
-function deseleccionarCuota(){document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));document.getElementById('pago-cuota-id').value='';const sp=document.getElementById('cuota-sel-info');if(sp)sp.textContent='Sin cuota específica (pago libre)';}
-async function toggleCuota(cuotaId,pagada,facId){loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);loaded();if(error){showToast(error.message,'err');return;}showToast(pagada?'Cuota marcada pagada':'Desmarcada','ok');if(facId)await verDetalle(facId);await renderCronograma();}
-function onFotoSelected(inp){const file=inp.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{fotoBase64=e.target.result;const prev=document.getElementById('foto-preview');prev.src=fotoBase64;prev.style.display='block';};reader.readAsDataURL(file);}
-async function savePago(){
-  const editId=document.getElementById('pago-edit-id').value,facId=document.getElementById('pago-factura').value,fecha=document.getElementById('pago-fecha').value,monto=parseFloat(document.getElementById('pago-monto').value)||0,quien=document.getElementById('pago-quien').value;
-  const cuotaId=document.getElementById('pago-cuota-id').value||null;
-  if(!facId||!fecha||!monto){showToast('Completa campos obligatorios','err');return;}
-  const{data:fac}=await sb.from('facturas').select('responsable').eq('id',facId).single();
-  loading('Guardando pago...');let cuotaNum=null,fotoUrl=null;
-  if(cuotaId&&!editId){const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();if(c)cuotaNum=c.numero;await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);}
-  else if(cuotaId&&editId){const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();if(c)cuotaNum=c.numero;}
-  if(fotoBase64){try{const blob=await fetch(fotoBase64).then(r=>r.blob());const ext=blob.type.split('/')[1]||'jpg';const fname=`comp_${Date.now()}.${ext}`;const{data:upData,error:upErr}=await sb.storage.from('comprobantes').upload(fname,blob,{contentType:blob.type,upsert:false});if(!upErr&&upData){const{data:urlData}=sb.storage.from('comprobantes').getPublicUrl(fname);fotoUrl=urlData?.publicUrl||null;}}catch(e){console.warn('Foto no subida:',e);}}
-  const pagoObj={factura_id:facId,fecha_pago:fecha,num_comprobante:document.getElementById('pago-comprobante').value.trim()||null,pago_quien:quien,deuda_de:fac?.responsable||'Compartida',monto,nota:document.getElementById('pago-nota').value.trim()||null,cuota_id:cuotaId,cuota_numero:cuotaNum,...(fotoUrl?{foto_url:fotoUrl}:{})};
-  let error;
-  if(editId){({error}=await sb.from('pagos').update(pagoObj).eq('id',editId));}else{({error}=await sb.from('pagos').insert(pagoObj));}
-  loaded();if(error){showToast(error.message,'err');return;}
-  showToast(editId?'Pago actualizado':`Pago registrado${cuotaId&&!editId?' y cuota marcada':''}`,'ok');
-  closeModal('modal-pago');fotoBase64=null;await loadFacSelect();await renderPagos();await renderDashboard();
+function deseleccionarCuota(){
+  document.querySelectorAll('.cuota-chip').forEach(c=>c.classList.remove('chip-sel'));
+  document.getElementById('pago-cuota-id').value='';
+  const sp=document.getElementById('cuota-sel-info');if(sp)sp.textContent='Sin cuota específica (pago libre)';
 }
+
+function onFotoSelected(inp){
+  const file=inp.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{fotoBase64=e.target.result;const prev=document.getElementById('foto-preview');prev.src=fotoBase64;prev.style.display='block';};
+  reader.readAsDataURL(file);
+}
+
+async function savePago(){
+  const editId=document.getElementById('pago-edit-id').value;
+  const facId=document.getElementById('pago-factura').value;
+  const fecha=document.getElementById('pago-fecha').value;
+  const montoBase=parseFloat(document.getElementById('pago-monto').value)||0;
+  const quien=document.getElementById('pago-quien').value;
+  const cuotaId=document.getElementById('pago-cuota-id').value||null;
+
+  if(!facId||!fecha||!montoBase){showToast('Completa campos obligatorios','err');return;}
+
+  // Calcular monto total incluyendo intereses
+  const totalIntereses=getIntereses();
+  const montoTotal=+(montoBase+totalIntereses).toFixed(2);
+
+  // Construir nota con detalle de recargos si hay
+  let notaFinal=document.getElementById('pago-nota').value.trim();
+  const interesRows=document.querySelectorAll('#intereses-container .interes-row');
+  if(interesRows.length>0){
+    const detalleIntereses=[];
+    interesRows.forEach(r=>{
+      const inputs=r.querySelectorAll('input');
+      const concepto=inputs[0]?.value.trim()||'Recargo';
+      const monto=parseFloat(inputs[1]?.value||0)||0;
+      if(monto>0)detalleIntereses.push(`${concepto}: ${fmt(monto)}`);
+    });
+    if(detalleIntereses.length>0){
+      notaFinal+=(notaFinal?' | ':'')+detalleIntereses.join(' | ');
+    }
+  }
+
+  const{data:fac}=await sb.from('facturas').select('responsable').eq('id',facId).single();
+  loading('Guardando pago...');
+  let cuotaNum=null,fotoUrl=null;
+  if(cuotaId&&!editId){
+    const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
+    if(c)cuotaNum=c.numero;
+    await sb.from('cuotas').update({pagada:true}).eq('id',cuotaId);
+  }else if(cuotaId&&editId){
+    const{data:c}=await sb.from('cuotas').select('numero').eq('id',cuotaId).single();
+    if(c)cuotaNum=c.numero;
+  }
+
+  if(fotoBase64){
+    try{
+      const blob=await fetch(fotoBase64).then(r=>r.blob());
+      const ext=blob.type.split('/')[1]||'jpg';const fname=`comp_${Date.now()}.${ext}`;
+      const{data:upData,error:upErr}=await sb.storage.from('comprobantes').upload(fname,blob,{contentType:blob.type,upsert:false});
+      if(!upErr&&upData){const{data:urlData}=sb.storage.from('comprobantes').getPublicUrl(fname);fotoUrl=urlData?.publicUrl||null;}
+    }catch(e){console.warn('Foto no subida:',e);}
+  }
+
+  const pagoObj={
+    factura_id:facId,
+    fecha_pago:fecha,
+    num_comprobante:document.getElementById('pago-comprobante').value.trim()||null,
+    pago_quien:quien,
+    deuda_de:fac?.responsable||'Compartida',
+    monto:montoTotal,  // monto total = cuota + intereses
+    nota:notaFinal||null,
+    cuota_id:cuotaId,
+    cuota_numero:cuotaNum,
+    ...(fotoUrl?{foto_url:fotoUrl}:{})
+  };
+
+  let error;
+  if(editId){({error}=await sb.from('pagos').update(pagoObj).eq('id',editId));}
+  else{({error}=await sb.from('pagos').insert(pagoObj));}
+
+  loaded();
+  if(error){showToast(error.message,'err');return;}
+  showToast(editId?'Pago actualizado':`Pago registrado${cuotaId&&!editId?' y cuota marcada':''}`+(totalIntereses>0?` (+${fmt(totalIntereses)} recargos)`:''),'ok');
+  closeModal('modal-pago');
+  fotoBase64=null;
+  await loadFacSelect();await renderPagos();await renderDashboard();
+}
+
 async function deletePago(id){if(!confirm('¿Eliminar este pago?'))return;loading();const{error}=await sb.from('pagos').delete().eq('id',id);loaded();if(error){showToast(error.message,'err');return;}showToast('Eliminado','ok');await renderPagos();await renderDashboard();}
+
 async function renderPagos(){
   loading();await reloadAll();loaded();
   const quien=document.getElementById('filt-pago-quien').value,casaF=document.getElementById('filt-pago-casa').value,mesF=document.getElementById('filt-pago-mes').value,anioF=document.getElementById('filt-pago-anio').value;
@@ -1383,44 +1510,33 @@ async function renderPagos(){
     ?pagos.map(p=>{const fac=_facturas[p.factura_id]||{};const casa=_casas[fac.casa_id]||{};const quienPago=p.pago_quien||p.quien_pago||'—';const cuotaCell=p.cuota_id||p.cuota_numero?`<span class="badge badge-blue">C${p.cuota_numero||'?'}</span>`:'<span style="color:var(--muted);font-size:11px">Libre</span>';const ab=currentRole==='admin'?`<td><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deletePago('${p.id}')">🗑</button></td>`:'';return`<tr class="pago-row" onclick="abrirEditarPago('${p.id}')"><td>${p.fecha_pago}</td><td>${p.num_comprobante||'—'}</td><td>${fac.numero||'—'}</td><td>${casa.nombre||'—'}</td><td>${cuotaCell}</td><td>${personaBadge(p.deuda_de)}</td><td>${personaBadge(quienPago)}</td><td><strong>${fmt(p.monto)}</strong></td><td style="font-size:11px;color:var(--muted)">${p.nota||p.observacion||''}</td><td>${p.foto_url?`<a href="${p.foto_url}" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);font-size:12px">📎</a>`:'—'}</td>${ab}</tr>`;}).join('')
     :'<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px">Sin pagos</td></tr>';
 }
-async function abrirEditarPago(id){loading('...');const{data,error}=await sb.from('pagos').select('*').eq('id',id).single();loaded();if(error||!data){showToast('No se pudo cargar el pago','err');return;}await loadFacSelect();openModalPago(data);}
 
-/* ══════════════════════════════════════════════
-   CRONOGRAMA — AGRUPADO POR CASA + MES
-   Click en mes = desglose de facturas individuales
-══════════════════════════════════════════════ */
-let cronTab='tabla';
-
-// ── CAMBIO 1: rango por defecto = todo el año 2026 ──
-function initCronRange(){
-  document.getElementById('cron-desde').value='2026-01-01';
-  document.getElementById('cron-hasta').value='2026-12-31';
+async function abrirEditarPago(id){
+  loading('...');const{data,error}=await sb.from('pagos').select('*').eq('id',id).single();loaded();
+  if(error||!data){showToast('No se pudo cargar el pago','err');return;}
+  await loadFacSelect();openModalPago(data);
 }
 
+async function toggleCuota(cuotaId,pagada,facId){loading();const{error}=await sb.from('cuotas').update({pagada}).eq('id',cuotaId);loaded();if(error){showToast(error.message,'err');return;}showToast(pagada?'Cuota marcada pagada':'Desmarcada','ok');if(facId)await verDetalle(facId);await renderCronograma();}
+
+/* ══════════════════════════════════════════════
+   CRONOGRAMA
+══════════════════════════════════════════════ */
+let cronTab='tabla';
+function initCronRange(){document.getElementById('cron-desde').value='2026-01-01';document.getElementById('cron-hasta').value='2026-12-31';}
 function resetCronRange(){initCronRange();renderCronograma();}
 function switchCronTab(t){cronTab=t;document.getElementById('tab-tabla').classList.toggle('active',t==='tabla');document.getElementById('tab-gantt').classList.toggle('active',t==='gantt');renderCronograma();}
 async function renderCronograma(){loading();await reloadAll();loaded();if(cronTab==='tabla')renderCronogramaCasaMes();else renderCronogramaGantt();}
 
-// Devuelve si una cuota está efectivamente cubierta según el saldo real de la factura
-function isCuotaCubierta(cuota) {
-  if (!cuota.pagada) return false;
-  const fac = _facturas[cuota.factura_id];
-  if (!fac) return true;
-  const enrich_fac = enrich(fac);
-  const saldo = calcSaldo(enrich_fac);
-  if (saldo > 0.01) {
-    const pagado = calcPagado(enrich_fac);
-    const cuotasOrden = (_cuotasByFac[fac.id] || [])
-      .filter(c => !c.es_historica)
-      .sort((a, b) => a.numero - b.numero);
-    let acum = 0;
-    for (const c of cuotasOrden) {
-      acum += parseFloat(c.monto || 0);
-      if (c.id === cuota.id) return pagado >= acum - 0.01;
-    }
-    return false;
-  }
-  return true;
+function isCuotaCubierta(cuota){
+  if(!cuota.pagada)return false;
+  const fac=_facturas[cuota.factura_id];if(!fac)return true;
+  const enrich_fac=enrich(fac);const saldo=calcSaldo(enrich_fac);
+  if(saldo>0.01){
+    const pagado=calcPagado(enrich_fac);
+    const cuotasOrden=(_cuotasByFac[fac.id]||[]).filter(c=>!c.es_historica).sort((a,b)=>a.numero-b.numero);
+    let acum=0;for(const c of cuotasOrden){acum+=parseFloat(c.monto||0);if(c.id===cuota.id)return pagado>=acum-0.01;}return false;
+  }return true;
 }
 
 function getCronFiltered(){
@@ -1441,211 +1557,59 @@ function getCronFiltered(){
 }
 
 function toggleDesglose(btnEl,desgloseId){
-  const el=document.getElementById(desgloseId);
-  const chev=btnEl.querySelector('.cron-mes-chevron');
-  if(!el)return;
-  const isOpen=el.classList.contains('open');
-  el.classList.toggle('open',!isOpen);
-  if(chev)chev.classList.toggle('open',!isOpen);
+  const el=document.getElementById(desgloseId);const chev=btnEl.querySelector('.cron-mes-chevron');
+  if(!el)return;const isOpen=el.classList.contains('open');el.classList.toggle('open',!isOpen);if(chev)chev.classList.toggle('open',!isOpen);
 }
+
 function renderCronogramaCasaMes(){
-  const hoyStr=new Date().toISOString().slice(0,10);
-  const list=getCronFiltered();
+  const hoyStr=new Date().toISOString().slice(0,10);const list=getCronFiltered();
   if(!list.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">No hay cuotas en el rango seleccionado.</div>';return;}
-
   const porMes={};
-  list.forEach(c=>{
-    const mesKey=c.fecha_vence.slice(0,7);
-    const fac=_facturas[c.factura_id]||{};
-    const casaId=fac.casa_id||'sin-casa';
-    if(!porMes[mesKey])porMes[mesKey]={};
-    if(!porMes[mesKey][casaId])porMes[mesKey][casaId]=[];
-    porMes[mesKey][casaId].push(c);
-  });
-
-  let desgloseCounter=0;
-  let html='';
-
+  list.forEach(c=>{const mesKey=c.fecha_vence.slice(0,7);const fac=_facturas[c.factura_id]||{};const casaId=fac.casa_id||'sin-casa';if(!porMes[mesKey])porMes[mesKey]={};if(!porMes[mesKey][casaId])porMes[mesKey][casaId]=[];porMes[mesKey][casaId].push(c);});
+  let desgloseCounter=0;let html='';
   Object.keys(porMes).sort().forEach(mesKey=>{
-    const[yr,mo]=mesKey.split('-');
-    const nombreMes=`${MESES_FULL[parseInt(mo)-1]} ${yr}`;
-    const casasDelMes=porMes[mesKey];
-    const hoyYr=new Date().getFullYear(),hoyMo=new Date().getMonth()+1;
-    const esMesActual=(parseInt(yr)===hoyYr&&parseInt(mo)===hoyMo);
-
+    const[yr,mo]=mesKey.split('-');const nombreMes=`${MESES_FULL[parseInt(mo)-1]} ${yr}`;const casasDelMes=porMes[mesKey];
+    const hoyYr=new Date().getFullYear(),hoyMo=new Date().getMonth()+1;const esMesActual=(parseInt(yr)===hoyYr&&parseInt(mo)===hoyMo);
     let totalMes=0,pendMes=0,mcMes=0,riMes=0;
-    Object.values(casasDelMes).forEach(cuotas=>cuotas.forEach(c=>{
-      const m=parseFloat(c.monto||0);
-      totalMes+=m;
-      if(!isCuotaCubierta(c))pendMes+=m;
-      const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';
-      if(resp==='Maria del Carmen')mcMes+=m;else if(resp==='Richard')riMes+=m;else{mcMes+=m/2;riMes+=m/2;}
-    }));
-
-    html+=`<div class="cron-casa-block" style="margin-bottom:24px">
-      <div class="cron-casa-header" style="cursor:default">
-        <div>
-          <div class="cron-casa-nombre" style="${esMesActual?'color:#86efac':''}">${esMesActual?'◀ ':''}📅 ${nombreMes}</div>
-          <div style="font-size:11px;opacity:.7;margin-top:2px;font-weight:600">${Object.keys(casasDelMes).length} casa${Object.keys(casasDelMes).length>1?'s':''} · ${Object.values(casasDelMes).flat().length} cuota${Object.values(casasDelMes).flat().length>1?'s':''}</div>
-        </div>
-        <div class="cron-casa-totales">
-          ${mcMes>0?`<div class="cron-casa-total-item"><div class="cron-casa-total-label">🔴 MC</div><div class="cron-casa-total-valor" style="font-size:15px;color:#fca5a5">${fmt(mcMes)}</div></div>`:''}
-          ${riMes>0?`<div class="cron-casa-total-item"><div class="cron-casa-total-label">🟠 Richard</div><div class="cron-casa-total-valor" style="font-size:15px;color:#fdba74">${fmt(riMes)}</div></div>`:''}
-          <div class="cron-casa-total-item"><div class="cron-casa-total-label">Pendiente</div><div class="cron-casa-total-valor" style="color:#86efac">${fmt(pendMes)}</div></div>
-          <div class="cron-casa-total-item"><div class="cron-casa-total-label">Total mes</div><div class="cron-casa-total-valor">${fmt(totalMes)}</div></div>
-        </div>
-      </div>`;
-
-    Object.entries(casasDelMes).sort(([aId],[bId])=>{
-      return((_casas[aId]?.nombre||'').toLowerCase()).localeCompare((_casas[bId]?.nombre||'').toLowerCase());
-    }).forEach(([casaId,cuotasCasa])=>{
-      const casa=_casas[casaId]||{nombre:'Sin casa'};
-      const totalCasa=cuotasCasa.reduce((s,c)=>s+parseFloat(c.monto||0),0);
-      let mcCasa=0,riCasa=0;
-      cuotasCasa.forEach(c=>{
-        const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';
-        const m=parseFloat(c.monto||0);
-        if(resp==='Maria del Carmen')mcCasa+=m;else if(resp==='Richard')riCasa+=m;else{mcCasa+=m/2;riCasa+=m/2;}
-      });
-      const facIds=[...new Set(cuotasCasa.map(c=>c.factura_id))];
-      const tieneVenc=cuotasCasa.some(c=>!isCuotaCubierta(c)&&c.fecha_vence<hoyStr);
-      const todasPagadas=cuotasCasa.every(c=>isCuotaCubierta(c));
-      const desgloseId=`dsg_${casaId}_${mesKey}_${desgloseCounter++}`;
-      const subtitulo=facIds.length>1?`${facIds.length} facturas`:(_facturas[facIds[0]]?.numero||'');
-
-      html+=`<div class="cron-mes-table">
-        <div class="cron-mes-header-row" onclick="toggleDesglose(this,'${desgloseId}')" style="${tieneVenc?'border-left:3px solid var(--danger);':''}${todasPagadas?'opacity:.55':''}">
-          <div class="cron-mes-titulo" style="font-size:14px">
-            🏪 ${casa.nombre}
-            <span style="font-size:10px;color:var(--muted);font-weight:600;margin-left:4px">${subtitulo}</span>
-          </div>
-          <div class="cron-mes-resumen">
-            ${mcCasa>0?`<span class="cron-mes-badge-mc">🔴 ${fmt(mcCasa)}</span>`:''}
-            ${riCasa>0?`<span class="cron-mes-badge-ri">🟠 ${fmt(riCasa)}</span>`:''}
-            <span class="cron-mes-badge-total">${fmt(totalCasa)}</span>
-            <span class="cron-mes-chevron">▼</span>
-          </div>
-        </div>
-        <div class="cron-desglose" id="${desgloseId}">
-          <table><thead><tr>
-            <th>Factura</th><th>Responsable</th><th>Cuota</th><th>Vence</th>
-            <th>Monto</th><th>Saldo</th><th>Estado</th>
-            ${currentRole==='admin'?'<th>Acción</th>':''}
-          </tr></thead>
-          <tbody>`;
-
-      cuotasCasa.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)||
-        (_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')
-      ).forEach(c=>{
-        const fac=_facturas[c.factura_id]||{};
-
-        const pagadosFac = (_pagosMap[fac.id] || []);
-        const itemsFac = _items[fac.id] || [];
-        const tFac = calcPersonas(itemsFac);
-        const totalMCFac = tFac.mc.s + tFac.mc.i;
-        const totalRiFac = tFac.ri.s + tFac.ri.i;
-        const totalFacItems = totalMCFac + totalRiFac;
-
-        let pagadoMCFac = 0, pagadoRiFac = 0;
-        pagadosFac.forEach(p => {
-          const m = parseFloat(p.monto || 0);
-          const quien = p.pago_quien || p.quien_pago || '';
-          if (quien === 'Maria del Carmen') pagadoMCFac += m;
-          else if (quien === 'Richard') pagadoRiFac += m;
-          else {
-            pagadoMCFac += totalFacItems > 0 ? m * (totalMCFac / totalFacItems) : m / 2;
-            pagadoRiFac += totalFacItems > 0 ? m * (totalRiFac / totalFacItems) : m / 2;
-          }
-        });
-
-        const saldoMCFac = Math.max(0, totalMCFac - pagadoMCFac);
-        const saldoRiFac = Math.max(0, totalRiFac - pagadoRiFac);
-
-        const cuotasPorFac = (_cuotasByFac[fac.id] || []).filter(x => !x.es_historica);
-        const totalCuotas = cuotasPorFac.reduce((s, x) => s + parseFloat(x.monto || 0), 0);
-        const fraccion = totalCuotas > 0 ? parseFloat(c.monto || 0) / totalCuotas : 1;
-
-        const saldoMCCuota = saldoMCFac * fraccion;
-        const saldoRiCuota = saldoRiFac * fraccion;
-
-        const cubierta=isCuotaCubierta(c);
-        const vencida=!cubierta&&c.fecha_vence<hoyStr;
-        const accion=currentRole==='admin'
-          ?(cubierta?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`
-            :`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`)
-          :'';
-
+    Object.values(casasDelMes).forEach(cuotas=>cuotas.forEach(c=>{const m=parseFloat(c.monto||0);totalMes+=m;if(!isCuotaCubierta(c))pendMes+=m;const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';if(resp==='Maria del Carmen')mcMes+=m;else if(resp==='Richard')riMes+=m;else{mcMes+=m/2;riMes+=m/2;}}));
+    html+=`<div class="cron-casa-block" style="margin-bottom:24px"><div class="cron-casa-header" style="cursor:default"><div><div class="cron-casa-nombre" style="${esMesActual?'color:#86efac':''}">${esMesActual?'◀ ':''}📅 ${nombreMes}</div><div style="font-size:11px;opacity:.7;margin-top:2px;font-weight:600">${Object.keys(casasDelMes).length} casa${Object.keys(casasDelMes).length>1?'s':''} · ${Object.values(casasDelMes).flat().length} cuota${Object.values(casasDelMes).flat().length>1?'s':''}</div></div><div class="cron-casa-totales">${mcMes>0?`<div class="cron-casa-total-item"><div class="cron-casa-total-label">🔴 MC</div><div class="cron-casa-total-valor" style="font-size:15px;color:#fca5a5">${fmt(mcMes)}</div></div>`:''} ${riMes>0?`<div class="cron-casa-total-item"><div class="cron-casa-total-label">🟠 Richard</div><div class="cron-casa-total-valor" style="font-size:15px;color:#fdba74">${fmt(riMes)}</div></div>`:''}<div class="cron-casa-total-item"><div class="cron-casa-total-label">Pendiente</div><div class="cron-casa-total-valor" style="color:#86efac">${fmt(pendMes)}</div></div><div class="cron-casa-total-item"><div class="cron-casa-total-label">Total mes</div><div class="cron-casa-total-valor">${fmt(totalMes)}</div></div></div></div>`;
+    Object.entries(casasDelMes).sort(([aId],[bId])=>((_casas[aId]?.nombre||'').toLowerCase()).localeCompare((_casas[bId]?.nombre||'').toLowerCase())).forEach(([casaId,cuotasCasa])=>{
+      const casa=_casas[casaId]||{nombre:'Sin casa'};const totalCasa=cuotasCasa.reduce((s,c)=>s+parseFloat(c.monto||0),0);let mcCasa=0,riCasa=0;
+      cuotasCasa.forEach(c=>{const resp=(_facturas[c.factura_id]||{}).responsable||'Compartida';const m=parseFloat(c.monto||0);if(resp==='Maria del Carmen')mcCasa+=m;else if(resp==='Richard')riCasa+=m;else{mcCasa+=m/2;riCasa+=m/2;}});
+      const facIds=[...new Set(cuotasCasa.map(c=>c.factura_id))];const tieneVenc=cuotasCasa.some(c=>!isCuotaCubierta(c)&&c.fecha_vence<hoyStr);const todasPagadas=cuotasCasa.every(c=>isCuotaCubierta(c));const desgloseId=`dsg_${casaId}_${mesKey}_${desgloseCounter++}`;const subtitulo=facIds.length>1?`${facIds.length} facturas`:(_facturas[facIds[0]]?.numero||'');
+      html+=`<div class="cron-mes-table"><div class="cron-mes-header-row" onclick="toggleDesglose(this,'${desgloseId}')" style="${tieneVenc?'border-left:3px solid var(--danger);':''}${todasPagadas?'opacity:.55':''}"><div class="cron-mes-titulo" style="font-size:14px">🏪 ${casa.nombre}<span style="font-size:10px;color:var(--muted);font-weight:600;margin-left:4px">${subtitulo}</span></div><div class="cron-mes-resumen">${mcCasa>0?`<span class="cron-mes-badge-mc">🔴 ${fmt(mcCasa)}</span>`:''}${riCasa>0?`<span class="cron-mes-badge-ri">🟠 ${fmt(riCasa)}</span>`:''}<span class="cron-mes-badge-total">${fmt(totalCasa)}</span><span class="cron-mes-chevron">▼</span></div></div><div class="cron-desglose" id="${desgloseId}"><table><thead><tr><th>Factura</th><th>Responsable</th><th>Cuota</th><th>Vence</th><th>Monto</th><th>Saldo</th><th>Estado</th>${currentRole==='admin'?'<th>Acción</th>':''}</tr></thead><tbody>`;
+      cuotasCasa.sort((a,b)=>a.fecha_vence.localeCompare(b.fecha_vence)||(_facturas[a.factura_id]?.numero||'').localeCompare(_facturas[b.factura_id]?.numero||'')).forEach(c=>{
+        const fac=_facturas[c.factura_id]||{};const pagadosFac=(_pagosMap[fac.id]||[]);const itemsFac=_items[fac.id]||[];const tFac=calcPersonas(itemsFac);const totalMCFac=tFac.mc.s+tFac.mc.i;const totalRiFac=tFac.ri.s+tFac.ri.i;const totalFacItems=totalMCFac+totalRiFac;
+        let pagadoMCFac=0,pagadoRiFac=0;pagadosFac.forEach(p=>{const m=parseFloat(p.monto||0);const quien=p.pago_quien||p.quien_pago||'';if(quien==='Maria del Carmen')pagadoMCFac+=m;else if(quien==='Richard')pagadoRiFac+=m;else{pagadoMCFac+=totalFacItems>0?m*(totalMCFac/totalFacItems):m/2;pagadoRiFac+=totalFacItems>0?m*(totalRiFac/totalFacItems):m/2;}});
+        const saldoMCFac=Math.max(0,totalMCFac-pagadoMCFac);const saldoRiFac=Math.max(0,totalRiFac-pagadoRiFac);const cuotasPorFac=(_cuotasByFac[fac.id]||[]).filter(x=>!x.es_historica);const totalCuotas=cuotasPorFac.reduce((s,x)=>s+parseFloat(x.monto||0),0);const fraccion=totalCuotas>0?parseFloat(c.monto||0)/totalCuotas:1;
+        const saldoMCCuota=saldoMCFac*fraccion;const saldoRiCuota=saldoRiFac*fraccion;const cubierta=isCuotaCubierta(c);const vencida=!cubierta&&c.fecha_vence<hoyStr;
+        const accion=currentRole==='admin'?(cubierta?`<button class="btn-desmarcar" onclick="toggleCuota('${c.id}',false,null)">↩</button>`:`<button class="btn-pagar-cuota" onclick="openPagarCuota('${fac.id}','${c.id}',${c.monto},${c.numero})">Pagar</button>`):'';
         let saldoCell;
-        if(cubierta){
-          saldoCell='<span class="badge badge-green">Pagada</span>';
-        } else if(fac.responsable==='Compartida'){
-          const partesMC=saldoMCCuota>0.01?`<div style="color:var(--mc);font-size:10px;font-weight:700">🔴 ${fmt(saldoMCCuota)}</div>`:'';
-          const partesRi=saldoRiCuota>0.01?`<div style="color:var(--richard);font-size:10px;font-weight:700">🟠 ${fmt(saldoRiCuota)}</div>`:'';
-          if(!partesMC&&!partesRi){
-            saldoCell='<span class="badge badge-green">Saldado</span>';
-          } else {
-            saldoCell=`<div>${partesMC}${partesRi}</div>`;
-          }
-        } else {
-          const colorSaldo=fac.responsable==='Maria del Carmen'?'var(--mc)':'var(--richard)';
-          const saldo=fac.responsable==='Maria del Carmen'?saldoMCCuota:saldoRiCuota;
-          saldoCell=`<span style="color:${colorSaldo};font-weight:700">${fmt(saldo)}</span>`;
-        }
-
-        const estadoCell=cubierta
-          ?'<span class="badge badge-green">Pagada</span>'
-          :vencida
-            ?'<span class="badge badge-red">Vencida</span>'
-            :'<span class="badge badge-amber">Pendiente</span>';
-
-        html+=`<tr style="${cubierta?'opacity:.5':''}${vencida?';background:#FFF5F5':''}">
-          <td><strong>${fac.numero||'—'}</strong></td>
-          <td>${personaBadge(fac.responsable)}</td>
-          <td style="font-weight:700">C${c.numero}/${fac.num_cuotas||'?'}</td>
-          <td>${c.fecha_vence}${vencida?'<span style="color:var(--danger);font-size:10px;font-weight:700;margin-left:4px">VENC</span>':''}</td>
-          <td><strong>${fmt(c.monto)}</strong></td>
-          <td>${saldoCell}</td>
-          <td>${estadoCell}</td>
-          ${currentRole==='admin'?`<td>${accion}</td>`:''}
-        </tr>`;
+        if(cubierta){saldoCell='<span class="badge badge-green">Pagada</span>';}
+        else if(fac.responsable==='Compartida'){const partesMC=saldoMCCuota>0.01?`<div style="color:var(--mc);font-size:10px;font-weight:700">🔴 ${fmt(saldoMCCuota)}</div>`:'';const partesRi=saldoRiCuota>0.01?`<div style="color:var(--richard);font-size:10px;font-weight:700">🟠 ${fmt(saldoRiCuota)}</div>`:'';saldoCell=(!partesMC&&!partesRi)?'<span class="badge badge-green">Saldado</span>':`<div>${partesMC}${partesRi}</div>`;}
+        else{const colorSaldo=fac.responsable==='Maria del Carmen'?'var(--mc)':'var(--richard)';const saldo=fac.responsable==='Maria del Carmen'?saldoMCCuota:saldoRiCuota;saldoCell=`<span style="color:${colorSaldo};font-weight:700">${fmt(saldo)}</span>`;}
+        const estadoCell=cubierta?'<span class="badge badge-green">Pagada</span>':vencida?'<span class="badge badge-red">Vencida</span>':'<span class="badge badge-amber">Pendiente</span>';
+        html+=`<tr style="${cubierta?'opacity:.5':''}${vencida?';background:#FFF5F5':''}"><td><strong>${fac.numero||'—'}</strong></td><td>${personaBadge(fac.responsable)}</td><td style="font-weight:700">C${c.numero}/${fac.num_cuotas||'?'}</td><td>${c.fecha_vence}${vencida?'<span style="color:var(--danger);font-size:10px;font-weight:700;margin-left:4px">VENC</span>':''}</td><td><strong>${fmt(c.monto)}</strong></td><td>${saldoCell}</td><td>${estadoCell}</td>${currentRole==='admin'?`<td>${accion}</td>`:''}</tr>`;
       });
-
       html+=`</tbody></table></div></div>`;
     });
-
     html+=`</div>`;
   });
-
   document.getElementById('cronograma-content').innerHTML=html;
 }
+
 function renderCronogramaGantt(){
-  const hoyStr=new Date().toISOString().slice(0,10);
-  const desde=document.getElementById('cron-desde').value,hasta=document.getElementById('cron-hasta').value;
+  const hoyStr=new Date().toISOString().slice(0,10);const desde=document.getElementById('cron-desde').value,hasta=document.getElementById('cron-hasta').value;
   if(!desde||!hasta){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">Selecciona un rango de fechas.</div>';return;}
   const meses=[];const dDate=new Date(desde+'T00:00:00');const hDate=new Date(hasta+'T00:00:00');let cur=new Date(dDate.getFullYear(),dDate.getMonth(),1);
   while(cur<=new Date(hDate.getFullYear(),hDate.getMonth(),1)){meses.push({yr:cur.getFullYear(),mo:cur.getMonth()});cur.setMonth(cur.getMonth()+1);}
   if(!meses.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">Rango inválido.</div>';return;}
   const personFilt=document.getElementById('cron-person').value,estadoFilt=document.getElementById('cron-estado').value;
-  const allCuotas=_cuotas.filter(c=>{
-    if(c.es_historica)return false;
-    const fac=_facturas[c.factura_id]||{};
-    if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;
-    if(estadoFilt==='pendiente'&&isCuotaCubierta(c))return false;
-    if(estadoFilt==='pagado'&&!isCuotaCubierta(c))return false;
-    if(estadoFilt==='vencida'&&(isCuotaCubierta(c)||c.fecha_vence>=hoyStr))return false;
-    return true;
-  });
+  const allCuotas=_cuotas.filter(c=>{if(c.es_historica)return false;const fac=_facturas[c.factura_id]||{};if(personFilt&&fac.responsable!==personFilt&&fac.responsable!=='Compartida')return false;if(estadoFilt==='pendiente'&&isCuotaCubierta(c))return false;if(estadoFilt==='pagado'&&!isCuotaCubierta(c))return false;if(estadoFilt==='vencida'&&(isCuotaCubierta(c)||c.fecha_vence>=hoyStr))return false;return true;});
   const facIds=[...new Set(allCuotas.map(c=>c.factura_id))];
   if(!facIds.length){document.getElementById('cronograma-content').innerHTML='<div class="cron-empty">No hay cuotas para estos filtros.</div>';return;}
   const totalesMes={};meses.forEach(({yr,mo})=>{totalesMes[`${yr}-${mo}`]={mc:0,ri:0};});
-  allCuotas.forEach(c=>{
-    const d=new Date(c.fecha_vence+'T00:00:00');const k=`${d.getFullYear()}-${d.getMonth()}`;
-    if(!totalesMes[k])return;
-    const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'Compartida';const m=parseFloat(c.monto||0);
-    if(resp==='Maria del Carmen')totalesMes[k].mc+=m;
-    else if(resp==='Richard')totalesMes[k].ri+=m;
-    else{totalesMes[k].mc+=m/2;totalesMes[k].ri+=m/2;}
-  });
+  allCuotas.forEach(c=>{const d=new Date(c.fecha_vence+'T00:00:00');const k=`${d.getFullYear()}-${d.getMonth()}`;if(!totalesMes[k])return;const fac=_facturas[c.factura_id]||{};const resp=fac.responsable||'Compartida';const m=parseFloat(c.monto||0);if(resp==='Maria del Carmen')totalesMes[k].mc+=m;else if(resp==='Richard')totalesMes[k].ri+=m;else{totalesMes[k].mc+=m/2;totalesMes[k].ri+=m/2;}});
   const hoyDate=new Date();const hoyYr=hoyDate.getFullYear(),hoyMo=hoyDate.getMonth();
   let html='<div class="gantt-outer"><div class="gantt-scroll"><div class="gantt-grid">';
   html+='<div class="gantt-months-row"><div class="gantt-label-col">Factura / Casa</div>';
@@ -1656,35 +1620,10 @@ function renderCronogramaGantt(){
     const cuotasFac=allCuotas.filter(c=>c.factura_id===facId);const cuotasPorMes={};
     cuotasFac.forEach(c=>{const d=new Date(c.fecha_vence+'T00:00:00');const k=`${d.getFullYear()}-${d.getMonth()}`;if(!cuotasPorMes[k])cuotasPorMes[k]=[];cuotasPorMes[k].push(c);});
     html+=`<div class="gantt-row"><div class="gantt-info"><div class="gantt-info-name">${fac.numero||'—'}</div><div class="gantt-info-sub">${casa.nombre||'—'}</div></div><div class="gantt-cells">`;
-    meses.forEach(({yr,mo})=>{
-      const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const cuotasMes=cuotasPorMes[k]||[];
-      html+=`<div class="gantt-cell${isHoy?' is-today-col':''}">`;
-      cuotasMes.forEach(c=>{
-        const cubierta=isCuotaCubierta(c);
-        const vencida=!cubierta&&c.fecha_vence<hoyStr;
-        let chipCls;
-        if(resp==='Maria del Carmen'){
-          chipCls=cubierta?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';
-        }else if(resp==='Richard'){
-          chipCls=cubierta?'g-chip-ri-pag':vencida?'g-chip-ri-venc':'g-chip-ri-pend';
-        }else{
-          chipCls=cubierta?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';
-        }
-        html+=`<div class="g-chip ${chipCls}" title="${fac.numero} C${c.numero} — ${fmt(c.monto)}">C${c.numero} ${fmt(c.monto)}</div>`;
-      });
-      html+='</div>';
-    });
-    html+='</div></div>';
+    meses.forEach(({yr,mo})=>{const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const cuotasMes=cuotasPorMes[k]||[];html+=`<div class="gantt-cell${isHoy?' is-today-col':''}">`;cuotasMes.forEach(c=>{const cubierta=isCuotaCubierta(c);const vencida=!cubierta&&c.fecha_vence<hoyStr;let chipCls;if(resp==='Maria del Carmen'){chipCls=cubierta?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';}else if(resp==='Richard'){chipCls=cubierta?'g-chip-ri-pag':vencida?'g-chip-ri-venc':'g-chip-ri-pend';}else{chipCls=cubierta?'g-chip-mc-pag':vencida?'g-chip-mc-venc':'g-chip-mc-pend';}html+=`<div class="g-chip ${chipCls}" title="${fac.numero} C${c.numero} — ${fmt(c.monto)}">C${c.numero} ${fmt(c.monto)}</div>`;});html+='</div>';});html+='</div></div>';
   });
   html+='<div class="gantt-totals-row"><div class="gantt-totals-label"><div class="gantt-totals-label-title">Totales del mes</div></div>';
-  meses.forEach(({yr,mo})=>{
-    const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const t=totalesMes[k]||{mc:0,ri:0};const total=t.mc+t.ri;
-    html+=`<div class="gantt-total-cell${isHoy?' is-today-col':''}">`;
-    if(t.mc>0)html+=`<div class="gt-mc">${fmt(t.mc)}</div><div style="font-size:8px;color:var(--mc);opacity:.7;margin-top:-1px">MC</div>`;
-    if(t.ri>0)html+=`<div class="gt-ri">${fmt(t.ri)}</div><div style="font-size:8px;color:var(--richard);opacity:.7;margin-top:-1px">Ri</div>`;
-    if(total>0)html+=`<div class="gt-total">= ${fmt(total)}</div>`;
-    html+='</div>';
-  });
+  meses.forEach(({yr,mo})=>{const isHoy=yr===hoyYr&&mo===hoyMo;const k=`${yr}-${mo}`;const t=totalesMes[k]||{mc:0,ri:0};const total=t.mc+t.ri;html+=`<div class="gantt-total-cell${isHoy?' is-today-col':''}">`;if(t.mc>0)html+=`<div class="gt-mc">${fmt(t.mc)}</div><div style="font-size:8px;color:var(--mc);opacity:.7;margin-top:-1px">MC</div>`;if(t.ri>0)html+=`<div class="gt-ri">${fmt(t.ri)}</div><div style="font-size:8px;color:var(--richard);opacity:.7;margin-top:-1px">Ri</div>`;if(total>0)html+=`<div class="gt-total">= ${fmt(total)}</div>`;html+='</div>';});
   html+='</div>';
   html+=`<div class="gantt-legend"><div class="gl-item"><div class="gl-dot" style="background:var(--mc3);border-left-color:var(--mc)"></div>🔴 MC pendiente</div><div class="gl-item"><div class="gl-dot" style="background:#FEE2E2;border-left-color:var(--danger)"></div>🔴 MC vencida</div><div class="gl-item"><div class="gl-dot" style="background:var(--richard3);border-left-color:var(--richard)"></div>🟠 Richard pendiente</div><div class="gl-item"><div class="gl-dot" style="background:#FEF3C7;border-left-color:var(--warn)"></div>🟠 Richard vencida</div><div class="gl-item"><div class="gl-dot" style="background:#F3F4F6;border-left-color:#9CA3AF"></div>Pagada</div><div style="margin-left:auto;font-size:10px;color:var(--muted)">Históricas excluidas · Verde = mes actual</div></div>`;
   html+='</div></div></div>';
@@ -1764,7 +1703,7 @@ async function _saveRefinEdit(editId,facId,fecha,nuevasCuotas,nuevaPrimera){
     if(insErr){loaded();showToast('Error insertando cuotas: '+insErr.message,'err');return;}
     await sb.from('facturas').update({num_cuotas:nuevasCuotas,fecha_primera_cuota:nuevaPrimera,total:nuevoTotal,total_mc:+nuevoMC.toFixed(2),total_richard:+nuevoRi.toFixed(2)}).eq('id',facId);
     loaded();showToast('Actualizado y cuotas regeneradas','ok');
-  } else {loaded();showToast('Refinanciamiento actualizado','ok');}
+  }else{loaded();showToast('Refinanciamiento actualizado','ok');}
   closeModal('modal-refin');await renderRefinanciamientos();await renderDashboard();
 }
 async function renderRefinanciamientos(){
